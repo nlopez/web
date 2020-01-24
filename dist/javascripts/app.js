@@ -1437,6 +1437,18 @@ function () {
           _this.closeAllRooms();
 
           _this.closeAccountMenu();
+        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_5__["APP_STATE_EVENT_BEGAN_BACKUP_DOWNLOAD"]) {
+          _this.backupStatus = statusManager.addStatusFromString("Saving local backup...");
+        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_5__["APP_STATE_EVENT_ENDED_BACKUP_DOWNLOAD"]) {
+          if (data.success) {
+            _this.backupStatus = statusManager.replaceStatusWithString(_this.backupStatus, "Successfully saved backup.");
+          } else {
+            _this.backupStatus = statusManager.replaceStatusWithString(_this.backupStatus, "Unable to save local backup.");
+          }
+
+          $timeout(function () {
+            _this.backupStatus = statusManager.removeStatus(_this.backupStatus);
+          }, 2000);
         }
       });
       authManager.checkForSecurityUpdate().then(function (available) {
@@ -1448,24 +1460,6 @@ function () {
       statusManager.addStatusObserver(function (string) {
         $timeout(function () {
           _this.arbitraryStatusMessage = string;
-        });
-      });
-      $rootScope.$on("did-begin-local-backup", function () {
-        $timeout(function () {
-          _this.backupStatus = statusManager.addStatusFromString("Saving local backup...");
-        });
-      });
-      $rootScope.$on("did-finish-local-backup", function (event, data) {
-        $timeout(function () {
-          if (data.success) {
-            _this.backupStatus = statusManager.replaceStatusWithString(_this.backupStatus, "Successfully saved backup.");
-          } else {
-            _this.backupStatus = statusManager.replaceStatusWithString(_this.backupStatus, "Unable to save local backup.");
-          }
-
-          $timeout(function () {
-            _this.backupStatus = statusManager.removeStatus(_this.backupStatus);
-          }, 2000);
         });
       });
 
@@ -2961,11 +2955,12 @@ function () {
 /*!********************************************************!*\
   !*** ./app/assets/javascripts/app/controllers/root.js ***!
   \********************************************************/
-/*! exports provided: Root */
+/*! exports provided: RootCtrl, Root */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RootCtrl", function() { return RootCtrl; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Root", function() { return Root; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
@@ -2982,6 +2977,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _root_pug__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_root_pug__WEBPACK_IMPORTED_MODULE_6__);
 /* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/app/state.js");
 /* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/app/controllers/constants.js");
+/* harmony import */ var _strings__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/strings */ "./app/assets/javascripts/app/strings.js");
 
 
 
@@ -2991,279 +2987,365 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var Root =
+
+/** How often to automatically sync, in milliseconds */
+
+var AUTO_SYNC_INTERVAL = 30000;
+var RootCtrl =
 /*#__PURE__*/
 function () {
-  function Root() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, Root);
+  RootCtrl.$inject = ["$scope", "$location", "$rootScope", "$timeout", "modelManager", "dbManager", "syncManager", "authManager", "passcodeManager", "storageManager", "statusManager", "alertManager", "preferencesManager", "appState"];
 
-    this.template = _root_pug__WEBPACK_IMPORTED_MODULE_6___default.a;
-  }
   /* @ngInject */
+  function RootCtrl($scope, $location, $rootScope, $timeout, modelManager, dbManager, syncManager, authManager, passcodeManager, storageManager, statusManager, alertManager, preferencesManager, appState) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, RootCtrl);
 
+    this.dbManager = dbManager;
+    this.syncManager = syncManager;
+    this.statusManager = statusManager;
+    this.storageManager = storageManager;
+    this.appState = appState;
+    this.authManager = authManager;
+    this.modelManager = modelManager;
+    this.alertManager = alertManager;
+    this.preferencesManager = preferencesManager;
+    this.passcodeManager = passcodeManager;
+    this.$rootScope = $rootScope;
+    this.$scope = $scope;
+    this.$location = $location;
+    this.$timeout = $timeout;
+    this.defineRootScopeFunctions();
+    this.handleAutoSignInFromParams();
+    this.initializeStorageManager();
+    this.addAppStateObserver();
+    this.addDragDropHandlers();
+    this.defaultLoad();
+  }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(Root, [{
-    key: "controller",
-    value: ["$scope", "$location", "$rootScope", "$timeout", "modelManager", "dbManager", "syncManager", "authManager", "themeManager", "passcodeManager", "storageManager", "migrationManager", "privilegesManager", "statusManager", "alertManager", "preferencesManager", "appState", function controller($scope, $location, $rootScope, $timeout, modelManager, dbManager, syncManager, authManager, themeManager, passcodeManager, storageManager, migrationManager, privilegesManager, statusManager, alertManager, preferencesManager, appState) {
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(RootCtrl, [{
+    key: "defineRootScopeFunctions",
+    value: function defineRootScopeFunctions() {
       var _this = this;
 
-      storageManager.initialize(passcodeManager.hasPasscode(), authManager.isEphemeralSession());
-      $scope.platform = Object(_utils__WEBPACK_IMPORTED_MODULE_5__["getPlatformString"])();
-
-      $scope.onUpdateAvailable = function () {
-        $rootScope.$broadcast('new-update-available');
+      this.$rootScope.sync = function () {
+        _this.syncManager.sync();
       };
 
-      appState.addObserver(function (eventName, data) {
+      this.$rootScope.lockApplication = function () {
+        /** Reloading wipes current objects from memory */
+        window.location.reload();
+      };
+
+      this.$rootScope.safeApply = function (fn) {
+        var phase = _this.$scope.$root.$$phase;
+
+        if (phase === '$apply' || phase === '$digest') {
+          _this.$scope.$eval(fn);
+        } else {
+          _this.$scope.$apply(fn);
+        }
+      };
+    }
+  }, {
+    key: "defaultLoad",
+    value: function defaultLoad() {
+      var _this2 = this;
+
+      this.$scope.platform = Object(_utils__WEBPACK_IMPORTED_MODULE_5__["getPlatformString"])();
+
+      if (this.passcodeManager.isLocked()) {
+        this.$scope.needsUnlock = true;
+      } else {
+        this.loadAfterUnlock();
+      }
+
+      this.$scope.onSuccessfulUnlock = function () {
+        _this2.$timeout(function () {
+          _this2.$scope.needsUnlock = false;
+
+          _this2.loadAfterUnlock();
+        });
+      };
+
+      this.$scope.onUpdateAvailable = function () {
+        _this2.$rootScope.$broadcast('new-update-available');
+      };
+    }
+  }, {
+    key: "initializeStorageManager",
+    value: function initializeStorageManager() {
+      this.storageManager.initialize(this.passcodeManager.hasPasscode(), this.authManager.isEphemeralSession());
+    }
+  }, {
+    key: "addAppStateObserver",
+    value: function addAppStateObserver() {
+      var _this3 = this;
+
+      this.appState.addObserver(function (eventName, data) {
         if (eventName === _state__WEBPACK_IMPORTED_MODULE_7__["APP_STATE_EVENT_PANEL_RESIZED"]) {
           if (data.panel === _controllers_constants__WEBPACK_IMPORTED_MODULE_8__["PANEL_NAME_NOTES"]) {
-            _this.notesCollapsed = data.collapsed;
+            _this3.notesCollapsed = data.collapsed;
           }
 
           if (data.panel === _controllers_constants__WEBPACK_IMPORTED_MODULE_8__["PANEL_NAME_TAGS"]) {
-            _this.tagsCollapsed = data.collapsed;
+            _this3.tagsCollapsed = data.collapsed;
           }
 
           var appClass = "";
 
-          if (_this.notesCollapsed) {
+          if (_this3.notesCollapsed) {
             appClass += "collapsed-notes";
           }
 
-          if (_this.tagsCollapsed) {
+          if (_this3.tagsCollapsed) {
             appClass += " collapsed-tags";
           }
 
-          $scope.appClass = appClass;
+          _this3.$scope.appClass = appClass;
         }
       });
-      /* Used to avoid circular dependencies where syncManager cannot be imported but rootScope can */
+    }
+  }, {
+    key: "loadAfterUnlock",
+    value: function loadAfterUnlock() {
+      this.openDatabase();
+      this.authManager.loadInitialData();
+      this.preferencesManager.load();
+      this.addSyncStatusObserver();
+      this.configureKeyRequestHandler();
+      this.addSyncEventHandler();
+      this.addSignOutObserver();
+      this.loadLocalData();
+    }
+  }, {
+    key: "openDatabase",
+    value: function openDatabase() {
+      var _this4 = this;
 
-      $rootScope.sync = function (source) {
-        syncManager.sync();
-      };
+      this.dbManager.setLocked(false);
+      this.dbManager.openDatabase({
+        onUpgradeNeeded: function onUpgradeNeeded() {
+          /**
+           * New database, delete syncToken so that items
+           * can be refetched entirely from server
+           */
+          _this4.syncManager.clearSyncToken();
 
-      $rootScope.lockApplication = function () {
-        // Reloading wipes current objects from memory
-        window.location.reload();
-      };
+          _this4.syncManager.sync();
+        }
+      });
+    }
+  }, {
+    key: "addSyncStatusObserver",
+    value: function addSyncStatusObserver() {
+      var _this5 = this;
 
-      var initiateSync = function initiateSync() {
-        authManager.loadInitialData();
-        preferencesManager.load();
-        _this.syncStatusObserver = syncManager.registerSyncStatusObserver(function (status) {
-          if (status.retrievedCount > 20) {
-            var text = "Downloading ".concat(status.retrievedCount, " items. Keep app open.");
-            _this.syncStatus = statusManager.replaceStatusWithString(_this.syncStatus, text);
-            _this.showingDownloadStatus = true;
-          } else if (_this.showingDownloadStatus) {
-            _this.showingDownloadStatus = false;
-            var text = "Download Complete.";
-            _this.syncStatus = statusManager.replaceStatusWithString(_this.syncStatus, text);
-            setTimeout(function () {
-              _this.syncStatus = statusManager.removeStatus(_this.syncStatus);
-            }, 2000);
-          } else if (status.total > 20) {
-            _this.uploadSyncStatus = statusManager.replaceStatusWithString(_this.uploadSyncStatus, "Syncing ".concat(status.current, "/").concat(status.total, " items..."));
-          } else if (_this.uploadSyncStatus) {
-            _this.uploadSyncStatus = statusManager.removeStatus(_this.uploadSyncStatus);
-          }
-        });
-        syncManager.setKeyRequestHandler(function _callee() {
-          var offline, auth_params, keys;
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function _callee$(_context) {
-            while (1) {
-              switch (_context.prev = _context.next) {
-                case 0:
-                  offline = authManager.offline();
+      this.syncStatusObserver = this.syncManager.registerSyncStatusObserver(function (status) {
+        if (status.retrievedCount > 20) {
+          var text = "Downloading ".concat(status.retrievedCount, " items. Keep app open.");
+          _this5.syncStatus = _this5.statusManager.replaceStatusWithString(_this5.syncStatus, text);
+          _this5.showingDownloadStatus = true;
+        } else if (_this5.showingDownloadStatus) {
+          _this5.showingDownloadStatus = false;
+          var _text = "Download Complete.";
+          _this5.syncStatus = _this5.statusManager.replaceStatusWithString(_this5.syncStatus, _text);
+          setTimeout(function () {
+            _this5.syncStatus = _this5.statusManager.removeStatus(_this5.syncStatus);
+          }, 2000);
+        } else if (status.total > 20) {
+          _this5.uploadSyncStatus = _this5.statusManager.replaceStatusWithString(_this5.uploadSyncStatus, "Syncing ".concat(status.current, "/").concat(status.total, " items..."));
+        } else if (_this5.uploadSyncStatus) {
+          _this5.uploadSyncStatus = _this5.statusManager.removeStatus(_this5.uploadSyncStatus);
+        }
+      });
+    }
+  }, {
+    key: "configureKeyRequestHandler",
+    value: function configureKeyRequestHandler() {
+      var _this6 = this;
 
-                  if (!offline) {
-                    _context.next = 5;
-                    break;
-                  }
+      this.syncManager.setKeyRequestHandler(function _callee() {
+        var offline, auth_params, keys;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                offline = _this6.authManager.offline();
 
-                  _context.t0 = passcodeManager.passcodeAuthParams();
-                  _context.next = 8;
+                if (!offline) {
+                  _context.next = 5;
                   break;
+                }
 
-                case 5:
-                  _context.next = 7;
-                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(authManager.getAuthParams());
+                _context.t0 = _this6.passcodeManager.passcodeAuthParams();
+                _context.next = 8;
+                break;
 
-                case 7:
-                  _context.t0 = _context.sent;
+              case 5:
+                _context.next = 7;
+                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this6.authManager.getAuthParams());
 
-                case 8:
-                  auth_params = _context.t0;
+              case 7:
+                _context.t0 = _context.sent;
 
-                  if (!offline) {
-                    _context.next = 13;
-                    break;
-                  }
+              case 8:
+                auth_params = _context.t0;
 
-                  _context.t1 = passcodeManager.keys();
-                  _context.next = 16;
+                if (!offline) {
+                  _context.next = 13;
                   break;
+                }
 
-                case 13:
-                  _context.next = 15;
-                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(authManager.keys());
+                _context.t1 = _this6.passcodeManager.keys();
+                _context.next = 16;
+                break;
 
-                case 15:
-                  _context.t1 = _context.sent;
+              case 13:
+                _context.next = 15;
+                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this6.authManager.keys());
 
-                case 16:
-                  keys = _context.t1;
-                  return _context.abrupt("return", {
-                    keys: keys,
-                    offline: offline,
-                    auth_params: auth_params
-                  });
+              case 15:
+                _context.t1 = _context.sent;
 
-                case 18:
-                case "end":
-                  return _context.stop();
-              }
-            }
-          });
-        });
-        var lastSessionInvalidAlert;
-        syncManager.addEventHandler(function (syncEvent, data) {
-          $rootScope.$broadcast(syncEvent, data || {});
-
-          if (syncEvent == "sync-session-invalid") {
-            // On Windows, some users experience issues where this message keeps appearing. It might be that on focus, the app syncs, and this message triggers again.
-            // We'll only show it once every X seconds
-            var showInterval = 30; // At most 30 seconds in between
-
-            if (!lastSessionInvalidAlert || (new Date() - lastSessionInvalidAlert) / 1000 > showInterval) {
-              lastSessionInvalidAlert = new Date();
-              setTimeout(function () {
-                // If this alert is displayed on launch, it may sometimes dismiss automatically really quicky for some reason. So we wrap in timeout
-                alertManager.alert({
-                  text: "Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session."
+              case 16:
+                keys = _context.t1;
+                return _context.abrupt("return", {
+                  keys: keys,
+                  offline: offline,
+                  auth_params: auth_params
                 });
-              }, 500);
+
+              case 18:
+              case "end":
+                return _context.stop();
             }
-          } else if (syncEvent == "sync-exception") {
-            alertManager.alert({
-              text: "There was an error while trying to save your items. Please contact support and share this message: ".concat(data)
-            });
           }
         });
-        var encryptionEnabled = authManager.user || passcodeManager.hasPasscode();
-        _this.syncStatus = statusManager.addStatusFromString(encryptionEnabled ? "Decrypting items..." : "Loading items...");
+      });
+    }
+  }, {
+    key: "addSyncEventHandler",
+    value: function addSyncEventHandler() {
+      var _this7 = this;
 
-        var incrementalCallback = function incrementalCallback(current, total) {
-          var notesString = "".concat(current, "/").concat(total, " items...");
-          _this.syncStatus = statusManager.replaceStatusWithString(_this.syncStatus, encryptionEnabled ? "Decrypting ".concat(notesString) : "Loading ".concat(notesString));
-        };
+      var lastShownDate;
+      this.syncManager.addEventHandler(function (syncEvent, data) {
+        _this7.$rootScope.$broadcast(syncEvent, data || {});
 
-        syncManager.loadLocalItems({
-          incrementalCallback: incrementalCallback
-        }).then(function () {
-          $timeout(function () {
-            $rootScope.$broadcast("initial-data-loaded"); // This needs to be processed first before sync is called so that singletonManager observers function properly.
-            // Perform integrity check on first sync
+        if (syncEvent === 'sync-session-invalid') {
+          /** Don't show repeatedly; at most 30 seconds in between */
+          var SHOW_INTERVAL = 30;
+          var lastShownSeconds = (new Date() - lastShownDate) / 1000;
 
-            _this.syncStatus = statusManager.replaceStatusWithString(_this.syncStatus, "Syncing...");
-            syncManager.sync({
-              performIntegrityCheck: true
-            }).then(function () {
-              _this.syncStatus = statusManager.removeStatus(_this.syncStatus);
-            }); // refresh every 30s
-
-            setInterval(function () {
-              syncManager.sync();
-            }, 30000);
+          if (!lastShownDate || lastShownSeconds > SHOW_INTERVAL) {
+            lastShownDate = new Date();
+            setTimeout(function () {
+              _this7.alertManager.alert({
+                text: _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_SESSION_EXPIRED"]
+              });
+            }, 500);
+          }
+        } else if (syncEvent === 'sync-exception') {
+          _this7.alertManager.alert({
+            text: Object(_strings__WEBPACK_IMPORTED_MODULE_9__["StringSyncException"])(data)
           });
-        });
-        authManager.addEventHandler(function (event) {
-          if (event == snjs__WEBPACK_IMPORTED_MODULE_4__["SFAuthManager"].DidSignOutEvent) {
-            modelManager.handleSignout();
-            syncManager.handleSignout();
-          }
-        });
+        }
+      });
+    }
+  }, {
+    key: "loadLocalData",
+    value: function loadLocalData() {
+      var _this8 = this;
+
+      var encryptionEnabled = this.authManager.user || this.passcodeManager.hasPasscode();
+      this.syncStatus = this.statusManager.addStatusFromString(encryptionEnabled ? "Decrypting items..." : "Loading items...");
+
+      var incrementalCallback = function incrementalCallback(current, total) {
+        var notesString = "".concat(current, "/").concat(total, " items...");
+        var status = encryptionEnabled ? "Decrypting ".concat(notesString) : "Loading ".concat(notesString);
+        _this8.syncStatus = _this8.statusManager.replaceStatusWithString(_this8.syncStatus, status);
       };
 
-      function load() {
-        openDatabase();
-        initiateSync();
-      }
+      this.syncManager.loadLocalItems({
+        incrementalCallback: incrementalCallback
+      }).then(function () {
+        _this8.$timeout(function () {
+          _this8.$rootScope.$broadcast("initial-data-loaded");
 
-      if (passcodeManager.isLocked()) {
-        $scope.needsUnlock = true;
-      } else {
-        load();
-      }
+          _this8.syncStatus = _this8.statusManager.replaceStatusWithString(_this8.syncStatus, "Syncing...");
 
-      $scope.onSuccessfulUnlock = function () {
-        $timeout(function () {
-          $scope.needsUnlock = false;
-          load();
+          _this8.syncManager.sync({
+            performIntegrityCheck: true
+          }).then(function () {
+            _this8.syncStatus = _this8.statusManager.removeStatus(_this8.syncStatus);
+          });
+
+          setInterval(function () {
+            _this8.syncManager.sync();
+          }, AUTO_SYNC_INTERVAL);
         });
-      };
+      });
+    }
+  }, {
+    key: "addSignOutObserver",
+    value: function addSignOutObserver() {
+      var _this9 = this;
 
-      function openDatabase() {
-        dbManager.setLocked(false);
-        dbManager.openDatabase({
-          onUpgradeNeeded: function onUpgradeNeeded() {
-            // new database, delete syncToken so that items can be refetched entirely from server
-            syncManager.clearSyncToken();
-            syncManager.sync();
-          }
-        });
-      }
-      /*
-      Shared Callbacks
-      */
+      this.authManager.addEventHandler(function (event) {
+        if (event === snjs__WEBPACK_IMPORTED_MODULE_4__["SFAuthManager"].DidSignOutEvent) {
+          _this9.modelManager.handleSignout();
 
+          _this9.syncManager.handleSignout();
+        }
+      });
+    }
+  }, {
+    key: "addDragDropHandlers",
+    value: function addDragDropHandlers() {
+      var _this10 = this;
 
-      $rootScope.safeApply = function (fn) {
-        var phase = this.$root.$$phase;
-        if (phase == '$apply' || phase == '$digest') this.$eval(fn);else this.$apply(fn);
-      };
-      /*
-      Disable dragging and dropping of files into main SN interface.
-      both 'dragover' and 'drop' are required to prevent dropping of files.
-      This will not prevent extensions from receiving drop events.
-      */
-
-
+      /**
+       * Disable dragging and dropping of files into main SN interface.
+       * both 'dragover' and 'drop' are required to prevent dropping of files.
+       * This will not prevent extensions from receiving drop events.
+       */
       window.addEventListener('dragover', function (event) {
         event.preventDefault();
       }, false);
       window.addEventListener('drop', function (event) {
         event.preventDefault();
-        alertManager.alert({
-          text: "Please use FileSafe or the Bold Editor to attach images and files. Learn more at standardnotes.org/filesafe."
+
+        _this10.alertManager.alert({
+          text: _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_DEFAULT_FILE_ERROR"]
         });
       }, false);
-      /*
-      Handle Auto Sign In From URL
-      */
+    }
+  }, {
+    key: "handleAutoSignInFromParams",
+    value: function handleAutoSignInFromParams() {
+      var _this11 = this;
 
-      function urlParam(key) {
-        return $location.search()[key];
-      }
+      var urlParam = function urlParam(key) {
+        return _this11.$location.search()[key];
+      };
 
-      function autoSignInFromParams() {
+      var autoSignInFromParams = function autoSignInFromParams() {
         var server, email, pw;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function autoSignInFromParams$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                server = urlParam("server");
-                email = urlParam("email");
-                pw = urlParam("pw");
+                server = urlParam('server');
+                email = urlParam('email');
+                pw = urlParam('pw');
 
-                if (authManager.offline()) {
+                if (_this11.authManager.offline()) {
                   _context2.next = 18;
                   break;
                 }
 
                 _context2.next = 6;
-                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(syncManager.getServerURL());
+                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this11.syncManager.getServerURL());
 
               case 6:
                 _context2.t1 = _context2.sent;
@@ -3275,7 +3357,7 @@ function () {
                   break;
                 }
 
-                _context2.t0 = authManager.user.email === email;
+                _context2.t0 = _this11.authManager.user.email === email;
 
               case 11:
                 if (!_context2.t0) {
@@ -3286,8 +3368,8 @@ function () {
                 return _context2.abrupt("return");
 
               case 15:
-                // sign out
-                authManager.signout(true).then(function () {
+                /** Sign out */
+                _this11.authManager.signout(true).then(function () {
                   window.location.reload();
                 });
 
@@ -3296,7 +3378,7 @@ function () {
                 break;
 
               case 18:
-                authManager.login(server, email, pw, false, false, {}).then(function (response) {
+                _this11.authManager.login(server, email, pw, false, false, {}).then(function (response) {
                   window.location.reload();
                 });
 
@@ -3306,16 +3388,22 @@ function () {
             }
           }
         });
-      }
+      };
 
-      if (urlParam("server")) {
+      if (urlParam('server')) {
         autoSignInFromParams();
       }
-    }]
+    }
   }]);
 
-  return Root;
+  return RootCtrl;
 }();
+var Root = function Root() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, Root);
+
+  this.template = _root_pug__WEBPACK_IMPORTED_MODULE_6___default.a;
+  this.controller = RootCtrl;
+};
 
 /***/ }),
 
@@ -9268,13 +9356,16 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+var COMPONENT_DATA_KEY_INSTALL_ERROR = 'installError';
+var COMPONENT_CONTENT_KEY_PACKAGE_INFO = 'package_info';
+var COMPONENT_CONTENT_KEY_LOCAL_URL = 'local_url';
 var DesktopManager =
 /*#__PURE__*/
 function () {
-  DesktopManager.$inject = ["$rootScope", "$timeout", "modelManager", "syncManager", "authManager", "passcodeManager"];
+  DesktopManager.$inject = ["$rootScope", "$timeout", "modelManager", "syncManager", "authManager", "passcodeManager", "appState"];
 
   /* @ngInject */
-  function DesktopManager($rootScope, $timeout, modelManager, syncManager, authManager, passcodeManager) {
+  function DesktopManager($rootScope, $timeout, modelManager, syncManager, authManager, passcodeManager, appState) {
     var _this = this;
 
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, DesktopManager);
@@ -9284,6 +9375,7 @@ function () {
     this.authManager = authManager;
     this.syncManager = syncManager;
     this.$rootScope = $rootScope;
+    this.appState = appState;
     this.timeout = $timeout;
     this.updateObservers = [];
     this.componentActivationObservers = [];
@@ -9310,7 +9402,7 @@ function () {
   }, {
     key: "getExtServerHost",
     value: function getExtServerHost() {
-      console.assert(this.extServerHost, "extServerHost is null");
+      console.assert(this.extServerHost, 'extServerHost is null');
       return this.extServerHost;
     }
     /*
@@ -9340,7 +9432,10 @@ function () {
     value: function syncComponentsInstallation(components) {
       var _this2 = this;
 
-      if (!this.isDesktop) return;
+      if (!this.isDesktop) {
+        return;
+      }
+
       Promise.all(components.map(function (component) {
         return _this2.convertComponentForTransmission(component);
       })).then(function (data) {
@@ -9374,7 +9469,6 @@ function () {
     key: "registerUpdateObserver",
     value: function registerUpdateObserver(callback) {
       var observer = {
-        id: Math.random,
         callback: callback
       };
       this.updateObservers.push(observer);
@@ -9423,26 +9517,37 @@ function () {
     value: function desktop_onComponentInstallationComplete(componentData, error) {
       var _this3 = this;
 
-      // Desktop is only allowed to change these keys:
-      var permissableKeys = ["package_info", "local_url"];
       var component = this.modelManager.findItem(componentData.uuid);
 
       if (!component) {
-        console.error("desktop_onComponentInstallationComplete component is null for uuid", componentData.uuid);
         return;
       }
 
       if (error) {
-        component.setAppDataItem("installError", error);
+        component.setAppDataItem(COMPONENT_DATA_KEY_INSTALL_ERROR, error);
       } else {
+        var permissableKeys = [COMPONENT_CONTENT_KEY_PACKAGE_INFO, COMPONENT_CONTENT_KEY_LOCAL_URL];
+
+        for (var _i = 0, _permissableKeys = permissableKeys; _i < _permissableKeys.length; _i++) {
+          var key = _permissableKeys[_i];
+          component[key] = componentData.content[key];
+        }
+
+        this.modelManager.notifySyncObserversOfModels([component], snjs__WEBPACK_IMPORTED_MODULE_5__["SFModelManager"].MappingSourceDesktopInstalled);
+        component.setAppDataItem(COMPONENT_DATA_KEY_INSTALL_ERROR, null);
+      }
+
+      this.modelManager.setItemDirty(component);
+      this.syncManager.sync();
+      this.timeout(function () {
         var _iteratorNormalCompletion = true;
         var _didIteratorError = false;
         var _iteratorError = undefined;
 
         try {
-          for (var _iterator = permissableKeys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var key = _step.value;
-            component[key] = componentData.content[key];
+          for (var _iterator = _this3.updateObservers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var observer = _step.value;
+            observer.callback(component);
           }
         } catch (err) {
           _didIteratorError = true;
@@ -9455,37 +9560,6 @@ function () {
           } finally {
             if (_didIteratorError) {
               throw _iteratorError;
-            }
-          }
-        }
-
-        this.modelManager.notifySyncObserversOfModels([component], snjs__WEBPACK_IMPORTED_MODULE_5__["SFModelManager"].MappingSourceDesktopInstalled);
-        component.setAppDataItem("installError", null);
-      }
-
-      this.modelManager.setItemDirty(component, true);
-      this.syncManager.sync();
-      this.timeout(function () {
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
-
-        try {
-          for (var _iterator2 = _this3.updateObservers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var observer = _step2.value;
-            observer.callback(component);
-          }
-        } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-              _iterator2.return();
-            }
-          } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
             }
           }
         }
@@ -9524,26 +9598,26 @@ function () {
             case 2:
               serializedComponent = _context3.sent;
               this.timeout(function () {
-                var _iteratorNormalCompletion3 = true;
-                var _didIteratorError3 = false;
-                var _iteratorError3 = undefined;
+                var _iteratorNormalCompletion2 = true;
+                var _didIteratorError2 = false;
+                var _iteratorError2 = undefined;
 
                 try {
-                  for (var _iterator3 = _this4.componentActivationObservers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var observer = _step3.value;
+                  for (var _iterator2 = _this4.componentActivationObservers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var observer = _step2.value;
                     observer.callback(serializedComponent);
                   }
                 } catch (err) {
-                  _didIteratorError3 = true;
-                  _iteratorError3 = err;
+                  _didIteratorError2 = true;
+                  _iteratorError2 = err;
                 } finally {
                   try {
-                    if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-                      _iterator3.return();
+                    if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                      _iterator2.return();
                     }
                   } finally {
-                    if (_didIteratorError3) {
-                      throw _iteratorError3;
+                    if (_didIteratorError2) {
+                      throw _iteratorError2;
                     }
                   }
                 }
@@ -9562,7 +9636,7 @@ function () {
     key: "desktop_setExtServerHost",
     value: function desktop_setExtServerHost(host) {
       this.extServerHost = host;
-      this.$rootScope.$broadcast("desktop-did-set-ext-server-host");
+      this.appState.desktopExtensionsReady();
     }
   }, {
     key: "desktop_setComponentInstallationSyncHandler",
@@ -9586,7 +9660,7 @@ function () {
   }, {
     key: "desktop_requestBackupFile",
     value: function desktop_requestBackupFile(callback) {
-      var keys, authParams;
+      var keys, authParams, nullOnEmpty;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function desktop_requestBackupFile$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
@@ -9614,13 +9688,12 @@ function () {
               authParams = _context4.sent;
 
             case 11:
-              this.modelManager.getAllItemsJSONData(keys, authParams, true
-              /* return null on empty */
-              ).then(function (data) {
+              nullOnEmpty = true;
+              this.modelManager.getAllItemsJSONData(keys, authParams, nullOnEmpty).then(function (data) {
                 callback(data);
               });
 
-            case 12:
+            case 13:
             case "end":
               return _context4.stop();
           }
@@ -9635,12 +9708,12 @@ function () {
   }, {
     key: "desktop_didBeginBackup",
     value: function desktop_didBeginBackup() {
-      this.$rootScope.$broadcast("did-begin-local-backup");
+      this.appState.beganBackupDownload();
     }
   }, {
     key: "desktop_didFinishBackup",
     value: function desktop_didFinishBackup(success) {
-      this.$rootScope.$broadcast("did-finish-local-backup", {
+      this.appState.endedBackupDownload({
         success: success
       });
     }
@@ -12731,6 +12804,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _storageManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./storageManager */ "./app/assets/javascripts/app/services/storageManager.js");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/app/state.js");
+
 
 
 
@@ -12741,10 +12816,10 @@ __webpack_require__.r(__webpack_exports__);
 var ThemeManager =
 /*#__PURE__*/
 function () {
-  ThemeManager.$inject = ["componentManager", "desktopManager", "storageManager", "passcodeManager", "$rootScope"];
+  ThemeManager.$inject = ["componentManager", "desktopManager", "storageManager", "passcodeManager", "appState"];
 
   /* @ngInject */
-  function ThemeManager(componentManager, desktopManager, storageManager, passcodeManager, $rootScope) {
+  function ThemeManager(componentManager, desktopManager, storageManager, passcodeManager, appState) {
     var _this = this;
 
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, ThemeManager);
@@ -12763,8 +12838,10 @@ function () {
     });
 
     if (desktopManager.isDesktop) {
-      $rootScope.$on("desktop-did-set-ext-server-host", function () {
-        _this.activateCachedThemes();
+      appState.addObserver(function (eventName, data) {
+        if (eventName === _state__WEBPACK_IMPORTED_MODULE_7__["APP_STATE_EVENT_DESKTOP_EXTS_READY"]) {
+          _this.activateCachedThemes();
+        }
       });
     } else {
       this.activateCachedThemes();
@@ -12990,7 +13067,7 @@ function () {
 /*!*********************************************!*\
   !*** ./app/assets/javascripts/app/state.js ***!
   \*********************************************/
-/*! exports provided: APP_STATE_EVENT_TAG_CHANGED, APP_STATE_EVENT_NOTE_CHANGED, APP_STATE_EVENT_PREFERENCES_CHANGED, APP_STATE_EVENT_PANEL_RESIZED, APP_STATE_EVENT_EDITOR_FOCUSED, AppState */
+/*! exports provided: APP_STATE_EVENT_TAG_CHANGED, APP_STATE_EVENT_NOTE_CHANGED, APP_STATE_EVENT_PREFERENCES_CHANGED, APP_STATE_EVENT_PANEL_RESIZED, APP_STATE_EVENT_EDITOR_FOCUSED, APP_STATE_EVENT_BEGAN_BACKUP_DOWNLOAD, APP_STATE_EVENT_ENDED_BACKUP_DOWNLOAD, APP_STATE_EVENT_DESKTOP_EXTS_READY, AppState */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13000,6 +13077,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "APP_STATE_EVENT_PREFERENCES_CHANGED", function() { return APP_STATE_EVENT_PREFERENCES_CHANGED; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "APP_STATE_EVENT_PANEL_RESIZED", function() { return APP_STATE_EVENT_PANEL_RESIZED; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "APP_STATE_EVENT_EDITOR_FOCUSED", function() { return APP_STATE_EVENT_EDITOR_FOCUSED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "APP_STATE_EVENT_BEGAN_BACKUP_DOWNLOAD", function() { return APP_STATE_EVENT_BEGAN_BACKUP_DOWNLOAD; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "APP_STATE_EVENT_ENDED_BACKUP_DOWNLOAD", function() { return APP_STATE_EVENT_ENDED_BACKUP_DOWNLOAD; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "APP_STATE_EVENT_DESKTOP_EXTS_READY", function() { return APP_STATE_EVENT_DESKTOP_EXTS_READY; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AppState", function() { return AppState; });
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
@@ -13012,6 +13092,9 @@ var APP_STATE_EVENT_NOTE_CHANGED = 2;
 var APP_STATE_EVENT_PREFERENCES_CHANGED = 3;
 var APP_STATE_EVENT_PANEL_RESIZED = 4;
 var APP_STATE_EVENT_EDITOR_FOCUSED = 5;
+var APP_STATE_EVENT_BEGAN_BACKUP_DOWNLOAD = 6;
+var APP_STATE_EVENT_ENDED_BACKUP_DOWNLOAD = 7;
+var APP_STATE_EVENT_DESKTOP_EXTS_READY = 8;
 var AppState =
 /*#__PURE__*/
 function () {
@@ -13106,10 +13189,52 @@ function () {
     value: function editorDidFocus() {
       this.notifyEvent(APP_STATE_EVENT_EDITOR_FOCUSED);
     }
+  }, {
+    key: "beganBackupDownload",
+    value: function beganBackupDownload() {
+      this.notifyEvent(APP_STATE_EVENT_BEGAN_BACKUP_DOWNLOAD);
+    }
+  }, {
+    key: "endedBackupDownload",
+    value: function endedBackupDownload(_ref2) {
+      var success = _ref2.success;
+      this.notifyEvent(APP_STATE_EVENT_ENDED_BACKUP_DOWNLOAD, {
+        success: success
+      });
+    }
+    /**
+     * When the desktop appplication extension server is ready.
+     */
+
+  }, {
+    key: "desktopExtensionsReady",
+    value: function desktopExtensionsReady() {
+      this.notifyEvent(APP_STATE_EVENT_DESKTOP_EXTS_READY);
+    }
   }]);
 
   return AppState;
 }();
+
+/***/ }),
+
+/***/ "./app/assets/javascripts/app/strings.js":
+/*!***********************************************!*\
+  !*** ./app/assets/javascripts/app/strings.js ***!
+  \***********************************************/
+/*! exports provided: STRING_SESSION_EXPIRED, STRING_DEFAULT_FILE_ERROR, StringSyncException */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STRING_SESSION_EXPIRED", function() { return STRING_SESSION_EXPIRED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STRING_DEFAULT_FILE_ERROR", function() { return STRING_DEFAULT_FILE_ERROR; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StringSyncException", function() { return StringSyncException; });
+var STRING_SESSION_EXPIRED = "Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.";
+var STRING_DEFAULT_FILE_ERROR = "Please use FileSafe or the Bold Editor to attach images and files. Learn more at standardnotes.org/filesafe.";
+function StringSyncException(data) {
+  return "There was an error while trying to save your items. Please contact support and share this message: ".concat(data, ".");
+}
 
 /***/ }),
 

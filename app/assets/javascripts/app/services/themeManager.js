@@ -2,10 +2,19 @@ import _ from 'lodash';
 import angular from 'angular';
 import { SNTheme, SFItemParams } from 'snjs';
 import { StorageManager } from './storageManager';
+import {
+  APP_STATE_EVENT_DESKTOP_EXTS_READY
+} from '@/state';
 
 export class ThemeManager {
   /* @ngInject */
-  constructor(componentManager, desktopManager, storageManager, passcodeManager, $rootScope) {
+  constructor(
+    componentManager,
+    desktopManager,
+    storageManager,
+    passcodeManager,
+    appState
+  ) {
     this.componentManager = componentManager;
     this.storageManager = storageManager;
     this.desktopManager = desktopManager;
@@ -23,8 +32,10 @@ export class ThemeManager {
     })
 
     if(desktopManager.isDesktop) {
-      $rootScope.$on("desktop-did-set-ext-server-host", () => {
-        this.activateCachedThemes();
+      appState.addObserver((eventName, data) => {
+        if(eventName === APP_STATE_EVENT_DESKTOP_EXTS_READY) {
+          this.activateCachedThemes();
+        }
       })
     } else {
       this.activateCachedThemes();

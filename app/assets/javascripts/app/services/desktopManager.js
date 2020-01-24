@@ -3,6 +3,10 @@ import _ from 'lodash';
 import { isDesktopApplication } from '@/utils';
 import { SFItemParams, SFModelManager } from 'snjs';
 
+const COMPONENT_DATA_KEY_INSTALL_ERROR = 'installError';
+const COMPONENT_CONTENT_KEY_PACKAGE_INFO = 'package_info';
+const COMPONENT_CONTENT_KEY_LOCAL_URL = 'local_url';
+
 export class DesktopManager {
   /* @ngInject */
   constructor(
@@ -11,13 +15,15 @@ export class DesktopManager {
     modelManager,
     syncManager,
     authManager,
-    passcodeManager
+    passcodeManager,
+    appState
   ) {
     this.passcodeManager = passcodeManager;
     this.modelManager = modelManager;
     this.authManager = authManager;
     this.syncManager = syncManager;
     this.$rootScope = $rootScope;
+    this.appState = appState;
     this.timeout = $timeout;
     this.updateObservers = [];
     this.componentActivationObservers = [];
@@ -43,7 +49,10 @@ export class DesktopManager {
   }
 
   getExtServerHost() {
-    console.assert(this.extServerHost, "extServerHost is null");
+    console.assert(
+      this.extServerHost,
+      'extServerHost is null'
+    );
     return this.extServerHost;
   }
 
@@ -57,8 +66,9 @@ export class DesktopManager {
 
   // All `components` should be installed
   syncComponentsInstallation(components) {
-    if(!this.isDesktop) return;
-
+    if(!this.isDesktop) {
+      return;
+    }
     Promise.all(components.map((component) => {
       return this.convertComponentForTransmission(component);
     })).then((data) => {
@@ -67,11 +77,15 @@ export class DesktopManager {
   }
 
   async installComponent(component) {
-    this.installComponentHandler(await this.convertComponentForTransmission(component));
+    this.installComponentHandler(
+      await this.convertComponentForTransmission(component)
+    );
   }
 
   registerUpdateObserver(callback) {
-    var observer = {id: Math.random, callback: callback};
+    const observer = {
+      callback: callback
+    };
     this.updateObservers.push(observer);
     return observer;
   }
@@ -89,7 +103,6 @@ export class DesktopManager {
       this.searchText(this.lastSearchedText);
     }
   }
-
 
   deregisterUpdateObserver(observer) {
     _.pull(this.updateObservers, observer);
@@ -109,23 +122,33 @@ export class DesktopManager {
   }
 
   desktop_onComponentInstallationComplete(componentData, error) {
-    // Desktop is only allowed to change these keys:
-    const permissableKeys = ["package_info", "local_url"];
     const component = this.modelManager.findItem(componentData.uuid);
     if(!component) {
-      console.error("desktop_onComponentInstallationComplete component is null for uuid", componentData.uuid);
       return;
     }
     if(error) {
-      component.setAppDataItem("installError", error);
+      component.setAppDataItem(
+        COMPONENT_DATA_KEY_INSTALL_ERROR,
+        error
+      );
     } else {
+      const permissableKeys = [
+        COMPONENT_CONTENT_KEY_PACKAGE_INFO,
+        COMPONENT_CONTENT_KEY_LOCAL_URL
+      ];
       for(const key of permissableKeys) {
         component[key] = componentData.content[key];
       }
-      this.modelManager.notifySyncObserversOfModels([component], SFModelManager.MappingSourceDesktopInstalled);
-      component.setAppDataItem("installError", null);
+      this.modelManager.notifySyncObserversOfModels(
+        [component],
+        SFModelManager.MappingSourceDesktopInstalled
+      );
+      component.setAppDataItem(
+        COMPONENT_DATA_KEY_INSTALL_ERROR,
+        null
+      );
     }
-    this.modelManager.setItemDirty(component, true);
+    this.modelManager.setItemDirty(component);
     this.syncManager.sync();
     this.timeout(() => {
       for(const observer of this.updateObservers) {
@@ -135,7 +158,7 @@ export class DesktopManager {
   }
 
   desktop_registerComponentActivationObserver(callback) {
-    var observer = {id: Math.random, callback: callback};
+    const observer = {id: Math.random, callback: callback};
     this.componentActivationObservers.push(observer);
     return observer;
   }
@@ -146,10 +169,11 @@ export class DesktopManager {
 
   /* Notify observers that a component has been registered/activated */
   async notifyComponentActivation(component) {
-    var serializedComponent = await this.convertComponentForTransmission(component);
-
+    const serializedComponent = await this.convertComponentForTransmission(
+      component
+    );
     this.timeout(() => {
-      for(var observer of this.componentActivationObservers) {
+      for(const observer of this.componentActivationObservers) {
         observer.callback(serializedComponent);
       }
     });
@@ -158,7 +182,7 @@ export class DesktopManager {
   /* Used to resolve "sn://" */
   desktop_setExtServerHost(host) {
     this.extServerHost = host;
-    this.$rootScope.$broadcast("desktop-did-set-ext-server-host");
+    this.appState.desktopExtensionsReady();
   }
 
   desktop_setComponentInstallationSyncHandler(handler) {
@@ -177,7 +201,7 @@ export class DesktopManager {
   }
 
   async desktop_requestBackupFile(callback) {
-    var keys, authParams;
+    let keys, authParams;
     if(this.authManager.offline() && this.passcodeManager.hasPasscode()) {
       keys = this.passcodeManager.keys();
       authParams = this.passcodeManager.passcodeAuthParams();
@@ -185,11 +209,11 @@ export class DesktopManager {
       keys = await this.authManager.keys();
       authParams = await this.authManager.getAuthParams();
     }
-
+    const nullOnEmpty = true;
     this.modelManager.getAllItemsJSONData(
       keys,
       authParams,
-      true /* return null on empty */
+      nullOnEmpty
     ).then((data) => {
       callback(data);
     })
@@ -200,10 +224,12 @@ export class DesktopManager {
   }
 
   desktop_didBeginBackup() {
-    this.$rootScope.$broadcast("did-begin-local-backup");
+    this.appState.beganBackupDownload();
   }
 
   desktop_didFinishBackup(success) {
-    this.$rootScope.$broadcast("did-finish-local-backup", {success: success});
+    this.appState.endedBackupDownload({
+      success: success
+    });
   }
 }

@@ -9,14 +9,19 @@ import {
   PANEL_NAME_NOTES,
   PANEL_NAME_TAGS
 } from '@/controllers/constants';
+import {
+  STRING_SESSION_EXPIRED,
+  STRING_DEFAULT_FILE_ERROR,
+  StringSyncException
+} from '@/strings';
 
-export class Root {
-  constructor() {
-    this.template = template;
-  }
+/** How often to automatically sync, in milliseconds */
+const AUTO_SYNC_INTERVAL = 30000;
+
+export class RootCtrl {
 
   /* @ngInject */
-  controller(
+  constructor(
     $scope,
     $location,
     $rootScope,
@@ -25,23 +30,86 @@ export class Root {
     dbManager,
     syncManager,
     authManager,
-    themeManager,
     passcodeManager,
     storageManager,
-    migrationManager,
-    privilegesManager,
     statusManager,
     alertManager,
     preferencesManager,
     appState
   ) {
-    storageManager.initialize(passcodeManager.hasPasscode(), authManager.isEphemeralSession());
-    $scope.platform = getPlatformString();
-    $scope.onUpdateAvailable = function() {
-      $rootScope.$broadcast('new-update-available');
+    this.dbManager = dbManager;
+    this.syncManager = syncManager;
+    this.statusManager = statusManager;
+    this.storageManager = storageManager;
+    this.appState = appState;
+    this.authManager = authManager;
+    this.modelManager = modelManager;
+    this.alertManager = alertManager;
+    this.preferencesManager = preferencesManager;
+    this.passcodeManager = passcodeManager;
+    this.$rootScope = $rootScope;
+    this.$scope = $scope;
+    this.$location = $location;
+    this.$timeout = $timeout;
+
+    this.defineRootScopeFunctions();
+    this.handleAutoSignInFromParams();
+    this.initializeStorageManager();
+    this.addAppStateObserver();
+    this.addDragDropHandlers();
+    this.defaultLoad();
+  }
+
+  defineRootScopeFunctions() {
+    this.$rootScope.sync = () => {
+      this.syncManager.sync();
     }
 
-    appState.addObserver((eventName, data) => {
+    this.$rootScope.lockApplication = () => {
+      /** Reloading wipes current objects from memory */
+      window.location.reload();
+    }
+
+    this.$rootScope.safeApply = (fn) => {
+      const phase = this.$scope.$root.$$phase;
+      if(phase === '$apply' || phase === '$digest') {
+        this.$scope.$eval(fn);
+      } else {
+        this.$scope.$apply(fn);
+      }
+    };
+  }
+
+  defaultLoad() {
+    this.$scope.platform = getPlatformString();
+
+    if(this.passcodeManager.isLocked()) {
+      this.$scope.needsUnlock = true;
+    } else {
+      this.loadAfterUnlock();
+    }
+
+    this.$scope.onSuccessfulUnlock = () => {
+      this.$timeout(() => {
+        this.$scope.needsUnlock = false;
+        this.loadAfterUnlock();
+      })
+    }
+
+    this.$scope.onUpdateAvailable = () => {
+      this.$rootScope.$broadcast('new-update-available');
+    }
+  }
+
+  initializeStorageManager() {
+    this.storageManager.initialize(
+      this.passcodeManager.hasPasscode(),
+      this.authManager.isEphemeralSession()
+    );
+  }
+
+  addAppStateObserver() {
+    this.appState.addObserver((eventName, data) => {
       if(eventName === APP_STATE_EVENT_PANEL_RESIZED) {
         if(data.panel === PANEL_NAME_NOTES) {
           this.notesCollapsed = data.collapsed;
@@ -52,194 +120,220 @@ export class Root {
         let appClass = "";
         if(this.notesCollapsed) { appClass += "collapsed-notes"; }
         if(this.tagsCollapsed) { appClass += " collapsed-tags"; }
-        $scope.appClass = appClass;
+        this.$scope.appClass = appClass;
       }
     })
+  }
 
-    /* Used to avoid circular dependencies where syncManager cannot be imported but rootScope can */
-    $rootScope.sync = function(source) {
-      syncManager.sync();
-    }
+  loadAfterUnlock() {
+    this.openDatabase();
+    this.authManager.loadInitialData();
+    this.preferencesManager.load();
+    this.addSyncStatusObserver();
+    this.configureKeyRequestHandler();
+    this.addSyncEventHandler();
+    this.addSignOutObserver();
+    this.loadLocalData();
+  }
 
-    $rootScope.lockApplication = function() {
-      // Reloading wipes current objects from memory
-      window.location.reload();
-    }
-
-    const initiateSync = () => {
-      authManager.loadInitialData();
-      preferencesManager.load();
-
-      this.syncStatusObserver = syncManager.registerSyncStatusObserver((status) => {
-        if(status.retrievedCount > 20) {
-          var text = `Downloading ${status.retrievedCount} items. Keep app open.`
-          this.syncStatus = statusManager.replaceStatusWithString(this.syncStatus, text);
-          this.showingDownloadStatus = true;
-        } else if(this.showingDownloadStatus) {
-          this.showingDownloadStatus = false;
-          var text = "Download Complete.";
-          this.syncStatus = statusManager.replaceStatusWithString(this.syncStatus, text);
-          setTimeout(() => {
-            this.syncStatus = statusManager.removeStatus(this.syncStatus);
-          }, 2000);
-        } else if(status.total > 20) {
-          this.uploadSyncStatus = statusManager.replaceStatusWithString(this.uploadSyncStatus, `Syncing ${status.current}/${status.total} items...`)
-        } else if(this.uploadSyncStatus) {
-          this.uploadSyncStatus = statusManager.removeStatus(this.uploadSyncStatus);
-        }
-      })
-
-      syncManager.setKeyRequestHandler(async () => {
-        let offline = authManager.offline();
-        let auth_params = offline ? passcodeManager.passcodeAuthParams() : await authManager.getAuthParams();
-        let keys = offline ? passcodeManager.keys() : await authManager.keys();
-        return {
-          keys: keys,
-          offline: offline,
-          auth_params: auth_params
-        }
-      });
-
-      let lastSessionInvalidAlert;
-
-      syncManager.addEventHandler((syncEvent, data) => {
-        $rootScope.$broadcast(syncEvent, data || {});
-        if(syncEvent == "sync-session-invalid") {
-          // On Windows, some users experience issues where this message keeps appearing. It might be that on focus, the app syncs, and this message triggers again.
-          // We'll only show it once every X seconds
-          let showInterval = 30; // At most 30 seconds in between
-          if(!lastSessionInvalidAlert || (new Date() - lastSessionInvalidAlert)/1000 > showInterval) {
-            lastSessionInvalidAlert = new Date();
-            setTimeout(function () {
-              // If this alert is displayed on launch, it may sometimes dismiss automatically really quicky for some reason. So we wrap in timeout
-              alertManager.alert({text: "Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session."});
-            }, 500);
-          }
-        } else if(syncEvent == "sync-exception") {
-          alertManager.alert({text: `There was an error while trying to save your items. Please contact support and share this message: ${data}`});
-        }
-      });
-
-      let encryptionEnabled = authManager.user || passcodeManager.hasPasscode();
-      this.syncStatus = statusManager.addStatusFromString(encryptionEnabled ? "Decrypting items..." : "Loading items...");
-
-      let incrementalCallback = (current, total) => {
-        let notesString = `${current}/${total} items...`
-        this.syncStatus = statusManager.replaceStatusWithString(this.syncStatus, encryptionEnabled ? `Decrypting ${notesString}` : `Loading ${notesString}`);
+  openDatabase() {
+    this.dbManager.setLocked(false);
+    this.dbManager.openDatabase({
+      onUpgradeNeeded: () => {
+        /**
+         * New database, delete syncToken so that items
+         * can be refetched entirely from server
+         */
+        this.syncManager.clearSyncToken();
+        this.syncManager.sync();
       }
+    })
+  }
 
-      syncManager.loadLocalItems({incrementalCallback}).then(() => {
-        $timeout(() => {
-          $rootScope.$broadcast("initial-data-loaded"); // This needs to be processed first before sync is called so that singletonManager observers function properly.
-          // Perform integrity check on first sync
-          this.syncStatus = statusManager.replaceStatusWithString(this.syncStatus, "Syncing...");
-          syncManager.sync({performIntegrityCheck: true}).then(() => {
-            this.syncStatus = statusManager.removeStatus(this.syncStatus);
-          })
-          // refresh every 30s
-          setInterval(function () {
-            syncManager.sync();
-          }, 30000);
+  addSyncStatusObserver() {
+    this.syncStatusObserver = this.syncManager.registerSyncStatusObserver((status) => {
+      if(status.retrievedCount > 20) {
+        const text = `Downloading ${status.retrievedCount} items. Keep app open.`
+        this.syncStatus = this.statusManager.replaceStatusWithString(
+          this.syncStatus,
+          text
+        );
+        this.showingDownloadStatus = true;
+      } else if(this.showingDownloadStatus) {
+        this.showingDownloadStatus = false;
+        const text = "Download Complete.";
+        this.syncStatus = this.statusManager.replaceStatusWithString(
+          this.syncStatus,
+          text
+        );
+        setTimeout(() => {
+          this.syncStatus = this.statusManager.removeStatus(this.syncStatus);
+        }, 2000);
+      } else if(status.total > 20) {
+        this.uploadSyncStatus = this.statusManager.replaceStatusWithString(
+          this.uploadSyncStatus,
+          `Syncing ${status.current}/${status.total} items...`
+        )
+      } else if(this.uploadSyncStatus) {
+        this.uploadSyncStatus = this.statusManager.removeStatus(
+          this.uploadSyncStatus
+        );
+      }
+    })
+  }
+
+  configureKeyRequestHandler() {
+    this.syncManager.setKeyRequestHandler(async () => {
+      const offline = this.authManager.offline();
+      const auth_params = (
+        offline
+        ? this.passcodeManager.passcodeAuthParams()
+        : await this.authManager.getAuthParams()
+      );
+      const keys = offline
+        ? this.passcodeManager.keys()
+        : await this.authManager.keys();
+      return {
+        keys: keys,
+        offline: offline,
+        auth_params: auth_params
+      }
+    });
+  }
+
+  addSyncEventHandler() {
+    let lastShownDate;
+    this.syncManager.addEventHandler((syncEvent, data) => {
+      this.$rootScope.$broadcast(
+        syncEvent,
+        data || {}
+      );
+      if(syncEvent === 'sync-session-invalid') {
+        /** Don't show repeatedly; at most 30 seconds in between */
+        const SHOW_INTERVAL = 30;
+        const lastShownSeconds = (new Date() - lastShownDate) / 1000;
+        if(!lastShownDate || lastShownSeconds > SHOW_INTERVAL) {
+          lastShownDate = new Date();
+          setTimeout(() => {
+            this.alertManager.alert({
+              text: STRING_SESSION_EXPIRED
+            });
+          }, 500);
+        }
+      } else if(syncEvent === 'sync-exception') {
+        this.alertManager.alert({
+          text: StringSyncException(data)
+        });
+      }
+    });
+  }
+
+  loadLocalData() {
+    const encryptionEnabled = this.authManager.user || this.passcodeManager.hasPasscode();
+    this.syncStatus = this.statusManager.addStatusFromString(
+      encryptionEnabled ? "Decrypting items..." : "Loading items..."
+    );
+    const incrementalCallback = (current, total) => {
+      const notesString = `${current}/${total} items...`
+      const status = encryptionEnabled
+        ? `Decrypting ${notesString}`
+        : `Loading ${notesString}`;
+      this.syncStatus = this.statusManager.replaceStatusWithString(
+        this.syncStatus,
+        status
+      );
+    }
+    this.syncManager.loadLocalItems({incrementalCallback}).then(() => {
+      this.$timeout(() => {
+        this.$rootScope.$broadcast("initial-data-loaded");
+        this.syncStatus = this.statusManager.replaceStatusWithString(
+          this.syncStatus,
+          "Syncing..."
+        );
+        this.syncManager.sync({
+          performIntegrityCheck: true
+        }).then(() => {
+          this.syncStatus = this.statusManager.removeStatus(this.syncStatus);
         })
-      });
-
-      authManager.addEventHandler((event) => {
-        if(event == SFAuthManager.DidSignOutEvent) {
-          modelManager.handleSignout();
-          syncManager.handleSignout();
-        }
+        setInterval(() => {
+          this.syncManager.sync();
+        }, AUTO_SYNC_INTERVAL);
       })
-    }
+    });
+  }
 
-    function load() {
-      openDatabase();
-      initiateSync();
-    }
+  addSignOutObserver() {
+    this.authManager.addEventHandler((event) => {
+      if(event === SFAuthManager.DidSignOutEvent) {
+        this.modelManager.handleSignout();
+        this.syncManager.handleSignout();
+      }
+    })
+  }
 
-    if(passcodeManager.isLocked()) {
-      $scope.needsUnlock = true;
-    } else {
-      load();
-    }
-
-    $scope.onSuccessfulUnlock = function() {
-      $timeout(() => {
-        $scope.needsUnlock = false;
-        load();
-      })
-    }
-
-    function openDatabase() {
-      dbManager.setLocked(false);
-      dbManager.openDatabase({
-        onUpgradeNeeded: () => {
-          // new database, delete syncToken so that items can be refetched entirely from server
-          syncManager.clearSyncToken();
-          syncManager.sync();
-        }
-      })
-    }
-
-    /*
-    Shared Callbacks
-    */
-
-    $rootScope.safeApply = function(fn) {
-      var phase = this.$root.$$phase;
-      if(phase == '$apply' || phase == '$digest')
-      this.$eval(fn);
-      else
-      this.$apply(fn);
-    };
-
-    /*
-    Disable dragging and dropping of files into main SN interface.
-    both 'dragover' and 'drop' are required to prevent dropping of files.
-    This will not prevent extensions from receiving drop events.
-    */
+  addDragDropHandlers() {
+    /**
+     * Disable dragging and dropping of files into main SN interface.
+     * both 'dragover' and 'drop' are required to prevent dropping of files.
+     * This will not prevent extensions from receiving drop events.
+     */
     window.addEventListener('dragover', (event) => {
       event.preventDefault();
     }, false)
 
     window.addEventListener('drop', (event) => {
       event.preventDefault();
-      alertManager.alert({text: "Please use FileSafe or the Bold Editor to attach images and files. Learn more at standardnotes.org/filesafe."})
+      this.alertManager.alert({
+        text: STRING_DEFAULT_FILE_ERROR
+      })
     }, false)
+  }
 
-
-    /*
-    Handle Auto Sign In From URL
-    */
-
-    function urlParam(key) {
-      return $location.search()[key];
+  handleAutoSignInFromParams() {
+    const urlParam = (key) => {
+      return this.$location.search()[key];
     }
 
-    async function autoSignInFromParams() {
-      var server = urlParam("server");
-      var email = urlParam("email");
-      var pw = urlParam("pw");
-
-      if(!authManager.offline()) {
-        // check if current account
-        if(await syncManager.getServerURL() === server && authManager.user.email === email) {
-          // already signed in, return
+    const autoSignInFromParams = async () =>  {
+      const server = urlParam('server');
+      const email = urlParam('email');
+      const pw = urlParam('pw');
+      if(!this.authManager.offline()) {
+        if(
+          await this.syncManager.getServerURL() === server
+          && this.authManager.user.email === email
+        ) {
+          /** Already signed in, return */
           return;
         } else {
-          // sign out
-          authManager.signout(true).then(() => {
+          /** Sign out */
+          this.authManager.signout(true).then(() => {
             window.location.reload();
           });
         }
       } else {
-        authManager.login(server, email, pw, false, false, {}).then((response) => {
+        this.authManager.login(
+          server,
+          email,
+          pw,
+          false,
+          false,
+          {}
+        ).then((response) => {
           window.location.reload();
         })
       }
     }
 
-    if(urlParam("server")) {
+    if(urlParam('server')) {
       autoSignInFromParams();
     }
+  }
+}
+
+export class Root {
+  constructor() {
+    this.template = template;
+    this.controller = RootCtrl;
   }
 }

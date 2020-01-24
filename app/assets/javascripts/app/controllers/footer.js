@@ -1,7 +1,9 @@
 import { PrivilegesManager } from '@/services/privilegesManager';
 import template from '%/footer.pug';
 import {
-  APP_STATE_EVENT_EDITOR_FOCUSED
+  APP_STATE_EVENT_EDITOR_FOCUSED,
+  APP_STATE_EVENT_BEGAN_BACKUP_DOWNLOAD,
+  APP_STATE_EVENT_ENDED_BACKUP_DOWNLOAD
 } from '@/state';
 
 export class Footer {
@@ -49,6 +51,26 @@ export class Footer {
       if(eventName === APP_STATE_EVENT_EDITOR_FOCUSED) {
         this.closeAllRooms();
         this.closeAccountMenu();
+      } else if(eventName === APP_STATE_EVENT_BEGAN_BACKUP_DOWNLOAD) {
+        this.backupStatus = statusManager.addStatusFromString(
+          "Saving local backup..."
+        );
+      } else if(eventName === APP_STATE_EVENT_ENDED_BACKUP_DOWNLOAD) {
+        if(data.success) {
+          this.backupStatus = statusManager.replaceStatusWithString(
+            this.backupStatus,
+            "Successfully saved backup."
+          );
+        } else {
+          this.backupStatus = statusManager.replaceStatusWithString(
+            this.backupStatus,
+            "Unable to save local backup."
+          );
+        }
+
+        $timeout(() => {
+          this.backupStatus = statusManager.removeStatus(this.backupStatus);
+        }, 2000)
       }
     })
 
@@ -65,34 +87,6 @@ export class Footer {
         this.arbitraryStatusMessage = string;
       })
     })
-
-    $rootScope.$on("did-begin-local-backup", () => {
-      $timeout(() => {
-        this.backupStatus = statusManager.addStatusFromString(
-          "Saving local backup..."
-        );
-      })
-    });
-
-    $rootScope.$on("did-finish-local-backup", (event, data) => {
-      $timeout(() => {
-        if(data.success) {
-          this.backupStatus = statusManager.replaceStatusWithString(
-            this.backupStatus,
-            "Successfully saved backup."
-          );
-        } else {
-          this.backupStatus = statusManager.replaceStatusWithString(
-            this.backupStatus,
-            "Unable to save local backup."
-          );
-        }
-
-        $timeout(() => {
-          this.backupStatus = statusManager.removeStatus(this.backupStatus);
-        }, 2000)
-      })
-    });
 
     this.openSecurityUpdate = function() {
       authManager.presentPasswordWizard("upgrade-security");
