@@ -25,6 +25,7 @@ class RootCtrl {
     $location,
     $rootScope,
     $timeout,
+    appState,
     modelManager,
     dbManager,
     syncManager,
@@ -34,7 +35,6 @@ class RootCtrl {
     statusManager,
     alertManager,
     preferencesManager,
-    appState
   ) {
     this.dbManager = dbManager;
     this.syncManager = syncManager;

@@ -128,15 +128,15 @@
               .sk-menu-panel-header
                 .sk-menu-panel-header-title Global Display
               menu-row(
-                action="ctrl.selectedMenuItem(true); ctrl.toggleKey('monospaceFont')", 
-                circle="ctrl.monospaceFont ? 'success' : 'neutral'", 
+                action="ctrl.selectedMenuItem(true); ctrl.toggleKey(ctrl.prefKeyMonospace)", 
+                circle="ctrl.monospaceEnabled ? 'success' : 'neutral'", 
                 desc="'Toggles the font style for the default editor'", 
                 disabled='ctrl.selectedEditor', 
                 label="'Monospace Font'", 
                 subtitle="ctrl.selectedEditor ? 'Not available with editor extensions' : null"
                 )
               menu-row(
-                action="ctrl.selectedMenuItem(true); ctrl.toggleKey('spellcheck')", 
+                action="ctrl.selectedMenuItem(true); ctrl.toggleKey(ctrl.prefKeySpellcheck)", 
                 circle="ctrl.spellcheck ? 'success' : 'neutral'", 
                 desc="'Toggles spellcheck for the default editor'", 
                 disabled='ctrl.selectedEditor', 
@@ -144,7 +144,7 @@
                 subtitle="ctrl.selectedEditor ? 'Not available with editor extensions' : (ctrl.isDesktop ? 'May degrade editor performance' : null)"
                 )
               menu-row(
-                action="ctrl.selectedMenuItem(true); ctrl.toggleKey('marginResizersEnabled')", 
+                action="ctrl.selectedMenuItem(true); ctrl.toggleKey(ctrl.prefKeyMarginResizers)", 
                 circle="ctrl.marginResizersEnabled ? 'success' : 'neutral'", 
                 desc="'Allows for editor left and right margins to be resized'", 
                 faded='!ctrl.marginResizersEnabled', 
@@ -206,7 +206,7 @@
       ng-focus='ctrl.onContentFocus()',
       ng-if='!ctrl.selectedEditor', 
       ng-model='ctrl.note.text', 
-      ng-model-options='{ debounce: ctrl.EditorNgDebounce}', 
+      ng-model-options='{ debounce: ctrl.editorDebounce}', 
       ng-readonly='ctrl.note.locked', 
       ng-trim='false'
       )

@@ -2,6 +2,11 @@ import { SFPredicate } from 'snjs';
 
 export const PREF_TAGS_PANEL_WIDTH         = 'tagsPanelWidth';
 export const PREF_NOTES_PANEL_WIDTH        = 'notesPanelWidth';
+export const PREF_EDITOR_WIDTH             = 'editorWidth';
+export const PREF_EDITOR_LEFT              = 'editorLeft';
+export const PREF_EDITOR_MONOSPACE_ENABLED = 'monospaceFont';
+export const PREF_EDITOR_SPELLCHECK        = 'spellcheck';
+export const PREF_EDITOR_RESIZERS_ENABLED  = 'marginResizersEnabled';
 export const PREF_SORT_NOTES_BY            = 'sortBy';
 export const PREF_SORT_NOTES_REVERSE       = 'sortReverse';
 export const PREF_NOTES_SHOW_ARCHIVED      = 'showArchived';
