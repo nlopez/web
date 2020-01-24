@@ -1532,312 +1532,184 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/services/privilegesManager.js");
-/* harmony import */ var _footer_pug__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! %/footer.pug */ "./app/assets/templates/footer.pug");
-/* harmony import */ var _footer_pug__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_footer_pug__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/defineProperty.js");
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/services/privilegesManager.js");
+/* harmony import */ var _footer_pug__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! %/footer.pug */ "./app/assets/templates/footer.pug");
+/* harmony import */ var _footer_pug__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_footer_pug__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
+/* harmony import */ var _strings__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/strings */ "./app/assets/javascripts/strings.js");
 
 
 
 
 
 
-var Footer =
+
+
+
+var FooterCtrl =
 /*#__PURE__*/
 function () {
-  function Footer() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, Footer);
+  FooterCtrl.$inject = ["$scope", "$rootScope", "$timeout", "alertManager", "appState", "authManager", "componentManager", "modelManager", "nativeExtManager", "passcodeManager", "privilegesManager", "statusManager", "syncManager"];
 
-    this.restrict = 'E';
-    this.scope = {};
-    this.template = _footer_pug__WEBPACK_IMPORTED_MODULE_4___default.a;
-    this.replace = true;
-    this.controllerAs = 'ctrl';
-    this.bindToController = true;
+  /* @ngInject */
+  function FooterCtrl($scope, $rootScope, $timeout, alertManager, appState, authManager, componentManager, modelManager, nativeExtManager, passcodeManager, privilegesManager, statusManager, syncManager) {
+    var _this = this;
+
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, FooterCtrl);
+
+    _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3___default()(this, "onAuthSuccess", function () {
+      _this.showAccountMenu = false;
+    });
+
+    _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3___default()(this, "toggleSyncResolutionMenu", function () {
+      _this.showSyncResolution = !_this.showSyncResolution;
+    });
+
+    _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3___default()(this, "closeAccountMenu", function () {
+      _this.showAccountMenu = false;
+    });
+
+    this.$rootScope = $rootScope;
+    this.$timeout = $timeout;
+    this.alertManager = alertManager;
+    this.appState = appState;
+    this.authManager = authManager;
+    this.componentManager = componentManager;
+    this.modelManager = modelManager;
+    this.nativeExtManager = nativeExtManager;
+    this.passcodeManager = passcodeManager;
+    this.privilegesManager = privilegesManager;
+    this.statusManager = statusManager;
+    this.syncManager = syncManager;
+    this.rooms = [];
+    this.themesWithIcons = [];
+    this.addAppStateObserver();
+    this.updateOfflineStatus();
+    this.addSyncEventHandler();
+    this.findErrors();
+    this.registerMappingObservers();
+    this.registerComponentHandler();
+    this.addRootScopeListeners();
+    this.authManager.checkForSecurityUpdate().then(function (available) {
+      _this.securityUpdateAvailable = available;
+    });
+    this.statusManager.addStatusObserver(function (string) {
+      _this.$timeout(function () {
+        _this.arbitraryStatusMessage = string;
+      });
+    });
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(Footer, [{
-    key: "link",
-    value: function link(scope, elem, attrs, ctrl) {
-      scope.$on('sync:completed', function () {
-        ctrl.syncUpdated();
-        ctrl.findErrors();
-        ctrl.updateOfflineStatus();
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(FooterCtrl, [{
+    key: "addRootScopeListeners",
+    value: function addRootScopeListeners() {
+      var _this2 = this;
+
+      this.$rootScope.$on("security-update-status-changed", function () {
+        _this2.securityUpdateAvailable = _this2.authManager.securityUpdateAvailable;
       });
-      scope.$on('sync:error', function () {
-        ctrl.findErrors();
-        ctrl.updateOfflineStatus();
+      this.$rootScope.$on("reload-ext-data", function () {
+        _this2.reloadExtendedData();
+      });
+      this.$rootScope.$on("new-update-available", function () {
+        _this2.$timeout(function () {
+          _this2.onNewUpdateAvailable();
+        });
       });
     }
-    /* @ngInject */
-
   }, {
-    key: "controller",
-    value: ["$rootScope", "authManager", "modelManager", "$timeout", "dbManager", "syncManager", "storageManager", "passcodeManager", "componentManager", "singletonManager", "nativeExtManager", "privilegesManager", "statusManager", "alertManager", "appState", function controller($rootScope, authManager, modelManager, $timeout, dbManager, syncManager, storageManager, passcodeManager, componentManager, singletonManager, nativeExtManager, privilegesManager, statusManager, alertManager, appState) {
-      var _this = this;
+    key: "addAppStateObserver",
+    value: function addAppStateObserver() {
+      var _this3 = this;
 
-      appState.addObserver(function (eventName, data) {
-        if (eventName === _state__WEBPACK_IMPORTED_MODULE_5__["APP_STATE_EVENT_EDITOR_FOCUSED"]) {
-          _this.closeAllRooms();
+      this.appState.addObserver(function (eventName, data) {
+        if (eventName === _state__WEBPACK_IMPORTED_MODULE_6__["APP_STATE_EVENT_EDITOR_FOCUSED"]) {
+          _this3.closeAllRooms();
 
-          _this.closeAccountMenu();
-        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_5__["APP_STATE_EVENT_BEGAN_BACKUP_DOWNLOAD"]) {
-          _this.backupStatus = statusManager.addStatusFromString("Saving local backup...");
-        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_5__["APP_STATE_EVENT_ENDED_BACKUP_DOWNLOAD"]) {
+          _this3.closeAccountMenu();
+        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_6__["APP_STATE_EVENT_BEGAN_BACKUP_DOWNLOAD"]) {
+          _this3.backupStatus = _this3.statusManager.addStatusFromString("Saving local backup...");
+        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_6__["APP_STATE_EVENT_ENDED_BACKUP_DOWNLOAD"]) {
           if (data.success) {
-            _this.backupStatus = statusManager.replaceStatusWithString(_this.backupStatus, "Successfully saved backup.");
+            _this3.backupStatus = _this3.statusManager.replaceStatusWithString(_this3.backupStatus, "Successfully saved backup.");
           } else {
-            _this.backupStatus = statusManager.replaceStatusWithString(_this.backupStatus, "Unable to save local backup.");
+            _this3.backupStatus = _this3.statusManager.replaceStatusWithString(_this3.backupStatus, "Unable to save local backup.");
           }
 
-          $timeout(function () {
-            _this.backupStatus = statusManager.removeStatus(_this.backupStatus);
+          _this3.$timeout(function () {
+            _this3.backupStatus = _this3.statusManager.removeStatus(_this3.backupStatus);
           }, 2000);
         }
       });
-      authManager.checkForSecurityUpdate().then(function (available) {
-        _this.securityUpdateAvailable = available;
-      });
-      $rootScope.$on("security-update-status-changed", function () {
-        _this.securityUpdateAvailable = authManager.securityUpdateAvailable;
-      });
-      statusManager.addStatusObserver(function (string) {
-        $timeout(function () {
-          _this.arbitraryStatusMessage = string;
-        });
-      });
+    }
+  }, {
+    key: "addSyncEventHandler",
+    value: function addSyncEventHandler() {
+      var _this4 = this;
 
-      this.openSecurityUpdate = function () {
-        authManager.presentPasswordWizard("upgrade-security");
-      };
-
-      $rootScope.$on("reload-ext-data", function () {
-        _this.reloadExtendedData();
-      });
-
-      this.reloadExtendedData = function () {
-        if (_this.reloadInProgress) {
-          return;
-        }
-
-        _this.reloadInProgress = true; // A reload occurs when the extensions manager window is opened. We can close it after a delay
-
-        var extWindow = _this.rooms.find(function (room) {
-          return room.package_info.identifier == nativeExtManager.extensionsManagerIdentifier;
-        });
-
-        if (!extWindow) {
-          _this.queueExtReload = true; // try again when the ext is available
-
-          _this.reloadInProgress = false;
-          return;
-        }
-
-        _this.selectRoom(extWindow);
-
-        $timeout(function () {
-          _this.selectRoom(extWindow);
-
-          _this.reloadInProgress = false;
-          $rootScope.$broadcast("ext-reload-complete");
-        }, 2000);
-      };
-
-      this.getUser = function () {
-        return authManager.user;
-      };
-
-      this.updateOfflineStatus = function () {
-        this.offline = authManager.offline();
-      };
-
-      this.updateOfflineStatus();
-      syncManager.addEventHandler(function (syncEvent, data) {
-        $timeout(function () {
-          if (syncEvent == "local-data-loaded") {
-            // If the user has no notes and is offline, show Account menu
-            if (_this.offline && modelManager.noteCount() == 0) {
-              _this.showAccountMenu = true;
+      this.syncManager.addEventHandler(function (syncEvent, data) {
+        _this4.$timeout(function () {
+          if (syncEvent === "local-data-loaded") {
+            if (_this4.offline && _this4.modelManager.noteCount() === 0) {
+              _this4.showAccountMenu = true;
             }
-          } else if (syncEvent == "enter-out-of-sync") {
-            _this.outOfSync = true;
-          } else if (syncEvent == "exit-out-of-sync") {
-            _this.outOfSync = false;
+          } else if (syncEvent === "enter-out-of-sync") {
+            _this4.outOfSync = true;
+          } else if (syncEvent === "exit-out-of-sync") {
+            _this4.outOfSync = false;
+          } else if (syncEvent === 'sync:completed') {
+            _this4.syncUpdated();
+
+            _this4.findErrors();
+
+            _this4.updateOfflineStatus();
+          } else if (syncEvent === 'sync:error') {
+            _this4.findErrors();
+
+            _this4.updateOfflineStatus();
           }
         });
       });
+    }
+  }, {
+    key: "registerMappingObservers",
+    value: function registerMappingObservers() {
+      var _this5 = this;
 
-      this.findErrors = function () {
-        this.error = syncManager.syncStatus.error;
-      };
-
-      this.findErrors();
-
-      this.onAuthSuccess = function () {
-        this.showAccountMenu = false;
-      }.bind(this);
-
-      this.accountMenuPressed = function () {
-        this.showAccountMenu = !this.showAccountMenu;
-        this.closeAllRooms();
-      };
-
-      this.toggleSyncResolutionMenu = function () {
-        this.showSyncResolution = !this.showSyncResolution;
-      }.bind(this);
-
-      this.closeAccountMenu = function () {
-        _this.showAccountMenu = false;
-      };
-
-      this.hasPasscode = function () {
-        return passcodeManager.hasPasscode();
-      };
-
-      this.lockApp = function () {
-        $rootScope.lockApplication();
-      };
-
-      this.refreshData = function () {
-        var _this2 = this;
-
-        this.isRefreshing = true; // Enable integrity checking for this force request
-
-        syncManager.sync({
-          force: true,
-          performIntegrityCheck: true
-        }).then(function (response) {
-          $timeout(function () {
-            _this2.isRefreshing = false;
-          }, 200);
-
-          if (response && response.error) {
-            alertManager.alert({
-              text: "There was an error syncing. Please try again. If all else fails, try signing out and signing back in."
-            });
-          } else {
-            _this2.syncUpdated();
-          }
-        });
-      };
-
-      this.syncUpdated = function () {
-        this.lastSyncDate = new Date();
-      };
-
-      $rootScope.$on("new-update-available", function () {
-        $timeout(function () {
-          _this.onNewUpdateAvailable();
-        });
-      });
-
-      this.onNewUpdateAvailable = function () {
-        this.newUpdateAvailable = true;
-      };
-
-      this.clickedNewUpdateAnnouncement = function () {
-        this.newUpdateAvailable = false;
-        alertManager.alert({
-          text: "A new update is ready to install. Please use the top-level 'Updates' menu to manage installation."
-        });
-      };
-      /* Rooms */
-
-
-      this.componentManager = componentManager;
-      this.rooms = [];
-      this.themesWithIcons = [];
-      modelManager.addItemSyncObserver("room-bar", "SN|Component", function (allItems, validItems, deletedItems, source) {
-        _this.rooms = modelManager.components.filter(function (candidate) {
-          return candidate.area == "rooms" && !candidate.deleted;
+      this.modelManager.addItemSyncObserver('room-bar', 'SN|Component', function (allItems, validItems, deletedItems, source) {
+        _this5.rooms = _this5.modelManager.components.filter(function (candidate) {
+          return candidate.area === 'rooms' && !candidate.deleted;
         });
 
-        if (_this.queueExtReload) {
-          _this.queueExtReload = false;
+        if (_this5.queueExtReload) {
+          _this5.queueExtReload = false;
 
-          _this.reloadExtendedData();
+          _this5.reloadExtendedData();
         }
       });
-      modelManager.addItemSyncObserver("footer-bar-themes", "SN|Theme", function (allItems, validItems, deletedItems, source) {
-        var themes = modelManager.validItemsForContentType("SN|Theme").filter(function (candidate) {
+      this.modelManager.addItemSyncObserver('footer-bar-themes', 'SN|Theme', function (allItems, validItems, deletedItems, source) {
+        var themes = _this5.modelManager.validItemsForContentType('SN|Theme').filter(function (candidate) {
           return !candidate.deleted && candidate.content.package_info && candidate.content.package_info.dock_icon;
         }).sort(function (a, b) {
           return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
         });
-        var differ = themes.length !== _this.themesWithIcons.length;
-        _this.themesWithIcons = themes;
+
+        var differ = themes.length !== _this5.themesWithIcons.length;
+        _this5.themesWithIcons = themes;
 
         if (differ) {
-          _this.reloadDockShortcuts();
+          _this5.reloadDockShortcuts();
         }
       });
+    }
+  }, {
+    key: "registerComponentHandler",
+    value: function registerComponentHandler() {
+      var _this6 = this;
 
-      this.reloadDockShortcuts = function () {
-        var shortcuts = [];
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
-        try {
-          for (var _iterator = this.themesWithIcons[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var theme = _step.value;
-            var name = theme.content.package_info.name;
-            var icon = theme.content.package_info.dock_icon;
-
-            if (!icon) {
-              continue;
-            }
-
-            shortcuts.push({
-              name: name,
-              component: theme,
-              icon: icon
-            });
-          }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return != null) {
-              _iterator.return();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
-        }
-
-        this.dockShortcuts = shortcuts.sort(function (a, b) {
-          /** Circles first, then images */
-          var aType = a.icon.type;
-          var bType = b.icon.type;
-
-          if (aType === bType) {
-            return 0;
-          } else if (aType == "circle" && bType == "svg") {
-            return -1;
-          } else if (bType == "circle" && aType == "svg") {
-            return 1;
-          }
-        });
-      };
-
-      this.initSvgForShortcut = function (shortcut) {
-        var id = "dock-svg-" + shortcut.component.uuid;
-        var element = document.getElementById(id);
-        var parser = new DOMParser();
-        var svg = shortcut.component.content.package_info.dock_icon.source;
-        var doc = parser.parseFromString(svg, "image/svg+xml");
-        element.appendChild(doc.documentElement);
-      };
-
-      this.selectShortcut = function (shortcut) {
-        componentManager.toggleComponent(shortcut.component);
-      };
-
-      componentManager.registerHandler({
+      this.componentManager.registerHandler({
         identifier: "roomBar",
         areas: ["rooms", "modal"],
         activationHandler: function activationHandler(component) {},
@@ -1848,105 +1720,295 @@ function () {
         },
         focusHandler: function focusHandler(component, focused) {
           if (component.isEditor() && focused) {
-            _this.closeAllRooms();
+            _this6.closeAllRooms();
 
-            _this.closeAccountMenu();
+            _this6.closeAccountMenu();
           }
         }
       });
+    }
+  }, {
+    key: "reloadExtendedData",
+    value: function reloadExtendedData() {
+      var _this7 = this;
 
-      this.onRoomDismiss = function (room) {
-        room.showRoom = false;
-      };
+      if (this.reloadInProgress) {
+        return;
+      }
 
-      this.closeAllRooms = function () {
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
+      this.reloadInProgress = true;
+      /**
+       * A reload consists of opening the extensions manager,
+       * then closing it after a short delay.
+       */
 
+      var extWindow = this.rooms.find(function (room) {
+        return room.package_info.identifier === _this7.nativeExtManager.extManagerId;
+      });
+
+      if (!extWindow) {
+        this.queueExtReload = true;
+        this.reloadInProgress = false;
+        return;
+      }
+
+      this.selectRoom(extWindow);
+      this.$timeout(function () {
+        _this7.selectRoom(extWindow);
+
+        _this7.reloadInProgress = false;
+
+        _this7.$rootScope.$broadcast('ext-reload-complete');
+      }, 2000);
+    }
+  }, {
+    key: "getUser",
+    value: function getUser() {
+      return this.authManager.user;
+    }
+  }, {
+    key: "updateOfflineStatus",
+    value: function updateOfflineStatus() {
+      this.offline = this.authManager.offline();
+    }
+  }, {
+    key: "openSecurityUpdate",
+    value: function openSecurityUpdate() {
+      this.authManager.presentPasswordWizard('upgrade-security');
+    }
+  }, {
+    key: "findErrors",
+    value: function findErrors() {
+      this.error = this.syncManager.syncStatus.error;
+    }
+  }, {
+    key: "accountMenuPressed",
+    value: function accountMenuPressed() {
+      this.showAccountMenu = !this.showAccountMenu;
+      this.closeAllRooms();
+    }
+  }, {
+    key: "hasPasscode",
+    value: function hasPasscode() {
+      return this.passcodeManager.hasPasscode();
+    }
+  }, {
+    key: "lockApp",
+    value: function lockApp() {
+      this.$rootScope.lockApplication();
+    }
+  }, {
+    key: "refreshData",
+    value: function refreshData() {
+      var _this8 = this;
+
+      this.isRefreshing = true;
+      this.syncManager.sync({
+        force: true,
+        performIntegrityCheck: true
+      }).then(function (response) {
+        _this8.$timeout(function () {
+          _this8.isRefreshing = false;
+        }, 200);
+
+        if (response && response.error) {
+          _this8.alertManager.alert({
+            text: _strings__WEBPACK_IMPORTED_MODULE_7__["STRING_GENERIC_SYNC_ERROR"]
+          });
+        } else {
+          _this8.syncUpdated();
+        }
+      });
+    }
+  }, {
+    key: "syncUpdated",
+    value: function syncUpdated() {
+      this.lastSyncDate = new Date();
+    }
+  }, {
+    key: "onNewUpdateAvailable",
+    value: function onNewUpdateAvailable() {
+      this.newUpdateAvailable = true;
+    }
+  }, {
+    key: "clickedNewUpdateAnnouncement",
+    value: function clickedNewUpdateAnnouncement() {
+      this.newUpdateAvailable = false;
+      this.alertManager.alert({
+        text: _strings__WEBPACK_IMPORTED_MODULE_7__["STRING_NEW_UPDATE_READY"]
+      });
+    }
+  }, {
+    key: "reloadDockShortcuts",
+    value: function reloadDockShortcuts() {
+      var shortcuts = [];
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = this.themesWithIcons[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var theme = _step.value;
+          var name = theme.content.package_info.name;
+          var icon = theme.content.package_info.dock_icon;
+
+          if (!icon) {
+            continue;
+          }
+
+          shortcuts.push({
+            name: name,
+            component: theme,
+            icon: icon
+          });
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
         try {
-          for (var _iterator2 = this.rooms[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var room = _step2.value;
-            room.showRoom = false;
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
           }
-        } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
         } finally {
-          try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-              _iterator2.return();
-            }
-          } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
-            }
+          if (_didIteratorError) {
+            throw _iteratorError;
           }
         }
-      };
+      }
 
-      this.selectRoom = function _callee(room) {
-        var run;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                run = function run() {
-                  $timeout(function () {
-                    room.showRoom = !room.showRoom;
-                  });
-                };
+      this.dockShortcuts = shortcuts.sort(function (a, b) {
+        /** Circles first, then images */
+        var aType = a.icon.type;
+        var bType = b.icon.type;
 
-                if (room.showRoom) {
-                  _context.next = 11;
-                  break;
-                }
+        if (aType === bType) {
+          return 0;
+        } else if (aType === 'circle' && bType === 'svg') {
+          return -1;
+        } else if (bType === 'circle' && aType === 'svg') {
+          return 1;
+        }
+      });
+    }
+  }, {
+    key: "initSvgForShortcut",
+    value: function initSvgForShortcut(shortcut) {
+      var id = 'dock-svg-' + shortcut.component.uuid;
+      var element = document.getElementById(id);
+      var parser = new DOMParser();
+      var svg = shortcut.component.content.package_info.dock_icon.source;
+      var doc = parser.parseFromString(svg, 'image/svg+xml');
+      element.appendChild(doc.documentElement);
+    }
+  }, {
+    key: "selectShortcut",
+    value: function selectShortcut(shortcut) {
+      this.componentManager.toggleComponent(shortcut.component);
+    }
+  }, {
+    key: "onRoomDismiss",
+    value: function onRoomDismiss(room) {
+      room.showRoom = false;
+    }
+  }, {
+    key: "closeAllRooms",
+    value: function closeAllRooms() {
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
 
-                _context.next = 4;
-                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__["PrivilegesManager"].ActionManageExtensions));
+      try {
+        for (var _iterator2 = this.rooms[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var room = _step2.value;
+          room.showRoom = false;
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+    }
+  }, {
+    key: "selectRoom",
+    value: function selectRoom(room) {
+      var _this9 = this;
 
-              case 4:
-                if (!_context.sent) {
-                  _context.next = 8;
-                  break;
-                }
-
-                privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__["PrivilegesManager"].ActionManageExtensions, function () {
-                  run();
+      var run, requiresPrivilege;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function selectRoom$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              run = function run() {
+                _this9.$timeout(function () {
+                  room.showRoom = !room.showRoom;
                 });
-                _context.next = 9;
+              };
+
+              if (room.showRoom) {
+                _context.next = 8;
                 break;
+              }
 
-              case 8:
+              _context.next = 4;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_4__["PrivilegesManager"].ActionManageExtensions));
+
+            case 4:
+              requiresPrivilege = _context.sent;
+
+              if (requiresPrivilege) {
+                this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_4__["PrivilegesManager"].ActionManageExtensions, run);
+              } else {
                 run();
+              }
 
-              case 9:
-                _context.next = 12;
-                break;
+              _context.next = 9;
+              break;
 
-              case 11:
-                run();
+            case 8:
+              run();
 
-              case 12:
-              case "end":
-                return _context.stop();
-            }
+            case 9:
+            case "end":
+              return _context.stop();
           }
-        });
-      };
-
-      this.clickOutsideAccountMenu = function () {
-        if (privilegesManager.authenticationInProgress()) {
-          return;
         }
+      }, null, this);
+    }
+  }, {
+    key: "clickOutsideAccountMenu",
+    value: function clickOutsideAccountMenu() {
+      if (this.privilegesManager.authenticationInProgress()) {
+        return;
+      }
 
-        this.showAccountMenu = false;
-      };
-    }]
+      this.showAccountMenu = false;
+    }
   }]);
 
-  return Footer;
+  return FooterCtrl;
 }();
+
+var Footer = function Footer() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, Footer);
+
+  this.restrict = 'E';
+  this.scope = {};
+  this.template = _footer_pug__WEBPACK_IMPORTED_MODULE_5___default.a;
+  this.controller = FooterCtrl;
+  this.replace = true;
+  this.controllerAs = 'ctrl';
+  this.bindToController = true;
+};
 
 /***/ }),
 
@@ -3268,6 +3330,10 @@ function () {
   function RootCtrl($scope, $location, $rootScope, $timeout, appState, modelManager, dbManager, syncManager, authManager, passcodeManager, storageManager, statusManager, alertManager, preferencesManager) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, RootCtrl);
 
+    this.$rootScope = $rootScope;
+    this.$scope = $scope;
+    this.$location = $location;
+    this.$timeout = $timeout;
     this.dbManager = dbManager;
     this.syncManager = syncManager;
     this.statusManager = statusManager;
@@ -3278,10 +3344,6 @@ function () {
     this.alertManager = alertManager;
     this.preferencesManager = preferencesManager;
     this.passcodeManager = passcodeManager;
-    this.$rootScope = $rootScope;
-    this.$scope = $scope;
-    this.$location = $location;
-    this.$timeout = $timeout;
     this.defineRootScopeFunctions();
     this.handleAutoSignInFromParams();
     this.initializeStorageManager();
@@ -11343,8 +11405,8 @@ function () {
     this.modelManager = modelManager;
     this.syncManager = syncManager;
     this.singletonManager = singletonManager;
-    this.extensionsManagerIdentifier = "org.standardnotes.extensions-manager";
-    this.batchManagerIdentifier = "org.standardnotes.batch-manager";
+    this.extManagerId = "org.standardnotes.extensions-manager";
+    this.batchManagerId = "org.standardnotes.batch-manager";
     this.systemExtensions = [];
     this.resolveExtensionsManager();
     this.resolveBatchManager();
@@ -11361,7 +11423,7 @@ function () {
       var _this = this;
 
       var contentTypePredicate = new snjs__WEBPACK_IMPORTED_MODULE_3__["SFPredicate"]("content_type", "=", "SN|Component");
-      var packagePredicate = new snjs__WEBPACK_IMPORTED_MODULE_3__["SFPredicate"]("package_info.identifier", "=", this.extensionsManagerIdentifier);
+      var packagePredicate = new snjs__WEBPACK_IMPORTED_MODULE_3__["SFPredicate"]("package_info.identifier", "=", this.extManagerId);
       this.singletonManager.registerSingleton([contentTypePredicate, packagePredicate], function (resolvedSingleton) {
         // Resolved Singleton
         _this.systemExtensions.push(resolvedSingleton.uuid);
@@ -11406,7 +11468,7 @@ function () {
 
         var packageInfo = {
           name: "Extensions",
-          identifier: _this.extensionsManagerIdentifier
+          identifier: _this.extManagerId
         };
         var item = {
           content_type: "SN|Component",
@@ -11446,7 +11508,7 @@ function () {
       var _this2 = this;
 
       var contentTypePredicate = new snjs__WEBPACK_IMPORTED_MODULE_3__["SFPredicate"]("content_type", "=", "SN|Component");
-      var packagePredicate = new snjs__WEBPACK_IMPORTED_MODULE_3__["SFPredicate"]("package_info.identifier", "=", this.batchManagerIdentifier);
+      var packagePredicate = new snjs__WEBPACK_IMPORTED_MODULE_3__["SFPredicate"]("package_info.identifier", "=", this.batchManagerId);
       this.singletonManager.registerSingleton([contentTypePredicate, packagePredicate], function (resolvedSingleton) {
         // Resolved Singleton
         _this2.systemExtensions.push(resolvedSingleton.uuid);
@@ -11481,7 +11543,7 @@ function () {
 
         var packageInfo = {
           name: "Batch Manager",
-          identifier: _this2.batchManagerIdentifier
+          identifier: _this2.batchManagerId
         };
         var item = {
           content_type: "SN|Component",
@@ -13600,14 +13662,16 @@ function () {
 /*!*******************************************!*\
   !*** ./app/assets/javascripts/strings.js ***!
   \*******************************************/
-/*! exports provided: STRING_SESSION_EXPIRED, STRING_DEFAULT_FILE_ERROR, StringSyncException, STRING_DELETE_TAG, STRING_DELETED_NOTE, STRING_INVALID_NOTE, STRING_ELLIPSES, STRING_GENERIC_SAVE_ERROR, STRING_DELETE_PLACEHOLDER_ATTEMPT, STRING_DELETE_LOCKED_ATTEMPT, StringDeleteNote, StringEmptyTrash */
+/*! exports provided: STRING_SESSION_EXPIRED, STRING_DEFAULT_FILE_ERROR, STRING_GENERIC_SYNC_ERROR, StringSyncException, STRING_NEW_UPDATE_READY, STRING_DELETE_TAG, STRING_DELETED_NOTE, STRING_INVALID_NOTE, STRING_ELLIPSES, STRING_GENERIC_SAVE_ERROR, STRING_DELETE_PLACEHOLDER_ATTEMPT, STRING_DELETE_LOCKED_ATTEMPT, StringDeleteNote, StringEmptyTrash */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STRING_SESSION_EXPIRED", function() { return STRING_SESSION_EXPIRED; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STRING_DEFAULT_FILE_ERROR", function() { return STRING_DEFAULT_FILE_ERROR; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STRING_GENERIC_SYNC_ERROR", function() { return STRING_GENERIC_SYNC_ERROR; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StringSyncException", function() { return StringSyncException; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STRING_NEW_UPDATE_READY", function() { return STRING_NEW_UPDATE_READY; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STRING_DELETE_TAG", function() { return STRING_DELETE_TAG; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STRING_DELETED_NOTE", function() { return STRING_DELETED_NOTE; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STRING_INVALID_NOTE", function() { return STRING_INVALID_NOTE; });
@@ -13620,9 +13684,13 @@ __webpack_require__.r(__webpack_exports__);
 /** @generic */
 var STRING_SESSION_EXPIRED = "Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.";
 var STRING_DEFAULT_FILE_ERROR = "Please use FileSafe or the Bold Editor to attach images and files. Learn more at standardnotes.org/filesafe.";
+var STRING_GENERIC_SYNC_ERROR = "There was an error syncing. Please try again. If all else fails, try signing out and signing back in.";
 function StringSyncException(data) {
   return "There was an error while trying to save your items. Please contact support and share this message: ".concat(data, ".");
 }
+/** @footer */
+
+var STRING_NEW_UPDATE_READY = "A new update is ready to install. Please use the top-level 'Updates' menu to manage installation.";
 /** @tags */
 
 var STRING_DELETE_TAG = "Are you sure you want to delete this tag? Note: deleting a tag will not delete its notes.";

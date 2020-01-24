@@ -10,8 +10,8 @@ export class NativeExtManager {
     this.syncManager = syncManager;
     this.singletonManager = singletonManager;
 
-    this.extensionsManagerIdentifier = "org.standardnotes.extensions-manager";
-    this.batchManagerIdentifier = "org.standardnotes.batch-manager";
+    this.extManagerId = "org.standardnotes.extensions-manager";
+    this.batchManagerId = "org.standardnotes.batch-manager";
     this.systemExtensions = [];
 
     this.resolveExtensionsManager();
@@ -25,7 +25,7 @@ export class NativeExtManager {
   resolveExtensionsManager() {
 
     let contentTypePredicate = new SFPredicate("content_type", "=", "SN|Component");
-    let packagePredicate = new SFPredicate("package_info.identifier", "=", this.extensionsManagerIdentifier);
+    let packagePredicate = new SFPredicate("package_info.identifier", "=", this.extManagerId);
 
     this.singletonManager.registerSingleton([contentTypePredicate, packagePredicate], (resolvedSingleton) => {
       // Resolved Singleton
@@ -65,7 +65,7 @@ export class NativeExtManager {
 
       let packageInfo = {
         name: "Extensions",
-        identifier: this.extensionsManagerIdentifier
+        identifier: this.extManagerId
       }
 
       var item = {
@@ -107,7 +107,7 @@ export class NativeExtManager {
   resolveBatchManager() {
 
     let contentTypePredicate = new SFPredicate("content_type", "=", "SN|Component");
-    let packagePredicate = new SFPredicate("package_info.identifier", "=", this.batchManagerIdentifier);
+    let packagePredicate = new SFPredicate("package_info.identifier", "=", this.batchManagerId);
 
     this.singletonManager.registerSingleton([contentTypePredicate, packagePredicate], (resolvedSingleton) => {
       // Resolved Singleton
@@ -140,7 +140,7 @@ export class NativeExtManager {
 
       let packageInfo = {
         name: "Batch Manager",
-        identifier: this.batchManagerIdentifier
+        identifier: this.batchManagerId
       }
 
       var item = {

@@ -36,6 +36,10 @@ class RootCtrl {
     alertManager,
     preferencesManager,
   ) {
+    this.$rootScope = $rootScope;
+    this.$scope = $scope;
+    this.$location = $location;
+    this.$timeout = $timeout;
     this.dbManager = dbManager;
     this.syncManager = syncManager;
     this.statusManager = statusManager;
@@ -46,10 +50,6 @@ class RootCtrl {
     this.alertManager = alertManager;
     this.preferencesManager = preferencesManager;
     this.passcodeManager = passcodeManager;
-    this.$rootScope = $rootScope;
-    this.$scope = $scope;
-    this.$location = $location;
-    this.$timeout = $timeout;
 
     this.defineRootScopeFunctions();
     this.handleAutoSignInFromParams();

@@ -8,39 +8,63 @@ export class AlertManager extends SFAlertManager {
     this.$timeout = $timeout;
   }
 
-  async alert({title, text, closeButtonText = "OK", onClose} = {}) {
+  async alert({
+    title, 
+    text,
+    closeButtonText = "OK",
+    onClose} = {}
+  ) {
     return new Promise((resolve, reject) => {
-      let buttons = [
-        {text: closeButtonText, style: "neutral", action: async () => {
-          if(onClose) {
-            this.$timeout(onClose);
+      const buttons = [
+        {
+          text: closeButtonText,
+          style: "neutral",
+          action: async () => {
+            if(onClose) {
+              this.$timeout(onClose);
+            }
+            resolve(true);
           }
-          resolve(true);
-        }}
+        }
       ]
-      let alert = new SKAlert({title, text, buttons});
+      const alert = new SKAlert({title, text, buttons});
       alert.present();
     })
   }
 
-  async confirm({title, text, confirmButtonText = "Confirm", cancelButtonText = "Cancel", onConfirm, onCancel, destructive = false} = {}) {
+  async confirm({
+    title,
+    text,
+    confirmButtonText = "Confirm",
+    cancelButtonText = "Cancel",
+    onConfirm,
+    onCancel,
+    destructive = false
+  } = {}) {
     return new Promise((resolve, reject) => {
-      let buttons = [
-        {text: cancelButtonText, style: "neutral", action: async () => {
-          if(onCancel) {
-            this.$timeout(onCancel);
+      const buttons = [
+        {
+          text: cancelButtonText,
+          style: "neutral",
+          action: async () => {
+            if(onCancel) {
+              this.$timeout(onCancel);
+            }
+            reject(false);
           }
-          reject(false);
-        }},
-        {text: confirmButtonText, style: destructive ? "danger" : "info", action: async () => {
-          if(onConfirm) {
-            this.$timeout(onConfirm);
+        },
+        {
+          text: confirmButtonText,
+          style: destructive ? "danger" : "info",
+          action: async () => {
+            if(onConfirm) {
+              this.$timeout(onConfirm);
+            }
+            resolve(true);
           }
-          resolve(true);
-        }},
+        },
       ];
-
-      let alert = new SKAlert({title, text, buttons});
+      const alert = new SKAlert({title, text, buttons});
       alert.present();
     })
   }
