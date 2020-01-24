@@ -5,7 +5,6 @@ export function StringSyncException(data) {
   return `There was an error while trying to save your items. Please contact support and share this message: ${data}.`
 }
 
-
 /** @tags */
 export const STRING_DELETE_TAG              = "Are you sure you want to delete this tag? Note: deleting a tag will not delete its notes.";
 

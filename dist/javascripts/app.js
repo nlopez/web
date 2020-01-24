@@ -2005,77 +2005,115 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var LockScreen =
+var ELEMENT_ID_PASSCODE_INPUT = 'passcode-input';
+
+var LockScreenCtrl =
 /*#__PURE__*/
 function () {
-  function LockScreen() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, LockScreen);
+  LockScreenCtrl.$inject = ["$scope", "alertManager", "authManager", "passcodeManager"];
 
-    this.restrict = "E";
-    this.template = _lock_screen_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
-    this.scope = {
-      onSuccess: "&"
-    };
-  }
   /* @ngInject */
+  function LockScreenCtrl($scope, alertManager, authManager, passcodeManager) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, LockScreenCtrl);
 
+    this.$scope = $scope;
+    this.alertManager = alertManager;
+    this.authManager = authManager;
+    this.passcodeManager = passcodeManager;
+    this.formData = {};
+    this.addVisibilityObserver();
+    this.addDestroyHandler();
+  }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(LockScreen, [{
-    key: "controller",
-    value: ["$scope", "passcodeManager", "authManager", "syncManager", "storageManager", "alertManager", function controller($scope, passcodeManager, authManager, syncManager, storageManager, alertManager) {
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(LockScreenCtrl, [{
+    key: "addDestroyHandler",
+    value: function addDestroyHandler() {
       var _this = this;
 
-      $scope.formData = {};
-      this.visibilityObserver = passcodeManager.addVisibilityObserver(function (visible) {
+      this.$scope.$on('$destroy', function () {
+        _this.passcodeManager.removeVisibilityObserver(_this.visibilityObserver);
+      });
+    }
+  }, {
+    key: "addVisibilityObserver",
+    value: function addVisibilityObserver() {
+      var _this2 = this;
+
+      this.visibilityObserver = this.passcodeManager.addVisibilityObserver(function (visible) {
         if (visible) {
-          var input = document.getElementById("passcode-input");
+          var input = _this2.passcodeInput;
 
           if (input) {
             input.focus();
           }
         }
       });
-      $scope.$on("$destroy", function () {
-        passcodeManager.removeVisibilityObserver(_this.visibilityObserver);
-      });
+    }
+  }, {
+    key: "submitPasscodeForm",
+    value: function submitPasscodeForm($event) {
+      var _this3 = this;
 
-      $scope.submitPasscodeForm = function () {
-        if (!$scope.formData.passcode || $scope.formData.passcode.length == 0) {
-          return;
+      if (!this.formData.passcode || this.formData.passcode.length == 0) {
+        return;
+      }
+
+      this.passcodeInput.blur();
+      this.passcodeManager.unlock(this.formData.passcode, function (success) {
+        if (!success) {
+          _this3.alertManager.alert({
+            text: "Invalid passcode. Please try again.",
+            onClose: function onClose() {
+              _this3.passcodeInput.focus();
+            }
+          });
+        } else {
+          _this3.onSuccess()();
         }
+      });
+    }
+  }, {
+    key: "forgotPasscode",
+    value: function forgotPasscode() {
+      this.formData.showRecovery = true;
+    }
+  }, {
+    key: "beginDeleteData",
+    value: function beginDeleteData() {
+      var _this4 = this;
 
-        passcodeManager.unlock($scope.formData.passcode, function (success) {
-          if (!success) {
-            alertManager.alert({
-              text: "Invalid passcode. Please try again."
-            });
-            return;
-          }
-
-          $scope.onSuccess()();
-        });
-      };
-
-      $scope.forgotPasscode = function () {
-        $scope.formData.showRecovery = true;
-      };
-
-      $scope.beginDeleteData = function () {
-        alertManager.confirm({
-          text: "Are you sure you want to clear all local data?",
-          destructive: true,
-          onConfirm: function onConfirm() {
-            authManager.signout(true).then(function () {
-              window.location.reload();
-            });
-          }
-        });
-      };
-    }]
+      this.alertManager.confirm({
+        text: "Are you sure you want to clear all local data?",
+        destructive: true,
+        onConfirm: function onConfirm() {
+          _this4.authManager.signout(true).then(function () {
+            window.location.reload();
+          });
+        }
+      });
+    }
+  }, {
+    key: "passcodeInput",
+    get: function get() {
+      return document.getElementById(ELEMENT_ID_PASSCODE_INPUT);
+    }
   }]);
 
-  return LockScreen;
+  return LockScreenCtrl;
 }();
+
+var LockScreen = function LockScreen() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, LockScreen);
+
+  this.restrict = 'E';
+  this.template = _lock_screen_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
+  this.controller = LockScreenCtrl;
+  this.controllerAs = 'ctrl';
+  this.bindToController = true;
+  this.scope = {
+    onSuccess: '&'
+  };
+};
 
 /***/ }),
 
@@ -68099,7 +68137,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\" id=\"lock-screen\"\u003E\u003Cdiv class=\"sk-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003EPasscode Required\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Cform class=\"sk-panel-form sk-panel-row\" ng-submit=\"submitPasscodeForm()\"\u003E\u003Cdiv class=\"sk-panel-column stretch\"\u003E\u003Cinput class=\"center-text sk-input contrast\" id=\"passcode-input\" autocomplete=\"new-password\" autofocus=\"true\" ng-model=\"formData.passcode\" placeholder=\"Enter Passcode\" should-focus=\"true\" sn-autofocus=\"true\" type=\"password\"\u003E\u003Cdiv class=\"sk-button-group stretch sk-panel-row form-submit\"\u003E\u003Cbutton class=\"sk-button info\" type=\"submit\"\u003E\u003Cdiv class=\"sk-label\"\u003EUnlock\u003C\u002Fdiv\u003E\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-footer\"\u003E\u003Cdiv id=\"passcode-reset\"\u003E\u003Ca class=\"sk-a neutral\" ng-click=\"forgotPasscode()\" ng-if=\"!formData.showRecovery\"\u003EForgot?\u003C\u002Fa\u003E\u003Cdiv ng-if=\"formData.showRecovery\"\u003E\u003Cdiv class=\"sk-p\"\u003EIf you forgot your local passcode, your only option is to clear your local data from this device\nand sign back in to your account.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a danger center-text\" ng-click=\"beginDeleteData()\"\u003EDelete Local Data\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\" id=\"lock-screen\"\u003E\u003Cdiv class=\"sk-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003EPasscode Required\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Cform class=\"sk-panel-form sk-panel-row\" ng-submit=\"ctrl.submitPasscodeForm($event)\"\u003E\u003Cdiv class=\"sk-panel-column stretch\"\u003E\u003Cinput class=\"center-text sk-input contrast\" id=\"passcode-input\" autocomplete=\"new-password\" autofocus=\"true\" ng-model=\"ctrl.formData.passcode\" placeholder=\"Enter Passcode\" should-focus=\"true\" sn-autofocus=\"true\" type=\"password\"\u003E\u003Cdiv class=\"sk-button-group stretch sk-panel-row form-submit\"\u003E\u003Cbutton class=\"sk-button info\" type=\"submit\"\u003E\u003Cdiv class=\"sk-label\"\u003EUnlock\u003C\u002Fdiv\u003E\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-footer\"\u003E\u003Cdiv id=\"passcode-reset\"\u003E\u003Ca class=\"sk-a neutral\" ng-click=\"ctrl.forgotPasscode()\" ng-if=\"!ctrl.formData.showRecovery\"\u003EForgot?\u003C\u002Fa\u003E\u003Cdiv ng-if=\"ctrl.formData.showRecovery\"\u003E\u003Cdiv class=\"sk-p\"\u003EIf you forgot your local passcode, your only option is to clear \nyour local data from this device and sign back in to your account.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a danger center-text\" ng-click=\"ctrl.beginDeleteData()\"\u003EDelete Local Data\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),
