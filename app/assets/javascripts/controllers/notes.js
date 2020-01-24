@@ -83,10 +83,6 @@ class NotesCtrl {
     angular.element(document).ready(() => {
       this.loadPreferences();
     });
-
-    this.$rootScope.$on('noteArchived', () => {
-      this.$timeout(this.selectNextOrCreateNew.bind(this));
-    });
   }
 
   addAppStateObserver() {
@@ -156,8 +152,10 @@ class NotesCtrl {
       'note-list',
       '*',
       (allItems, validItems, deletedItems, source, sourceKey) => {
-        if(this.selectedNote &&
-          (this.selectedNote.deleted || this.selectedNote.content.trashed)) {
+        if(
+          this.selectedNote &&
+          (this.selectedNote.deleted || this.selectedNote.content.trashed)
+        ) {
           this.selectNextOrCreateNew();
         }
         this.reloadNotes();

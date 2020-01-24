@@ -245,6 +245,7 @@ var APP_DATA_KEY_PREFERS_PLAIN_EDITOR = 'prefersPlainEditor';
 var ELEMENT_ID_NOTE_TEXT_EDITOR = 'note-text-editor';
 var ELEMENT_ID_NOTE_TITLE_EDITOR = 'note-title-editor';
 var ELEMENT_ID_EDITOR_CONTENT = 'editor-content';
+var ELEMENT_ID_NOTE_TAGS_COMPONENT_CONTAINER = 'note-tags-component-container';
 var DESKTOP_MONOSPACE_FAMILY = "Menlo,Consolas,'DejaVu Sans Mono',monospace";
 var WEB_MONOSPACE_FAMILY = "monospace";
 var SANS_SERIF_FAMILY = "inherit";
@@ -479,9 +480,9 @@ function () {
           return;
         }
 
-        if (eventName === "sync:taking-too-long") {
+        if (eventName === 'sync:taking-too-long') {
           _this4.syncTakingTooLong = true;
-        } else if (eventName === "sync:completed") {
+        } else if (eventName === 'sync:completed') {
           _this4.syncTakingTooLong = false;
 
           if (_this4.note.dirty) {
@@ -496,7 +497,7 @@ function () {
               _this4.showAllChangesSavedStatus();
             }
           }
-        } else if (eventName === "sync:error") {
+        } else if (eventName === 'sync:error') {
           /**
            * Only show error status in editor if the note is dirty.
            * Otherwise, it means the originating sync came from somewhere else
@@ -526,7 +527,7 @@ function () {
     }
   }, {
     key: "setNote",
-    value: function setNote(note, oldNote) {
+    value: function setNote(note, previousNote) {
       var _this6 = this;
 
       this.showExtensions = false;
@@ -581,9 +582,9 @@ function () {
         this.focusTitle(100);
       }
 
-      if (oldNote && oldNote !== note) {
-        if (oldNote.dummy) {
-          this.performNoteDeletion(oldNote);
+      if (previousNote && previousNote !== note) {
+        if (previousNote.dummy) {
+          this.performNoteDeletion(previousNote);
         }
       }
     }
@@ -1007,7 +1008,6 @@ function () {
         bypassDebouncer: true,
         dontUpdatePreviews: true
       });
-      this.$rootScope.$broadcast("noteArchived");
     }
   }, {
     key: "clickedEditNote",
@@ -1225,29 +1225,28 @@ function () {
           if (component.area === 'note-tags') {
             _this14.tagsComponent = component.active ? component : null;
           } else if (component.area === 'editor-editor') {
-            // An editor is already active, ensure the potential replacement is explicitely enabled for this item
-            // We also check if the selectedEditor is active. If it's inactive, we want to treat it as an external reference wishing to deactivate this editor (i.e componentView)
-            if (_this14.selectedEditor && _this14.selectedEditor == component && component.active == false) {
+            if (component === _this14.selectedEditor && !component.active) {
               _this14.selectedEditor = null;
             } else if (_this14.selectedEditor) {
               if (_this14.selectedEditor.active) {
-                // In the case where an editor is duplicated, then you'll have two editors who are explicitely enabled for the same note.
-                // This will cause an infinite loop, where as soon as the first is enabled, the second will come in, pass the `isExplicitlyEnabledForItem` check,
-                // and replace the previous one. So we now check to make the current editor isn't also explicitely enabled, and if it is, then we'll just keep that one active.
                 if (component.isExplicitlyEnabledForItem(_this14.note) && !_this14.selectedEditor.isExplicitlyEnabledForItem(_this14.note)) {
                   _this14.selectedEditor = component;
                 }
               }
             } else {
-              // If no selected editor, let's see if the incoming one is a candidate
-              if (component.active && _this14.note && (component.isExplicitlyEnabledForItem(_this14.note) || component.isDefaultEditor())) {
+              var enableable = component.isExplicitlyEnabledForItem(_this14.note) || component.isDefaultEditor();
+
+              if (component.active && _this14.note && enableable) {
                 _this14.selectedEditor = component;
               } else {
-                // Not a candidate, and no selected editor. Disable the current editor by setting selectedEditor to null
+                /**
+                 * Not a candidate, and no qualified editor.
+                 * Disable the current editor.
+                 */
                 _this14.selectedEditor = null;
               }
             }
-          } else if (component.area == 'editor-stack') {
+          } else if (component.area === 'editor-stack') {
             _this14.reloadComponentContext();
           }
         },
@@ -1266,29 +1265,31 @@ function () {
             var setSize = function setSize(element, size) {
               var widthString = typeof size.width === 'string' ? size.width : "".concat(data.width, "px");
               var heightString = typeof size.height === 'string' ? size.height : "".concat(data.height, "px");
-              element.setAttribute("style", "width:".concat(widthString, "; height:").concat(heightString, "; "));
+              element.setAttribute('style', "width: ".concat(widthString, "; height: ").concat(heightString, ";"));
             };
 
-            if (data.type == 'container') {
-              if (component.area == 'note-tags') {
-                var container = document.getElementById('note-tags-component-container');
+            if (data.type === 'container') {
+              if (component.area === 'note-tags') {
+                var container = document.getElementById(ELEMENT_ID_NOTE_TAGS_COMPONENT_CONTAINER);
                 setSize(container, data);
               }
             }
-          } else if (action === "associate-item") {
-            if (data.item.content_type == "Tag") {
+          } else if (action === 'associate-item') {
+            if (data.item.content_type === 'Tag') {
               var tag = _this14.modelManager.findItem(data.item.uuid);
 
               _this14.addTag(tag);
             }
-          } else if (action === "deassociate-item") {
+          } else if (action === 'deassociate-item') {
             var _tag2 = _this14.modelManager.findItem(data.item.uuid);
 
             _this14.removeTag(_tag2);
-          } else if (action === "save-items") {
-            if (data.items.map(function (item) {
+          } else if (action === 'save-items') {
+            var includesNote = data.items.map(function (item) {
               return item.uuid;
-            }).includes(_this14.note.uuid)) {
+            }).includes(_this14.note.uuid);
+
+            if (includesNote) {
               _this14.showSavingStatus();
             }
           }
@@ -1298,7 +1299,8 @@ function () {
   }, {
     key: "reloadComponentStackArray",
     value: function reloadComponentStackArray() {
-      this.componentStack = this.componentManager.componentsForArea("editor-stack").sort(function (a, b) {
+      var components = this.componentManager.componentsForArea('editor-stack');
+      this.componentStack = components.sort(function (a, b) {
         return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
       });
     }
@@ -1336,9 +1338,9 @@ function () {
         }
       }
 
-      this.componentManager.contextItemDidChangeInArea("note-tags");
-      this.componentManager.contextItemDidChangeInArea("editor-stack");
-      this.componentManager.contextItemDidChangeInArea("editor-editor");
+      this.componentManager.contextItemDidChangeInArea('note-tags');
+      this.componentManager.contextItemDidChangeInArea('editor-stack');
+      this.componentManager.contextItemDidChangeInArea('editor-editor');
     }
   }, {
     key: "toggleStackComponentForCurrentItem",
@@ -1351,7 +1353,7 @@ function () {
           this.componentManager.activateComponent(component);
         }
 
-        this.componentManager.contextItemDidChangeInArea("editor-stack");
+        this.componentManager.contextItemDidChangeInArea('editor-stack');
       } else {
         this.componentManager.setComponentHidden(component, true);
         this.disassociateComponentWithCurrentNote(component);
@@ -1451,26 +1453,24 @@ function () {
         element: editor,
         key: _services_keyboardManager__WEBPACK_IMPORTED_MODULE_7__["KeyboardManager"].KeyTab,
         onKeyDown: function onKeyDown(event) {
-          if (event.shiftKey) {
+          if (_this18.note.locked || event.shiftKey) {
             return;
           }
 
-          if (_this18.note.locked) {
-            return;
-          }
+          event.preventDefault();
+          /** Using document.execCommand gives us undo support */
 
-          event.preventDefault(); // Using document.execCommand gives us undo support
-
-          var insertSuccessful = document.execCommand("insertText", false, "\t");
+          var insertSuccessful = document.execCommand('insertText', false, '\t');
 
           if (!insertSuccessful) {
-            // document.execCommand works great on Chrome/Safari but not Firefox
+            /** document.execCommand works great on Chrome/Safari but not Firefox */
             var start = editor.selectionStart;
             var end = editor.selectionEnd;
-            var spaces = "    "; // Insert 4 spaces
+            var spaces = '    ';
+            /** Insert 4 spaces */
 
-            editor.value = editor.value.substring(0, start) + spaces + editor.value.substring(end); // Place cursor 4 spaces away from where
-            // the tab key was pressed
+            editor.value = editor.value.substring(0, start) + spaces + editor.value.substring(end);
+            /** Place cursor 4 spaces away from where the tab key was pressed */
 
             editor.selectionStart = editor.selectionEnd = start + 4;
           }
@@ -1483,7 +1483,11 @@ function () {
             });
           });
         }
-      }); // This handles when the editor itself is destroyed, and not when our controller is destroyed.
+      });
+      /**
+       * Handles when the editor is destroyed,
+       * (and not when our controller is destroyed.)
+       */
 
       angular__WEBPACK_IMPORTED_MODULE_4___default.a.element(editor).on('$destroy', function () {
         if (_this18.tabObserver) {
@@ -2185,9 +2189,6 @@ function () {
     this.registerKeyboardShortcuts();
     angular__WEBPACK_IMPORTED_MODULE_5___default.a.element(document).ready(function () {
       _this.loadPreferences();
-    });
-    this.$rootScope.$on('noteArchived', function () {
-      _this.$timeout(_this.selectNextOrCreateNew.bind(_this));
     });
   }
 

@@ -1,4 +1,3 @@
-
 import angular from 'angular';
 import { SFModelManager } from 'snjs';
 import { isDesktopApplication } from '@/utils';
@@ -41,6 +40,7 @@ const APP_DATA_KEY_PREFERS_PLAIN_EDITOR = 'prefersPlainEditor';
 const ELEMENT_ID_NOTE_TEXT_EDITOR  = 'note-text-editor';
 const ELEMENT_ID_NOTE_TITLE_EDITOR = 'note-title-editor';
 const ELEMENT_ID_EDITOR_CONTENT    = 'editor-content';
+const ELEMENT_ID_NOTE_TAGS_COMPONENT_CONTAINER = 'note-tags-component-container';
 
 const DESKTOP_MONOSPACE_FAMILY = `Menlo,Consolas,'DejaVu Sans Mono',monospace`;
 const WEB_MONOSPACE_FAMILY     = `monospace`;
@@ -181,9 +181,9 @@ class EditorCtrl {
       if(!this.note) {
         return;
       }
-      if(eventName === "sync:taking-too-long") {
+      if(eventName === 'sync:taking-too-long') {
         this.syncTakingTooLong = true;
-      } else if(eventName === "sync:completed") {
+      } else if(eventName === 'sync:completed') {
         this.syncTakingTooLong = false;
         if(this.note.dirty) {
           /** if we're still dirty, don't change status, a sync is likely upcoming. */
@@ -196,7 +196,7 @@ class EditorCtrl {
             this.showAllChangesSavedStatus();
           }
         }
-      } else if(eventName === "sync:error") {
+      } else if(eventName === 'sync:error') {
         /**
          * Only show error status in editor if the note is dirty.
          * Otherwise, it means the originating sync came from somewhere else
@@ -210,7 +210,8 @@ class EditorCtrl {
   }
 
   addSyncStatusObserver() {
-    this.syncStatusObserver = this.syncManager.registerSyncStatusObserver((status) => {
+    this.syncStatusObserver = this.syncManager.
+    registerSyncStatusObserver((status) => {
       if(status.localError) {
         this.$timeout(() => {
           this.showErrorStatus({
@@ -222,7 +223,7 @@ class EditorCtrl {
     })
   }
 
-  setNote(note, oldNote) {
+  setNote(note, previousNote) {
     this.showExtensions = false;
     this.showMenu = false;
     this.noteStatus = null;
@@ -242,7 +243,6 @@ class EditorCtrl {
         this.loadPreferences();
       })
     }
-
     const associatedEditor = this.editorForNote(note);
     if(associatedEditor && associatedEditor !== this.selectedEditor) {
       /**
@@ -267,10 +267,9 @@ class EditorCtrl {
     if(note.safeText().length === 0 && note.dummy) {
       this.focusTitle(100);
     }
-
-    if(oldNote && oldNote !== note) {
-      if(oldNote.dummy) {
-        this.performNoteDeletion(oldNote);
+    if(previousNote && previousNote !== note) {
+      if(previousNote.dummy) {
+        this.performNoteDeletion(previousNote);
       }
     }
   }
@@ -672,7 +671,6 @@ class EditorCtrl {
       bypassDebouncer: true,
       dontUpdatePreviews: true
     });
-    this.$rootScope.$broadcast("noteArchived");
   }
 
   clickedEditNote() {
@@ -874,37 +872,52 @@ class EditorCtrl {
         if(component.area === 'note-tags') {
           this.tagsComponent = component.active ? component : null;
         } else if(component.area === 'editor-editor') {
-          // An editor is already active, ensure the potential replacement is explicitely enabled for this item
-          // We also check if the selectedEditor is active. If it's inactive, we want to treat it as an external reference wishing to deactivate this editor (i.e componentView)
-          if(this.selectedEditor && this.selectedEditor == component && component.active == false) {
+          if(
+            component === this.selectedEditor
+            && !component.active
+          ) {
             this.selectedEditor = null;
           }
           else if(this.selectedEditor) {
             if(this.selectedEditor.active) {
-              // In the case where an editor is duplicated, then you'll have two editors who are explicitely enabled for the same note.
-              // This will cause an infinite loop, where as soon as the first is enabled, the second will come in, pass the `isExplicitlyEnabledForItem` check,
-              // and replace the previous one. So we now check to make the current editor isn't also explicitely enabled, and if it is, then we'll just keep that one active.
-              if(component.isExplicitlyEnabledForItem(this.note) && !this.selectedEditor.isExplicitlyEnabledForItem(this.note)) {
+              if(
+                component.isExplicitlyEnabledForItem(this.note)
+                && !this.selectedEditor.isExplicitlyEnabledForItem(this.note)
+              ) {
                 this.selectedEditor = component;
               }
             }
           }
           else {
-            // If no selected editor, let's see if the incoming one is a candidate
-            if(component.active && this.note && (component.isExplicitlyEnabledForItem(this.note) || component.isDefaultEditor())) {
+            const enableable = (
+              component.isExplicitlyEnabledForItem(this.note)
+              || component.isDefaultEditor()
+            );
+            if(
+              component.active
+              && this.note
+              && enableable
+            ) {
               this.selectedEditor = component;
             } else {
-              // Not a candidate, and no selected editor. Disable the current editor by setting selectedEditor to null
+              /**
+               * Not a candidate, and no qualified editor.
+               * Disable the current editor.
+               */
               this.selectedEditor = null;
             }
           }
 
-        } else if(component.area == 'editor-stack') {
+        } else if(component.area === 'editor-stack') {
           this.reloadComponentContext();
         }
     },
     contextRequestHandler: (component) => {
-      if(component == this.selectedEditor || component == this.tagsComponent || this.componentStack.includes(component)) {
+      if(
+        component == this.selectedEditor ||
+        component == this.tagsComponent ||
+        this.componentStack.includes(component)
+      ) {
         return this.note;
       }
     },
@@ -915,34 +928,42 @@ class EditorCtrl {
     },
     actionHandler: (component, action, data) => {
       if(action === 'set-size') {
-        var setSize = function(element, size) {
-          var widthString = typeof size.width === 'string' ? size.width : `${data.width}px`;
-          var heightString = typeof size.height === 'string' ? size.height : `${data.height}px`;
-          element.setAttribute("style", `width:${widthString}; height:${heightString}; `);
+        const setSize = function(element, size) {
+          const widthString = typeof size.width === 'string'
+            ? size.width
+            : `${data.width}px`;
+          const heightString = typeof size.height === 'string'
+            ? size.height
+            : `${data.height}px`;
+          element.setAttribute(
+            'style',
+            `width: ${widthString}; height: ${heightString};`
+          );
         }
-
-        if(data.type == 'container') {
-          if(component.area == 'note-tags') {
-            var container = document.getElementById('note-tags-component-container');
+        if(data.type === 'container') {
+          if(component.area === 'note-tags') {
+            const container = document.getElementById(
+              ELEMENT_ID_NOTE_TAGS_COMPONENT_CONTAINER
+            );
             setSize(container, data);
           }
         }
       }
-
-      else if(action === "associate-item") {
-        if(data.item.content_type == "Tag") {
+      else if(action === 'associate-item') {
+        if(data.item.content_type === 'Tag') {
           const tag = this.modelManager.findItem(data.item.uuid);
           this.addTag(tag);
         }
       }
-
-      else if(action === "deassociate-item") {
+      else if(action === 'deassociate-item') {
         const tag = this.modelManager.findItem(data.item.uuid);
         this.removeTag(tag);
       }
-
-      else if(action === "save-items") {
-        if(data.items.map((item) => {return item.uuid}).includes(this.note.uuid)) {
+      else if(action === 'save-items') {
+        const includesNote = data.items.map((item) => {
+          return item.uuid
+        }).includes(this.note.uuid);
+        if(includesNote) {
           this.showSavingStatus();
         }
       }
@@ -950,7 +971,8 @@ class EditorCtrl {
   }
 
   reloadComponentStackArray() {
-    this.componentStack = this.componentManager.componentsForArea("editor-stack").sort((a, b) => {
+    const components = this.componentManager.componentsForArea('editor-stack');
+    this.componentStack = components.sort((a, b) => {
       return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
     });
   }
@@ -968,9 +990,9 @@ class EditorCtrl {
       }
     }
 
-    this.componentManager.contextItemDidChangeInArea("note-tags");
-    this.componentManager.contextItemDidChangeInArea("editor-stack");
-    this.componentManager.contextItemDidChangeInArea("editor-editor");
+    this.componentManager.contextItemDidChangeInArea('note-tags');
+    this.componentManager.contextItemDidChangeInArea('editor-stack');
+    this.componentManager.contextItemDidChangeInArea('editor-editor');
   }
 
   toggleStackComponentForCurrentItem(component) {
@@ -980,7 +1002,7 @@ class EditorCtrl {
       if(!component.active) {
         this.componentManager.activateComponent(component);
       }
-      this.componentManager.contextItemDidChangeInArea("editor-stack");
+      this.componentManager.contextItemDidChangeInArea('editor-stack');
     } else {
       this.componentManager.setComponentHidden(component, true);
       this.disassociateComponentWithCurrentNote(component);
@@ -989,7 +1011,7 @@ class EditorCtrl {
 
   disassociateComponentWithCurrentNote(component) {
     component.associatedItemIds = component.associatedItemIds.filter((id) => {
-      return id !== this.note.uuid
+      return id !== this.note.uuid;
     });
 
     if(!component.disassociatedItemIds.includes(this.note.uuid)) {
@@ -1001,8 +1023,9 @@ class EditorCtrl {
   }
 
   associateComponentWithCurrentNote(component) {
-    component.disassociatedItemIds = component.disassociatedItemIds.filter((id) => {
-      return id !== this.note.uuid
+    component.disassociatedItemIds = component.disassociatedItemIds
+    .filter((id) => {
+      return id !== this.note.uuid;
     });
 
     if(!component.associatedItemIds.includes(this.note.uuid)) {
@@ -1065,7 +1088,6 @@ class EditorCtrl {
       return;
     }
     this.loadedTabListener = true;
-
     /**
      * Insert 4 spaces when a tab key is pressed,
      * only used when inside of the text editor.
@@ -1079,37 +1101,27 @@ class EditorCtrl {
       element: editor,
       key: KeyboardManager.KeyTab,
       onKeyDown: (event) => {
-        if(event.shiftKey) {
+        if(this.note.locked || event.shiftKey) {
           return;
         }
-
-        if(this.note.locked) {
-          return;
-        }
-
         event.preventDefault();
-
-        // Using document.execCommand gives us undo support
+        /** Using document.execCommand gives us undo support */
         const insertSuccessful = document.execCommand(
-          "insertText",
+          'insertText',
           false,
-          "\t"
+          '\t'
         );
         if(!insertSuccessful) {
-          // document.execCommand works great on Chrome/Safari but not Firefox
+          /** document.execCommand works great on Chrome/Safari but not Firefox */
           const start = editor.selectionStart;
           const end = editor.selectionEnd;
-          const spaces = "    ";
-
-          // Insert 4 spaces
+          const spaces = '    ';
+          /** Insert 4 spaces */
           editor.value = editor.value.substring(0, start)
             + spaces + editor.value.substring(end);
-
-          // Place cursor 4 spaces away from where
-          // the tab key was pressed
+          /** Place cursor 4 spaces away from where the tab key was pressed */
           editor.selectionStart = editor.selectionEnd = start + 4;
         }
-
         this.$timeout(() => {
           this.note.text = editor.value;
           this.saveNote({
@@ -1119,7 +1131,10 @@ class EditorCtrl {
       },
     })
 
-    // This handles when the editor itself is destroyed, and not when our controller is destroyed.
+    /**
+     * Handles when the editor is destroyed,
+     * (and not when our controller is destroyed.)
+     */
     angular.element(editor).on('$destroy', () => {
       if(this.tabObserver) {
         this.keyboardManager.removeKeyObserver(this.tabObserver);
