@@ -1,72 +1,69 @@
 import { SNNote, SNSmartTag } from 'snjs';
 import template from '%/tags.pug';
-import {
-  APP_STATE_EVENT_PREFERENCES_CHANGED
-} from '@/state';
-import {
-  PANEL_NAME_TAGS
-} from '@/controllers/constants';
-import {
-  PREF_TAGS_PANEL_WIDTH
-} from '@/services/preferencesManager';
+import { APP_STATE_EVENT_PREFERENCES_CHANGED } from '@/state';
+import { PANEL_NAME_TAGS } from '@/controllers/constants';
+import { PREF_TAGS_PANEL_WIDTH } from '@/services/preferencesManager';
+import { STRING_DELETE_TAG } from '@/strings';
 
-export class TagsPanel {
-  constructor() {
-    this.restrict = 'E';
-    this.scope = {};
-    this.template = template;
-    this.replace = true;
-    this.controllerAs = 'ctrl';
-    this.bindToController = true;
-  }
-
+class TagsPanelCtrl {
   /* @ngInject */
-  controller(
+  constructor(
     $rootScope,
+    $timeout,
     modelManager,
     syncManager,
-    $timeout,
     componentManager,
-    authManager,
     appState,
     alertManager,
     preferencesManager
   ) {
-    // Wrap in timeout so that selectTag is defined
+    this.componentManager = componentManager;
+    this.modelManager = modelManager;
+    this.syncManager = syncManager;
+    this.appState = appState;
+    this.modelManager = modelManager;
+    this.alertManager = alertManager;
+    this.preferencesManager = preferencesManager;
+    this.$rootScope = $rootScope;
+    this.$timeout = $timeout;
     $timeout(() => {
-      this.smartTags = modelManager.getSmartTags();
-      this.selectTag(this.smartTags[0]);
+      this.selectDefaultTag();
     })
+    this.addSyncEventHandler();
+    this.addAppStateObserver();
+    this.addMappingObserver();
+    this.loadPreferences();
+    this.registerComponentHandler();
+  }
 
-    syncManager.addEventHandler((syncEvent, data) => {
+  addSyncEventHandler() {
+    this.syncManager.addEventHandler((syncEvent, data) => {
       if(
         syncEvent === 'local-data-loaded' ||
         syncEvent === 'sync:completed' ||
         syncEvent === 'local-data-incremental-load'
       ) {
-        this.tags = modelManager.tags;
-        this.smartTags = modelManager.getSmartTags();
+        this.tags = this.modelManager.tags;
+        this.smartTags = this.modelManager.getSmartTags();
       }
     });
+  }
 
-    appState.addObserver((eventName, data) => {
+  addAppStateObserver() {
+    this.appState.addObserver((eventName, data) => {
       if(eventName === APP_STATE_EVENT_PREFERENCES_CHANGED) {
         this.loadPreferences();
       }
     })
+  }
 
-    modelManager.addItemSyncObserver(
-      'tags-list',
-      '*',
-      (allItems, validItems, deletedItems, source, sourceKey) => {
-        this.reloadNoteCounts();
-      }
-    );
-
-    modelManager.addItemSyncObserver(
+  addMappingObserver() {
+    this.modelManager.addItemSyncObserver(
       'tags-list-tags',
       'Tag',
       (allItems, validItems, deletedItems, source, sourceKey) => {
+        this.reloadNoteCounts();
+
         if(!this.selectedTag) {
           return;
         }
@@ -79,48 +76,49 @@ export class TagsPanel {
         }
       }
     );
+  }
 
-    this.reloadNoteCounts = function() {
-      let allTags = [];
-      if(this.tags) { allTags = allTags.concat(this.tags);}
-      if(this.smartTags) { allTags = allTags.concat(this.smartTags);}
+  reloadNoteCounts() {
+    let allTags = [];
+    if(this.tags) { allTags = allTags.concat(this.tags);}
+    if(this.smartTags) { allTags = allTags.concat(this.smartTags);}
 
-      for(const tag of allTags) {
-        const validNotes = SNNote.filterDummyNotes(tag.notes).filter((note) => {
-          return !note.archived && !note.content.trashed;
-        });
-        tag.cachedNoteCount = validNotes.length;
-      }
-    }
-
-    this.panelController = {};
-
-    this.loadPreferences = function() {
-      let width = preferencesManager.getValue(PREF_TAGS_PANEL_WIDTH);
-      if(width) {
-        this.panelController.setWidth(width);
-        if(this.panelController.isCollapsed()) {
-          appState.panelDidResize({
-            name: PANEL_NAME_TAGS,
-            collapsed: this.panelController.isCollapsed()
-          })
-        }
-      }
-    }
-
-    this.loadPreferences();
-
-    this.onPanelResize = function(newWidth, lastLeft, isAtMaxWidth, isCollapsed) {
-      preferencesManager.setUserPrefValue(PREF_TAGS_PANEL_WIDTH, newWidth, true);
-      appState.panelDidResize({
-        name: PANEL_NAME_TAGS,
-        collapsed: isCollapsed
+    for(const tag of allTags) {
+      const validNotes = SNNote.filterDummyNotes(tag.notes).filter((note) => {
+        return !note.archived && !note.content.trashed;
       });
+      tag.cachedNoteCount = validNotes.length;
     }
+  }
 
-    this.componentManager = componentManager;
+  loadPreferences() {
+    this.panelController = {};
+    const width = this.preferencesManager.getValue(PREF_TAGS_PANEL_WIDTH);
+    if(width) {
+      this.panelController.setWidth(width);
+      if(this.panelController.isCollapsed()) {
+        appState.panelDidResize({
+          name: PANEL_NAME_TAGS,
+          collapsed: this.panelController.isCollapsed()
+        })
+      }
+    }
+  }
 
-    componentManager.registerHandler({
+  onPanelResize(newWidth, lastLeft, isAtMaxWidth, isCollapsed) {
+    this.preferencesManager.setUserPrefValue(
+      PREF_TAGS_PANEL_WIDTH,
+      newWidth,
+      true
+    );
+    this.appState.panelDidResize({
+      name: PANEL_NAME_TAGS,
+      collapsed: isCollapsed
+    });
+  }
+
+  registerComponentHandler() {
+    this.componentManager.registerHandler({
       identifier: 'tags',
       areas: ['tags-list'],
       activationHandler: (component) => {
@@ -132,7 +130,7 @@ export class TagsPanel {
       actionHandler: (component, action, data) => {
         if(action === 'select-item') {
           if(data.item.content_type === 'Tag') {
-            let tag = modelManager.findItem(data.item.uuid);
+            let tag = this.modelManager.findItem(data.item.uuid);
             if(tag) {
               this.selectTag(tag);
             }
@@ -145,98 +143,108 @@ export class TagsPanel {
         }
       }
     });
+  }
 
-    this.selectTag = function(tag) {
-      if(tag.isSmartTag()) {
-        Object.defineProperty(tag, 'notes', {
-          get: () => {
-            return modelManager.notesMatchingSmartTag(tag);
-          }
+  selectTag(tag) {
+    if(tag.isSmartTag()) {
+      Object.defineProperty(tag, 'notes', {
+        get: () => {
+          return this.modelManager.notesMatchingSmartTag(tag);
+        }
+      });
+    }
+    this.selectedTag = tag;
+    if(tag.content.conflict_of) {
+      tag.content.conflict_of = null;
+      this.modelManager.setItemDirty(tag);
+      this.syncManager.sync();
+    }
+
+    this.appState.setSelectedTag(tag);
+  }
+
+  clickedAddNewTag() {
+    if(this.editingTag) {
+      return;
+    }
+    this.newTag = this.modelManager.createItem({
+      content_type: 'Tag'
+    });
+    this.selectedTag = this.newTag;
+    this.editingTag = this.newTag;
+    this.modelManager.addItem(this.newTag);
+  }
+
+  tagTitleDidChange(tag) {
+    this.editingTag = tag;
+  }
+
+  saveTag($event, tag) {
+    $event.target.blur();
+    this.editingTag = null;
+    if(!tag.title || tag.title.length === 0) {
+      if(this.editingOriginalName) {
+        tag.title = this.editingOriginalName;
+        this.editingOriginalName = null;
+      } else {
+        /** Newly created tag without content */
+        this.modelManager.removeItemLocally(tag);
+      }
+      return;
+    }
+
+    if(!tag.title || tag.title.length === 0) {
+      this.removeTag(tag);
+      return;
+    }
+
+    this.modelManager.setItemDirty(tag);
+    this.syncManager.sync();
+    this.modelManager.resortTag(tag);
+    this.selectTag(tag);
+    this.newTag = null;
+  }
+
+  selectedRenameTag($event, tag) {
+    this.editingOriginalName = tag.title;
+    this.editingTag = tag;
+    $timeout(() => {
+      document.getElementById('tag-' + tag.uuid).focus()
+    })
+  }
+
+  selectedDeleteTag(tag) {
+    this.removeTag(tag);
+    this.selectTag(this.smartTags[0]);
+  }
+
+  removeTag(tag) {
+    this.alertManager.confirm({
+      text: STRING_DELETE_TAG,
+      destructive: true,
+      onConfirm: () => {
+        this.modelManager.setItemToBeDeleted(tag);
+        this.syncManager.sync().then(() => {
+          this.$rootScope.safeApply();
         });
       }
-      this.selectedTag = tag;
-      if(tag.content.conflict_of) {
-        tag.content.conflict_of = null;
-        modelManager.setItemDirty(tag, true);
-        syncManager.sync();
-      }
+    });
+  }
 
-      appState.setSelectedTag(tag);
-    }
+  selectDefaultTag() {
+    this.smartTags = this.modelManager.getSmartTags();
+    this.selectTag(this.smartTags[0]);
+  }
+}
 
-    this.clickedAddNewTag = function() {
-      if(this.editingTag) {
-        return;
-      }
-      this.newTag = modelManager.createItem({
-        content_type: 'Tag'
-      });
-      this.selectedTag = this.newTag;
-      this.editingTag = this.newTag;
-      modelManager.addItem(this.newTag);
-    }
-
-    this.tagTitleDidChange = function(tag) {
-      this.editingTag = tag;
-    }
-
-    this.saveTag = function($event, tag) {
-      this.editingTag = null;
-      $event.target.blur();
-
-      if(!tag.title || tag.title.length == 0) {
-        if(originalTagName) {
-          tag.title = originalTagName;
-          originalTagName = null;
-        } else {
-          // newly created tag without content
-          modelManager.removeItemLocally(tag);
-        }
-        return;
-      }
-
-      if(!tag.title || tag.title.length == 0) {
-        this.removeTag(tag);
-        return;
-      }
-
-      modelManager.setItemDirty(tag, true);
-      syncManager.sync().then();
-      modelManager.resortTag(tag);
-      this.selectTag(tag);
-      this.newTag = null;
-    }
-
-    this.removeTag = function(tag) {
-      alertManager.confirm({
-        text: "Are you sure you want to delete this tag? Note: deleting a tag will not delete its notes.",
-        destructive: true,
-        onConfirm: () => {
-          modelManager.setItemToBeDeleted(tag);
-          syncManager.sync().then(() => {
-            // force scope tags to update on sub directives
-            $rootScope.safeApply();
-          });
-        }
-      });
-    }
-
-    function inputElementForTag(tag) {
-      return document.getElementById('tag-' + tag.uuid);
-    }
-
-    let originalTagName = '';
-    this.selectedRenameTag = function($event, tag) {
-      originalTagName = tag.title;
-      this.editingTag = tag;
-      $timeout(function(){
-        inputElementForTag(tag).focus();
-      })
-    }
-
-    this.selectedDeleteTag = function(tag) {
-      this.removeTag(tag);
-      this.selectTag(this.smartTags[0]);
-    }
+export class TagsPanel {
+  constructor() {
+    this.restrict = 'E';
+    this.scope = {};
+    this.template = template;
+    this.replace = true;
+    this.controller = TagsPanelCtrl;
+    this.controllerAs = 'ctrl';
+    this.bindToController = true;
   }
 }

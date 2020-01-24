@@ -2955,12 +2955,11 @@ function () {
 /*!****************************************************!*\
   !*** ./app/assets/javascripts/controllers/root.js ***!
   \****************************************************/
-/*! exports provided: RootCtrl, Root */
+/*! exports provided: Root */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RootCtrl", function() { return RootCtrl; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Root", function() { return Root; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
@@ -2991,6 +2990,7 @@ __webpack_require__.r(__webpack_exports__);
 /** How often to automatically sync, in milliseconds */
 
 var AUTO_SYNC_INTERVAL = 30000;
+
 var RootCtrl =
 /*#__PURE__*/
 function () {
@@ -3398,6 +3398,7 @@ function () {
 
   return RootCtrl;
 }();
+
 var Root = function Root() {
   _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, Root);
 
@@ -3428,6 +3429,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
 /* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/controllers/constants.js");
 /* harmony import */ var _services_preferencesManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/services/preferencesManager */ "./app/assets/javascripts/services/preferencesManager.js");
+/* harmony import */ var _strings__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/strings */ "./app/assets/javascripts/strings.js");
 
 
 
@@ -3435,135 +3437,160 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var TagsPanel =
+
+
+var TagsPanelCtrl =
 /*#__PURE__*/
 function () {
-  function TagsPanel() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, TagsPanel);
+  TagsPanelCtrl.$inject = ["$rootScope", "$timeout", "modelManager", "syncManager", "componentManager", "appState", "alertManager", "preferencesManager"];
 
-    this.restrict = 'E';
-    this.scope = {};
-    this.template = _tags_pug__WEBPACK_IMPORTED_MODULE_3___default.a;
-    this.replace = true;
-    this.controllerAs = 'ctrl';
-    this.bindToController = true;
-  }
   /* @ngInject */
+  function TagsPanelCtrl($rootScope, $timeout, modelManager, syncManager, componentManager, appState, alertManager, preferencesManager) {
+    var _this = this;
 
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, TagsPanelCtrl);
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(TagsPanel, [{
-    key: "controller",
-    value: ["$rootScope", "modelManager", "syncManager", "$timeout", "componentManager", "authManager", "appState", "alertManager", "preferencesManager", function controller($rootScope, modelManager, syncManager, $timeout, componentManager, authManager, appState, alertManager, preferencesManager) {
-      var _this = this;
+    this.componentManager = componentManager;
+    this.modelManager = modelManager;
+    this.syncManager = syncManager;
+    this.appState = appState;
+    this.modelManager = modelManager;
+    this.alertManager = alertManager;
+    this.preferencesManager = preferencesManager;
+    this.$rootScope = $rootScope;
+    this.$timeout = $timeout;
+    $timeout(function () {
+      _this.selectDefaultTag();
+    });
+    this.addSyncEventHandler();
+    this.addAppStateObserver();
+    this.addMappingObserver();
+    this.loadPreferences();
+    this.registerComponentHandler();
+  }
 
-      // Wrap in timeout so that selectTag is defined
-      $timeout(function () {
-        _this.smartTags = modelManager.getSmartTags();
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(TagsPanelCtrl, [{
+    key: "addSyncEventHandler",
+    value: function addSyncEventHandler() {
+      var _this2 = this;
 
-        _this.selectTag(_this.smartTags[0]);
-      });
-      syncManager.addEventHandler(function (syncEvent, data) {
+      this.syncManager.addEventHandler(function (syncEvent, data) {
         if (syncEvent === 'local-data-loaded' || syncEvent === 'sync:completed' || syncEvent === 'local-data-incremental-load') {
-          _this.tags = modelManager.tags;
-          _this.smartTags = modelManager.getSmartTags();
+          _this2.tags = _this2.modelManager.tags;
+          _this2.smartTags = _this2.modelManager.getSmartTags();
         }
       });
-      appState.addObserver(function (eventName, data) {
+    }
+  }, {
+    key: "addAppStateObserver",
+    value: function addAppStateObserver() {
+      var _this3 = this;
+
+      this.appState.addObserver(function (eventName, data) {
         if (eventName === _state__WEBPACK_IMPORTED_MODULE_4__["APP_STATE_EVENT_PREFERENCES_CHANGED"]) {
-          _this.loadPreferences();
+          _this3.loadPreferences();
         }
       });
-      modelManager.addItemSyncObserver('tags-list', '*', function (allItems, validItems, deletedItems, source, sourceKey) {
-        _this.reloadNoteCounts();
-      });
-      modelManager.addItemSyncObserver('tags-list-tags', 'Tag', function (allItems, validItems, deletedItems, source, sourceKey) {
-        if (!_this.selectedTag) {
+    }
+  }, {
+    key: "addMappingObserver",
+    value: function addMappingObserver() {
+      var _this4 = this;
+
+      this.modelManager.addItemSyncObserver('tags-list-tags', 'Tag', function (allItems, validItems, deletedItems, source, sourceKey) {
+        _this4.reloadNoteCounts();
+
+        if (!_this4.selectedTag) {
           return;
         }
         /** If the selected tag has been deleted, revert to All view. */
 
 
         var selectedTag = allItems.find(function (tag) {
-          return tag.uuid === _this.selectedTag.uuid;
+          return tag.uuid === _this4.selectedTag.uuid;
         });
 
         if (selectedTag && selectedTag.deleted) {
-          _this.selectTag(_this.smartTags[0]);
+          _this4.selectTag(_this4.smartTags[0]);
         }
       });
+    }
+  }, {
+    key: "reloadNoteCounts",
+    value: function reloadNoteCounts() {
+      var allTags = [];
 
-      this.reloadNoteCounts = function () {
-        var allTags = [];
+      if (this.tags) {
+        allTags = allTags.concat(this.tags);
+      }
 
-        if (this.tags) {
-          allTags = allTags.concat(this.tags);
+      if (this.smartTags) {
+        allTags = allTags.concat(this.smartTags);
+      }
+
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = allTags[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var tag = _step.value;
+          var validNotes = snjs__WEBPACK_IMPORTED_MODULE_2__["SNNote"].filterDummyNotes(tag.notes).filter(function (note) {
+            return !note.archived && !note.content.trashed;
+          });
+          tag.cachedNoteCount = validNotes.length;
         }
-
-        if (this.smartTags) {
-          allTags = allTags.concat(this.smartTags);
-        }
-
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
         try {
-          for (var _iterator = allTags[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var tag = _step.value;
-            var validNotes = snjs__WEBPACK_IMPORTED_MODULE_2__["SNNote"].filterDummyNotes(tag.notes).filter(function (note) {
-              return !note.archived && !note.content.trashed;
-            });
-            tag.cachedNoteCount = validNotes.length;
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
           }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
         } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return != null) {
-              _iterator.return();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
+          if (_didIteratorError) {
+            throw _iteratorError;
           }
         }
-      };
-
+      }
+    }
+  }, {
+    key: "loadPreferences",
+    value: function loadPreferences() {
       this.panelController = {};
+      var width = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_6__["PREF_TAGS_PANEL_WIDTH"]);
 
-      this.loadPreferences = function () {
-        var width = preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_6__["PREF_TAGS_PANEL_WIDTH"]);
+      if (width) {
+        this.panelController.setWidth(width);
 
-        if (width) {
-          this.panelController.setWidth(width);
-
-          if (this.panelController.isCollapsed()) {
-            appState.panelDidResize({
-              name: _controllers_constants__WEBPACK_IMPORTED_MODULE_5__["PANEL_NAME_TAGS"],
-              collapsed: this.panelController.isCollapsed()
-            });
-          }
+        if (this.panelController.isCollapsed()) {
+          appState.panelDidResize({
+            name: _controllers_constants__WEBPACK_IMPORTED_MODULE_5__["PANEL_NAME_TAGS"],
+            collapsed: this.panelController.isCollapsed()
+          });
         }
-      };
+      }
+    }
+  }, {
+    key: "onPanelResize",
+    value: function onPanelResize(newWidth, lastLeft, isAtMaxWidth, isCollapsed) {
+      this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_6__["PREF_TAGS_PANEL_WIDTH"], newWidth, true);
+      this.appState.panelDidResize({
+        name: _controllers_constants__WEBPACK_IMPORTED_MODULE_5__["PANEL_NAME_TAGS"],
+        collapsed: isCollapsed
+      });
+    }
+  }, {
+    key: "registerComponentHandler",
+    value: function registerComponentHandler() {
+      var _this5 = this;
 
-      this.loadPreferences();
-
-      this.onPanelResize = function (newWidth, lastLeft, isAtMaxWidth, isCollapsed) {
-        preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_6__["PREF_TAGS_PANEL_WIDTH"], newWidth, true);
-        appState.panelDidResize({
-          name: _controllers_constants__WEBPACK_IMPORTED_MODULE_5__["PANEL_NAME_TAGS"],
-          collapsed: isCollapsed
-        });
-      };
-
-      this.componentManager = componentManager;
-      componentManager.registerHandler({
+      this.componentManager.registerHandler({
         identifier: 'tags',
         areas: ['tags-list'],
         activationHandler: function activationHandler(component) {
-          _this.component = component;
+          _this5.component = component;
         },
         contextRequestHandler: function contextRequestHandler(component) {
           return null;
@@ -3571,124 +3598,147 @@ function () {
         actionHandler: function actionHandler(component, action, data) {
           if (action === 'select-item') {
             if (data.item.content_type === 'Tag') {
-              var tag = modelManager.findItem(data.item.uuid);
+              var tag = _this5.modelManager.findItem(data.item.uuid);
 
               if (tag) {
-                _this.selectTag(tag);
+                _this5.selectTag(tag);
               }
             } else if (data.item.content_type === 'SN|SmartTag') {
               var smartTag = new snjs__WEBPACK_IMPORTED_MODULE_2__["SNSmartTag"](data.item);
 
-              _this.selectTag(smartTag);
+              _this5.selectTag(smartTag);
             }
           } else if (action === 'clear-selection') {
-            _this.selectTag(_this.smartTags[0]);
+            _this5.selectTag(_this5.smartTags[0]);
           }
         }
       });
+    }
+  }, {
+    key: "selectTag",
+    value: function selectTag(tag) {
+      var _this6 = this;
 
-      this.selectTag = function (tag) {
-        if (tag.isSmartTag()) {
-          Object.defineProperty(tag, 'notes', {
-            get: function get() {
-              return modelManager.notesMatchingSmartTag(tag);
-            }
-          });
-        }
-
-        this.selectedTag = tag;
-
-        if (tag.content.conflict_of) {
-          tag.content.conflict_of = null;
-          modelManager.setItemDirty(tag, true);
-          syncManager.sync();
-        }
-
-        appState.setSelectedTag(tag);
-      };
-
-      this.clickedAddNewTag = function () {
-        if (this.editingTag) {
-          return;
-        }
-
-        this.newTag = modelManager.createItem({
-          content_type: 'Tag'
-        });
-        this.selectedTag = this.newTag;
-        this.editingTag = this.newTag;
-        modelManager.addItem(this.newTag);
-      };
-
-      this.tagTitleDidChange = function (tag) {
-        this.editingTag = tag;
-      };
-
-      this.saveTag = function ($event, tag) {
-        this.editingTag = null;
-        $event.target.blur();
-
-        if (!tag.title || tag.title.length == 0) {
-          if (originalTagName) {
-            tag.title = originalTagName;
-            originalTagName = null;
-          } else {
-            // newly created tag without content
-            modelManager.removeItemLocally(tag);
-          }
-
-          return;
-        }
-
-        if (!tag.title || tag.title.length == 0) {
-          this.removeTag(tag);
-          return;
-        }
-
-        modelManager.setItemDirty(tag, true);
-        syncManager.sync().then();
-        modelManager.resortTag(tag);
-        this.selectTag(tag);
-        this.newTag = null;
-      };
-
-      this.removeTag = function (tag) {
-        alertManager.confirm({
-          text: "Are you sure you want to delete this tag? Note: deleting a tag will not delete its notes.",
-          destructive: true,
-          onConfirm: function onConfirm() {
-            modelManager.setItemToBeDeleted(tag);
-            syncManager.sync().then(function () {
-              // force scope tags to update on sub directives
-              $rootScope.safeApply();
-            });
+      if (tag.isSmartTag()) {
+        Object.defineProperty(tag, 'notes', {
+          get: function get() {
+            return _this6.modelManager.notesMatchingSmartTag(tag);
           }
         });
-      };
-
-      function inputElementForTag(tag) {
-        return document.getElementById('tag-' + tag.uuid);
       }
 
-      var originalTagName = '';
+      this.selectedTag = tag;
 
-      this.selectedRenameTag = function ($event, tag) {
-        originalTagName = tag.title;
-        this.editingTag = tag;
-        $timeout(function () {
-          inputElementForTag(tag).focus();
-        });
-      };
+      if (tag.content.conflict_of) {
+        tag.content.conflict_of = null;
+        this.modelManager.setItemDirty(tag);
+        this.syncManager.sync();
+      }
 
-      this.selectedDeleteTag = function (tag) {
+      this.appState.setSelectedTag(tag);
+    }
+  }, {
+    key: "clickedAddNewTag",
+    value: function clickedAddNewTag() {
+      if (this.editingTag) {
+        return;
+      }
+
+      this.newTag = this.modelManager.createItem({
+        content_type: 'Tag'
+      });
+      this.selectedTag = this.newTag;
+      this.editingTag = this.newTag;
+      this.modelManager.addItem(this.newTag);
+    }
+  }, {
+    key: "tagTitleDidChange",
+    value: function tagTitleDidChange(tag) {
+      this.editingTag = tag;
+    }
+  }, {
+    key: "saveTag",
+    value: function saveTag($event, tag) {
+      $event.target.blur();
+      this.editingTag = null;
+
+      if (!tag.title || tag.title.length === 0) {
+        if (this.editingOriginalName) {
+          tag.title = this.editingOriginalName;
+          this.editingOriginalName = null;
+        } else {
+          /** Newly created tag without content */
+          this.modelManager.removeItemLocally(tag);
+        }
+
+        return;
+      }
+
+      if (!tag.title || tag.title.length === 0) {
         this.removeTag(tag);
-        this.selectTag(this.smartTags[0]);
-      };
-    }]
+        return;
+      }
+
+      this.modelManager.setItemDirty(tag);
+      this.syncManager.sync();
+      this.modelManager.resortTag(tag);
+      this.selectTag(tag);
+      this.newTag = null;
+    }
+  }, {
+    key: "selectedRenameTag",
+    value: function selectedRenameTag($event, tag) {
+      this.editingOriginalName = tag.title;
+      this.editingTag = tag;
+      $timeout(function () {
+        document.getElementById('tag-' + tag.uuid).focus();
+      });
+    }
+  }, {
+    key: "selectedDeleteTag",
+    value: function selectedDeleteTag(tag) {
+      this.removeTag(tag);
+      this.selectTag(this.smartTags[0]);
+    }
+  }, {
+    key: "removeTag",
+    value: function removeTag(tag) {
+      var _this7 = this;
+
+      this.alertManager.confirm({
+        text: _strings__WEBPACK_IMPORTED_MODULE_7__["STRING_DELETE_TAG"],
+        destructive: true,
+        onConfirm: function onConfirm() {
+          _this7.modelManager.setItemToBeDeleted(tag);
+
+          _this7.syncManager.sync().then(function () {
+            _this7.$rootScope.safeApply();
+          });
+        }
+      });
+    }
+  }, {
+    key: "selectDefaultTag",
+    value: function selectDefaultTag() {
+      this.smartTags = this.modelManager.getSmartTags();
+      this.selectTag(this.smartTags[0]);
+    }
   }]);
 
-  return TagsPanel;
+  return TagsPanelCtrl;
 }();
+
+var TagsPanel = function TagsPanel() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, TagsPanel);
+
+  this.restrict = 'E';
+  this.scope = {};
+  this.template = _tags_pug__WEBPACK_IMPORTED_MODULE_3___default.a;
+  this.replace = true;
+  this.controller = TagsPanelCtrl;
+  this.controllerAs = 'ctrl';
+  this.bindToController = true;
+};
 
 /***/ }),
 
@@ -13270,16 +13320,18 @@ function () {
 /*!*******************************************!*\
   !*** ./app/assets/javascripts/strings.js ***!
   \*******************************************/
-/*! exports provided: STRING_SESSION_EXPIRED, STRING_DEFAULT_FILE_ERROR, StringSyncException */
+/*! exports provided: STRING_SESSION_EXPIRED, STRING_DEFAULT_FILE_ERROR, STRING_DELETE_TAG, StringSyncException */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STRING_SESSION_EXPIRED", function() { return STRING_SESSION_EXPIRED; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STRING_DEFAULT_FILE_ERROR", function() { return STRING_DEFAULT_FILE_ERROR; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STRING_DELETE_TAG", function() { return STRING_DELETE_TAG; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StringSyncException", function() { return StringSyncException; });
 var STRING_SESSION_EXPIRED = "Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.";
 var STRING_DEFAULT_FILE_ERROR = "Please use FileSafe or the Bold Editor to attach images and files. Learn more at standardnotes.org/filesafe.";
+var STRING_DELETE_TAG = "Are you sure you want to delete this tag? Note: deleting a tag will not delete its notes.";
 function StringSyncException(data) {
   return "There was an error while trying to save your items. Please contact support and share this message: ".concat(data, ".");
 }

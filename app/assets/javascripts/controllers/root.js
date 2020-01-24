@@ -18,8 +18,7 @@ import {
 /** How often to automatically sync, in milliseconds */
 const AUTO_SYNC_INTERVAL = 30000;
 
-export class RootCtrl {
-
+class RootCtrl {
   /* @ngInject */
   constructor(
     $scope,
