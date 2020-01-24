@@ -1,5 +1,8 @@
 import { PrivilegesManager } from '@/services/privilegesManager';
 import template from '%/footer.pug';
+import {
+  APP_STATE_EVENT_EDITOR_FOCUSED
+} from '@/state';
 
 export class Footer {
   constructor() {
@@ -38,8 +41,17 @@ export class Footer {
     nativeExtManager,
     privilegesManager,
     statusManager,
-    alertManager
+    alertManager,
+    appState
   ) {
+
+    appState.addObserver((eventName, data) => {
+      if(eventName === APP_STATE_EVENT_EDITOR_FOCUSED) {
+        this.closeAllRooms();
+        this.closeAccountMenu();
+      }
+    })
+
     authManager.checkForSecurityUpdate().then((available) => {
       this.securityUpdateAvailable = available;
     })
@@ -56,16 +68,24 @@ export class Footer {
 
     $rootScope.$on("did-begin-local-backup", () => {
       $timeout(() => {
-        this.backupStatus = statusManager.addStatusFromString("Saving local backup...");
+        this.backupStatus = statusManager.addStatusFromString(
+          "Saving local backup..."
+        );
       })
     });
 
     $rootScope.$on("did-finish-local-backup", (event, data) => {
       $timeout(() => {
         if(data.success) {
-          this.backupStatus = statusManager.replaceStatusWithString(this.backupStatus, "Successfully saved backup.");
+          this.backupStatus = statusManager.replaceStatusWithString(
+            this.backupStatus,
+            "Successfully saved backup."
+          );
         } else {
-          this.backupStatus = statusManager.replaceStatusWithString(this.backupStatus, "Unable to save local backup.");
+          this.backupStatus = statusManager.replaceStatusWithString(
+            this.backupStatus,
+            "Unable to save local backup."
+          );
         }
 
         $timeout(() => {
@@ -87,7 +107,9 @@ export class Footer {
       this.reloadInProgress = true;
 
       // A reload occurs when the extensions manager window is opened. We can close it after a delay
-      let extWindow = this.rooms.find((room) => {return room.package_info.identifier == nativeExtManager.extensionsManagerIdentifier});
+      const extWindow = this.rooms.find((room) => {
+        return room.package_info.identifier == nativeExtManager.extensionsManagerIdentifier
+      });
       if(!extWindow) {
         this.queueExtReload = true; // try again when the ext is available
         this.reloadInProgress = false;
@@ -95,7 +117,6 @@ export class Footer {
       }
 
       this.selectRoom(extWindow);
-
       $timeout(() => {
         this.selectRoom(extWindow);
         this.reloadInProgress = false;
@@ -161,12 +182,17 @@ export class Footer {
     this.refreshData = function() {
       this.isRefreshing = true;
       // Enable integrity checking for this force request
-      syncManager.sync({force: true, performIntegrityCheck: true}).then((response) => {
-        $timeout(function(){
+      syncManager.sync({
+        force: true,
+        performIntegrityCheck: true
+      }).then((response) => {
+        $timeout(() => {
           this.isRefreshing = false;
-        }.bind(this), 200)
+        }, 200)
         if(response && response.error) {
-          alertManager.alert({text: "There was an error syncing. Please try again. If all else fails, try signing out and signing back in."});
+          alertManager.alert({
+            text: "There was an error syncing. Please try again. If all else fails, try signing out and signing back in."
+          });
         } else {
           this.syncUpdated();
         }
@@ -189,7 +215,9 @@ export class Footer {
 
     this.clickedNewUpdateAnnouncement = function() {
       this.newUpdateAvailable = false;
-      alertManager.alert({text: "A new update is ready to install. Please use the top-level 'Updates' menu to manage installation."})
+      alertManager.alert({
+        text: "A new update is ready to install. Please use the top-level 'Updates' menu to manage installation."
+      })
     }
 
 
@@ -199,35 +227,44 @@ export class Footer {
     this.rooms = [];
     this.themesWithIcons = [];
 
-    modelManager.addItemSyncObserver("room-bar", "SN|Component", (allItems, validItems, deletedItems, source) => {
-      this.rooms = modelManager.components.filter((candidate) => {return candidate.area == "rooms" && !candidate.deleted});
-      if(this.queueExtReload) {
-        this.queueExtReload = false;
-        this.reloadExtendedData();
+    modelManager.addItemSyncObserver(
+      "room-bar",
+      "SN|Component",
+      (allItems, validItems, deletedItems, source) => {
+        this.rooms = modelManager.components.filter((candidate) => {return candidate.area == "rooms" && !candidate.deleted});
+        if(this.queueExtReload) {
+          this.queueExtReload = false;
+          this.reloadExtendedData();
+        }
       }
-    });
+    );
 
-    modelManager.addItemSyncObserver("footer-bar-themes", "SN|Theme", (allItems, validItems, deletedItems, source) => {
-      let themes = modelManager.validItemsForContentType("SN|Theme").filter((candidate) => {
-        return !candidate.deleted && candidate.content.package_info && candidate.content.package_info.dock_icon;
-      }).sort((a, b) => {
-        return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
-      });
-
-      let differ = themes.length != this.themesWithIcons.length;
-
-      this.themesWithIcons = themes;
-
-      if(differ) {
-        this.reloadDockShortcuts();
+    modelManager.addItemSyncObserver(
+      "footer-bar-themes",
+      "SN|Theme",
+      (allItems, validItems, deletedItems, source) => {
+        const themes = modelManager.validItemsForContentType("SN|Theme").filter((candidate) => {
+          return (
+            !candidate.deleted &&
+            candidate.content.package_info &&
+            candidate.content.package_info.dock_icon
+          );
+        }).sort((a, b) => {
+          return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+        });
+        const differ = themes.length !== this.themesWithIcons.length;
+        this.themesWithIcons = themes;
+        if(differ) {
+          this.reloadDockShortcuts();
+        }
       }
-    });
+    );
 
     this.reloadDockShortcuts = function() {
-      let shortcuts = [];
-      for(var theme of this.themesWithIcons) {
-        var name = theme.content.package_info.name;
-        var icon = theme.content.package_info.dock_icon;
+      const shortcuts = [];
+      for(const theme of this.themesWithIcons) {
+        const name = theme.content.package_info.name;
+        const icon = theme.content.package_info.dock_icon;
         if(!icon) {
           continue;
         }
@@ -239,12 +276,10 @@ export class Footer {
       }
 
       this.dockShortcuts = shortcuts.sort((a, b) => {
-        // circles first, then images
-
-        var aType = a.icon.type;
-        var bType = b.icon.type;
-
-        if(aType == bType) {
+        /** Circles first, then images */
+        const aType = a.icon.type;
+        const bType = b.icon.type;
+        if(aType === bType) {
           return 0;
         } else if(aType == "circle" && bType == "svg") {
           return -1;
@@ -255,11 +290,11 @@ export class Footer {
     }
 
     this.initSvgForShortcut = function(shortcut) {
-      var id = "dock-svg-" + shortcut.component.uuid;
-      var element = document.getElementById(id);
-      var parser = new DOMParser();
-      var svg = shortcut.component.content.package_info.dock_icon.source;
-      var doc = parser.parseFromString(svg, "image/svg+xml");
+      const id = "dock-svg-" + shortcut.component.uuid;
+      const element = document.getElementById(id);
+      const parser = new DOMParser();
+      const svg = shortcut.component.content.package_info.dock_icon.source;
+      const doc = parser.parseFromString(svg, "image/svg+xml");
       element.appendChild(doc.documentElement);
     }
 
@@ -267,25 +302,24 @@ export class Footer {
       componentManager.toggleComponent(shortcut.component);
     }
 
-    componentManager.registerHandler({identifier: "roomBar", areas: ["rooms", "modal"], activationHandler: (component) => {
-      // RIP: There used to be code here that checked if component.active was true, and if so, displayed the component.
-      // However, we no longer want to persist active state for footer extensions. If you open Extensions on one computer,
-      // it shouldn't open on another computer. Active state should only be persisted for persistent extensions, like Folders.
-    }, actionHandler: (component, action, data) => {
-      if(action == "set-size") {
-        component.setLastSize(data);
-      }
-    }, focusHandler: (component, focused) => {
-      if(component.isEditor() && focused) {
-        this.closeAllRooms();
-        this.closeAccountMenu();
-      }
-    }});
+    componentManager.registerHandler({
+      identifier: "roomBar",
+      areas: ["rooms", "modal"],
+      activationHandler: (component) => {
 
-    $rootScope.$on("editorFocused", () => {
-      this.closeAllRooms();
-      this.closeAccountMenu();
-    })
+      },
+      actionHandler: (component, action, data) => {
+        if(action === "set-size") {
+          component.setLastSize(data);
+        }
+      },
+      focusHandler: (component, focused) => {
+        if(component.isEditor() && focused) {
+          this.closeAllRooms();
+          this.closeAccountMenu();
+        }
+      }
+    });
 
     this.onRoomDismiss = function(room) {
       room.showRoom = false;

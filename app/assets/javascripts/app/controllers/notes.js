@@ -3,8 +3,39 @@ import angular from 'angular';
 import { SFAuthManager } from 'snjs';
 import { PrivilegesManager } from '@/services/privilegesManager';
 import { KeyboardManager } from '@/services/keyboardManager';
-import { APP_STATE_EVENT_TAG_CHANGED, APP_STATE_EVENT_NOTE_CHANGED } from '@/state';
+import {
+  APP_STATE_EVENT_NOTE_CHANGED,
+  APP_STATE_EVENT_TAG_CHANGED,
+  APP_STATE_EVENT_PREFERENCES_CHANGED
+} from '@/state';
 import template from '%/notes.pug';
+import {
+  PREF_NOTES_PANEL_WIDTH,
+  PREF_SORT_NOTES_BY,
+  PREF_SORT_NOTES_REVERSE,
+  PREF_NOTES_SHOW_ARCHIVED,
+  PREF_NOTES_HIDE_PINNED,
+  PREF_NOTES_HIDE_NOTE_PREVIEW,
+  PREF_NOTES_HIDE_DATE,
+  PREF_NOTES_HIDE_TAGS
+} from '@/services/preferencesManager';
+import {
+  PANEL_NAME_NOTES
+} from '@/controllers/constants';
+
+/**
+ * This is the height of a note cell with nothing but the title,
+ * which *is* a display option
+ */
+const MIN_NOTE_CELL_HEIGHT   = 51.0;
+const DEFAULT_LIST_NUM_NOTES = 20;
+
+const SORT_KEY_CREATED_AT        = 'created_at';
+const SORT_KEY_UPDATED_AT        = 'updated_at';
+const SORT_KEY_CLIENT_UPDATED_AT = 'client_updated_at';
+const SORT_KEY_TITLE             = 'title';
+
+const ELEMENT_ID_SEARCH_BAR      = 'search-bar';
 
 export class NotesPanel {
   constructor() {
@@ -26,15 +57,17 @@ export class NotesPanel {
     desktopManager,
     privilegesManager,
     keyboardManager,
-    appState
+    appState,
+    preferencesManager
   ) {
     this.panelController = {};
     this.searchSubmitted = false;
 
-    $rootScope.$on("user-preferences-changed", () => {
-      this.loadPreferences();
-      this.reloadNotes();
-    });
+    window.onresize = (event) =>   {
+      this.resetPagination({
+        keepCurrentIfLarger: true
+      });
+    };
 
     appState.addObserver((eventName, data) => {
       if(eventName === APP_STATE_EVENT_TAG_CHANGED) {
@@ -51,44 +84,48 @@ export class NotesPanel {
             this.selectNextOrCreateNew();
           });
         }
+      } else if(eventName === APP_STATE_EVENT_PREFERENCES_CHANGED) {
+        this.loadPreferences();
+        this.reloadNotes();
       }
     })
 
     authManager.addEventHandler((event) => {
-      if(event == SFAuthManager.DidSignInEvent) {
-        // Delete dummy note if applicable
+      if(event === SFAuthManager.DidSignInEvent) {
+        /** Delete dummy note if applicable */
         if(this.selectedNote && this.selectedNote.dummy) {
           modelManager.removeItemLocally(this.selectedNote);
           _.pull(this.notes, this.selectedNote);
           this.selectedNote = null;
           this.selectNote(null);
-
-          // We now want to see if the user will download any items from the server.
-          // If the next sync completes and our notes are still 0, we need to create a dummy.
+          /**
+           * We want to see if the user will download any items from the server.
+           * If the next sync completes and our notes are still 0,
+           * we need to create a dummy.
+           */
           this.createDummyOnSynCompletionIfNoNotes = true;
         }
       }
     })
 
     syncManager.addEventHandler((syncEvent, data) => {
-      if(syncEvent == "local-data-loaded") {
+      if(syncEvent === 'local-data-loaded') {
         if(this.notes.length == 0) {
           this.createNewNote();
         }
-      } else if(syncEvent == "sync:completed") {
-        // Pad with a timeout just to be extra patient
+      } else if(syncEvent === 'sync:completed') {
         $timeout(() => {
           if(this.createDummyOnSynCompletionIfNoNotes && this.notes.length == 0) {
             this.createDummyOnSynCompletionIfNoNotes = false;
             this.createNewNote();
           }
-        }, 100)
+        })
       }
     });
 
     modelManager.addItemSyncObserver(
-      "note-list",
-      "*",
+      'note-list',
+      '*',
       (allItems, validItems, deletedItems, source, sourceKey) => {
         if(this.selectedNote &&
           (this.selectedNote.deleted || this.selectedNote.content.trashed)) {
@@ -97,7 +134,7 @@ export class NotesPanel {
         this.reloadNotes();
 
         /** Note has changed values, reset its flags */
-        const notes = allItems.filter((item) => item.content_type === "Note");
+        const notes = allItems.filter((item) => item.content_type === 'Note');
         for(const note of notes) {
           this.loadFlagsForNote(note);
           note.cachedCreatedAtString = note.createdAtString();
@@ -143,32 +180,50 @@ export class NotesPanel {
 
     this.loadPreferences = function() {
       const prevSortValue = this.sortBy;
-      this.sortBy = authManager.getUserPrefValue("sortBy", "created_at");
-      this.sortReverse = authManager.getUserPrefValue("sortReverse", false);
-
-      if(this.sortBy == "updated_at") {
-        // use client_updated_at instead
-        this.sortBy = "client_updated_at";
+      this.sortBy = preferencesManager.getValue(
+        PREF_SORT_NOTES_BY,
+        SORT_KEY_CREATED_AT
+      );
+      this.sortReverse = preferencesManager.getValue(
+        PREF_SORT_NOTES_REVERSE,
+        false
+      );
+      if(this.sortBy === SORT_KEY_UPDATED_AT) {
+        /** Use client_updated_at instead */
+        this.sortBy = SORT_KEY_CLIENT_UPDATED_AT;
       }
-
       if(prevSortValue && prevSortValue != this.sortBy) {
         $timeout(() => {
           this.selectFirstNote();
         })
       }
+      this.showArchived = preferencesManager.getValue(
+        PREF_NOTES_SHOW_ARCHIVED,
+        false
+      );
+      this.hidePinned = preferencesManager.getValue(
+        PREF_NOTES_HIDE_PINNED,
+        false
+      );
+      this.hideNotePreview = preferencesManager.getValue(
+        PREF_NOTES_HIDE_NOTE_PREVIEW,
+        false
+      );
+      this.hideDate = preferencesManager.getValue(
+        PREF_NOTES_HIDE_DATE,
+        false
+      );
+      this.hideTags = preferencesManager.getValue(
+        PREF_NOTES_HIDE_TAGS,
+        false
+      );
 
-      this.showArchived = authManager.getUserPrefValue("showArchived", false);
-      this.hidePinned = authManager.getUserPrefValue("hidePinned", false);
-      this.hideNotePreview = authManager.getUserPrefValue("hideNotePreview", false);
-      this.hideDate = authManager.getUserPrefValue("hideDate", false);
-      this.hideTags = authManager.getUserPrefValue("hideTags", false);
-
-      let width = authManager.getUserPrefValue("notesPanelWidth");
+      const width = preferencesManager.getValue(PREF_NOTES_PANEL_WIDTH);
       if(width) {
         this.panelController.setWidth(width);
         if(this.panelController.isCollapsed()) {
-          $rootScope.$broadcast("panel-resized", {
-            panel: "notes",
+          appState.panelDidResize({
+            name: PANEL_NAME_NOTES,
             collapsed: this.panelController.isCollapsed()
           })
         }
@@ -178,23 +233,23 @@ export class NotesPanel {
     this.loadPreferences();
 
     this.onPanelResize = function(newWidth, lastLeft, isAtMaxWidth, isCollapsed) {
-      authManager.setUserPrefValue("notesPanelWidth", newWidth);
-      authManager.syncUserPreferences();
-      $rootScope.$broadcast(
-        "panel-resized",
-        {panel: "notes", collapsed: isCollapsed}
-      )
+      preferencesManager.setUserPrefValue(PREF_NOTES_PANEL_WIDTH, newWidth);
+      preferencesManager.syncUserPreferences();
+      appState.panelDidResize({
+        name: PANEL_NAME_NOTES,
+        collapsed: isCollapsed
+      });
     }
 
     angular.element(document).ready(() => {
       this.loadPreferences();
     });
 
-    $rootScope.$on("editorFocused", function(){
+    $rootScope.$on('editorFocused', function(){
       this.showMenu = false;
     }.bind(this))
 
-    $rootScope.$on("noteArchived", function() {
+    $rootScope.$on('noteArchived', function() {
       $timeout(this.selectNextOrCreateNew.bind(this));
     }.bind(this));
 
@@ -217,44 +272,43 @@ export class NotesPanel {
       }
     }
 
-    window.onresize = (event) =>   {
-      this.resetPagination({keepCurrentIfLarger: true});
-    };
-
     this.paginate = function() {
-      this.notesToDisplay += this.DefaultNotesToDisplayValue
-
-      if (this.searchSubmitted) {
+      this.notesToDisplay += this.pageSize
+      if(this.searchSubmitted) {
         desktopManager.searchText(this.noteFilter.text);
       }
     }
 
     this.resetPagination = function({keepCurrentIfLarger} = {}) {
-      let MinNoteHeight = 51.0; // This is the height of a note cell with nothing but the title, which *is* a display option
-      this.DefaultNotesToDisplayValue = (document.documentElement.clientHeight / MinNoteHeight) || 20;
-      if(keepCurrentIfLarger && this.notesToDisplay > this.DefaultNotesToDisplayValue) {
+      const clientHeight = document.documentElement.clientHeight;
+      this.pageSize = clientHeight / MIN_NOTE_CELL_HEIGHT;
+      if(this.pageSize === 0) {
+        this.pageSize = DEFAULT_LIST_NUM_NOTES;
+      }
+      if(keepCurrentIfLarger && this.notesToDisplay > this.pageSize) {
         return;
       }
-      this.notesToDisplay = this.DefaultNotesToDisplayValue;
+      this.notesToDisplay = this.pageSize;
     }
 
     this.resetPagination();
 
     this.reloadPanelTitle = function() {
       if(this.isFiltering()) {
-        this.panelTitle = `${this.notes.filter((i) => {return i.visible;}).length} search results`;
+        const resultCount = this.notes.filter((i) => i.visible).length
+        this.panelTitle = `${resultCount} search results`;
       } else if(this.tag) {
         this.panelTitle = `${this.tag.title}`;
       }
     }
 
     this.optionsSubtitle = function() {
-      var base = "";
-      if(this.sortBy == "created_at") {
+      let base = "";
+      if(this.sortBy == 'created_at') {
         base += " Date Added";
-      } else if(this.sortBy == "client_updated_at") {
+      } else if(this.sortBy == 'client_updated_at') {
         base += " Date Modified";
-      } else if(this.sortBy == "title") {
+      } else if(this.sortBy == 'title') {
         base += " Title";
       }
 
@@ -277,56 +331,56 @@ export class NotesPanel {
       if(note.pinned) {
         flags.push({
           text: "Pinned",
-          class: "info"
+          class: 'info'
         })
       }
 
       if(note.archived) {
         flags.push({
           text: "Archived",
-          class: "warning"
+          class: 'warning'
         })
       }
 
       if(note.content.protected) {
         flags.push({
           text: "Protected",
-          class: "success"
+          class: 'success'
         })
       }
 
       if(note.locked) {
         flags.push({
           text: "Locked",
-          class: "neutral"
+          class: 'neutral'
         })
       }
 
       if(note.content.trashed) {
         flags.push({
           text: "Deleted",
-          class: "danger"
+          class: 'danger'
         })
       }
 
       if(note.content.conflict_of) {
         flags.push({
           text: "Conflicted Copy",
-          class: "danger"
+          class: 'danger'
         })
       }
 
       if(note.errorDecrypting) {
         flags.push({
           text: "Missing Keys",
-          class: "danger"
+          class: 'danger'
         })
       }
 
       if(note.deleted) {
         flags.push({
           text: "Deletion Pending Sync",
-          class: "danger"
+          class: 'danger'
         })
       }
 
@@ -336,7 +390,7 @@ export class NotesPanel {
     }
 
     this.tagDidChange = function(tag, oldTag) {
-      const scrollable = document.getElementById("notes-scrollable");
+      const scrollable = document.getElementById('notes-scrollable');
       if(scrollable) {
         scrollable.scrollTop = 0;
         scrollable.scrollLeft = 0;
@@ -377,23 +431,23 @@ export class NotesPanel {
     }
 
     this.selectFirstNote = function() {
-      var displayableNotes = this.displayableNotes();
+      const displayableNotes = this.displayableNotes();
       if(displayableNotes.length > 0) {
         this.selectNote(displayableNotes[0]);
       }
     }
 
     this.selectNextNote = function() {
-      var displayableNotes = this.displayableNotes();
-      let currentIndex = displayableNotes.indexOf(this.selectedNote);
+      const displayableNotes = this.displayableNotes();
+      const currentIndex = displayableNotes.indexOf(this.selectedNote);
       if(currentIndex + 1 < displayableNotes.length) {
         this.selectNote(displayableNotes[currentIndex + 1]);
       }
     }
 
     this.selectPreviousNote = function() {
-      var displayableNotes = this.displayableNotes();
-      let currentIndex = displayableNotes.indexOf(this.selectedNote);
+      const displayableNotes = this.displayableNotes();
+      const currentIndex = displayableNotes.indexOf(this.selectedNote);
       if(currentIndex - 1 >= 0) {
         this.selectNote(displayableNotes[currentIndex - 1]);
         return true;
@@ -413,8 +467,11 @@ export class NotesPanel {
       const run = () => {
         $timeout(() => {
           let dummyNote;
-          if(this.selectedNote && this.selectedNote !== note && this.selectedNote.dummy) {
-            // remove dummy
+          if(this.selectedNote
+            && this.selectedNote !== note
+            && this.selectedNote.dummy
+          ) {
+            /** Set this dummy to be removed */
             dummyNote = this.selectedNote;
           }
 
@@ -422,13 +479,16 @@ export class NotesPanel {
           this.selectedIndex = Math.max(this.displayableNotes().indexOf(note), 0);
 
           if(note.content.conflict_of) {
-            note.content.conflict_of = null; // clear conflict
+            note.content.conflict_of = null;
             modelManager.setItemDirty(note, true);
             syncManager.sync();
           }
 
-          // There needs to be a long timeout after setting selection before removing the dummy
-          // Otherwise, you'll click a note, remove this one, and strangely, the click event registers for a lower cell
+          /**
+           * There needs to be a long timeout after setting selection before
+           * removing the dummy. Otherwise, you'll click a note, remove this one,
+           * and strangely, the click event registers for a lower cell.
+           */
           if(dummyNote && dummyNote.dummy == true) {
             $timeout(() => {
               modelManager.removeItemLocally(dummyNote);
@@ -442,10 +502,16 @@ export class NotesPanel {
         })
       }
 
-      if(note.content.protected && await privilegesManager.actionRequiresPrivilege(PrivilegesManager.ActionViewProtectedNotes)) {
-        privilegesManager.presentPrivilegesModal(PrivilegesManager.ActionViewProtectedNotes, () => {
-          run();
-        });
+      if(note.content.protected &&
+        await privilegesManager.actionRequiresPrivilege(
+          PrivilegesManager.ActionViewProtectedNotes
+        )) {
+        privilegesManager.presentPrivilegesModal(
+          PrivilegesManager.ActionViewProtectedNotes,
+          () => {
+            run();
+          }
+        );
       } else {
         run();
       }
@@ -459,11 +525,9 @@ export class NotesPanel {
       if(this.selectedNote && this.selectedNote.dummy) {
         return;
       }
-      // The "Note X" counter is based off this.notes.length, but sometimes, what you see in the list is only a subset.
-      // We can use this.displayableNotes().length, but that only accounts for non-paginated results, so first 15 or so.
       const title = "Note" + (this.notes ? (" " + (this.notes.length + 1)) : "");
       const newNote = modelManager.createItem({
-        content_type: "Note",
+        content_type: 'Note',
         content: {
           text: "",
           title: title
@@ -522,36 +586,42 @@ export class NotesPanel {
 
     this.togglePrefKey = function(key) {
       this[key] = !this[key];
-      authManager.setUserPrefValue(key, this[key]);
-      authManager.syncUserPreferences();
+      preferencesManager.setUserPrefValue(key, this[key]);
+      preferencesManager.syncUserPreferences();
       this.reloadNotes();
     }
 
     this.selectedSortByCreated = function() {
-      this.setSortBy("created_at");
+      this.setSortBy(SORT_KEY_CREATED_AT);
     }
 
     this.selectedSortByUpdated = function() {
-      this.setSortBy("client_updated_at");
+      this.setSortBy(SORT_KEY_CLIENT_UPDATED_AT);
     }
 
     this.selectedSortByTitle = function() {
-      this.setSortBy("title");
+      this.setSortBy(SORT_KEY_TITLE);
     }
 
     this.toggleReverseSort = function() {
       this.selectedMenuItem();
       this.sortReverse = !this.sortReverse;
       this.reorderNotes();
-      authManager.setUserPrefValue("sortReverse", this.sortReverse);
-      authManager.syncUserPreferences();
+      preferencesManager.setUserPrefValue(
+        PREF_SORT_NOTES_REVERSE,
+        this.sortReverse
+      );
+      preferencesManager.syncUserPreferences();
     }
 
     this.setSortBy = function(type) {
       this.sortBy = type;
       this.reorderNotes();
-      authManager.setUserPrefValue("sortBy", this.sortBy);
-      authManager.syncUserPreferences();
+      preferencesManager.setUserPrefValue(
+        PREF_SORT_NOTES_BY,
+        this.sortBy
+      );
+      preferencesManager.syncUserPreferences();
     }
 
     this.shouldShowTagsForNote = function(note) {
@@ -581,7 +651,7 @@ export class NotesPanel {
           return note.visible;
         }
 
-        var isSmartTag = this.tag.isSmartTag();
+        const isSmartTag = this.tag.isSmartTag();
         if(isSmartTag) {
           canShowArchived = canShowArchived || this.tag.content.isArchiveTag || isTrash;
         }
@@ -621,8 +691,8 @@ export class NotesPanel {
           if(b.pinned) { return 1; }
         }
 
-        var aValue = a[sortBy] || "";
-        var bValue = b[sortBy] || "";
+        let aValue = a[sortBy] || "";
+        let bValue = b[sortBy] || "";
 
         let vector = 1;
 
@@ -651,7 +721,7 @@ export class NotesPanel {
       }
 
       items = items || [];
-      var result = items.sort(function(a, b){
+      const result = items.sort(function(a, b){
         return sortValueFn(a, b);
       })
       return result;
@@ -665,8 +735,11 @@ export class NotesPanel {
     // In the browser we're not allowed to override cmd/ctrl + n, so we have to use Control modifier as well.
     // These rules don't apply to desktop, but probably better to be consistent.
     this.newNoteKeyObserver = keyboardManager.addKeyObserver({
-      key: "n",
-      modifiers: [KeyboardManager.KeyModifierMeta, KeyboardManager.KeyModifierCtrl],
+      key: 'n',
+      modifiers: [
+        KeyboardManager.KeyModifierMeta,
+        KeyboardManager.KeyModifierCtrl
+      ],
       onKeyDown: (event) => {
         event.preventDefault();
         $timeout(() => {
@@ -676,7 +749,7 @@ export class NotesPanel {
     })
 
     this.getSearchBar = function() {
-      return document.getElementById("search-bar");
+      return document.getElementById(ELEMENT_ID_SEARCH_BAR);
     }
 
     this.nextNoteKeyObserver = keyboardManager.addKeyObserver({
@@ -705,7 +778,10 @@ export class NotesPanel {
 
     this.searchKeyObserver = keyboardManager.addKeyObserver({
       key: "f",
-      modifiers: [KeyboardManager.KeyModifierMeta, KeyboardManager.KeyModifierShift],
+      modifiers: [
+        KeyboardManager.KeyModifierMeta,
+        KeyboardManager.KeyModifierShift
+      ],
       onKeyDown: (event) => {
         let searchBar = this.getSearchBar();
         if(searchBar) {searchBar.focus()};

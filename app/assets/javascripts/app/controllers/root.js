@@ -2,6 +2,13 @@ import _ from 'lodash';
 import { SFAuthManager } from 'snjs';
 import { getPlatformString } from '@/utils';
 import template from '%/root.pug';
+import {
+  APP_STATE_EVENT_PANEL_RESIZED
+} from '@/state';
+import {
+  PANEL_NAME_NOTES,
+  PANEL_NAME_TAGS
+} from '@/controllers/constants';
 
 export class Root {
   constructor() {
@@ -24,7 +31,9 @@ export class Root {
     migrationManager,
     privilegesManager,
     statusManager,
-    alertManager
+    alertManager,
+    preferencesManager,
+    appState
   ) {
     storageManager.initialize(passcodeManager.hasPasscode(), authManager.isEphemeralSession());
     $scope.platform = getPlatformString();
@@ -32,13 +41,19 @@ export class Root {
       $rootScope.$broadcast('new-update-available');
     }
 
-    $rootScope.$on('panel-resized', (event, info) => {
-      if(info.panel == 'notes') { this.notesCollapsed = info.collapsed; }
-      if(info.panel == 'tags') { this.tagsCollapsed = info.collapsed; }
-      let appClass = "";
-      if(this.notesCollapsed) { appClass += "collapsed-notes"; }
-      if(this.tagsCollapsed) { appClass += " collapsed-tags"; }
-      $scope.appClass = appClass;
+    appState.addObserver((eventName, data) => {
+      if(eventName === APP_STATE_EVENT_PANEL_RESIZED) {
+        if(data.panel === PANEL_NAME_NOTES) {
+          this.notesCollapsed = data.collapsed;
+        }
+        if(data.panel === PANEL_NAME_TAGS) {
+          this.tagsCollapsed = data.collapsed;
+        }
+        let appClass = "";
+        if(this.notesCollapsed) { appClass += "collapsed-notes"; }
+        if(this.tagsCollapsed) { appClass += " collapsed-tags"; }
+        $scope.appClass = appClass;
+      }
     })
 
     /* Used to avoid circular dependencies where syncManager cannot be imported but rootScope can */
@@ -53,6 +68,7 @@ export class Root {
 
     const initiateSync = () => {
       authManager.loadInitialData();
+      preferencesManager.load();
 
       this.syncStatusObserver = syncManager.registerSyncStatusObserver((status) => {
         if(status.retrievedCount > 20) {

@@ -170,7 +170,23 @@ angular__WEBPACK_IMPORTED_MODULE_0___default.a.module('app').directive('accountM
 
 angular__WEBPACK_IMPORTED_MODULE_0___default.a.module('app').filter('appDate', _filters__WEBPACK_IMPORTED_MODULE_6__["appDate"]).filter('appDateTime', _filters__WEBPACK_IMPORTED_MODULE_6__["appDateTime"]).filter('trusted', ['$sce', _filters__WEBPACK_IMPORTED_MODULE_6__["trusted"]]); // Services
 
-angular__WEBPACK_IMPORTED_MODULE_0___default.a.module('app').service('appState', _state__WEBPACK_IMPORTED_MODULE_2__["AppState"]).service('actionsManager', _services__WEBPACK_IMPORTED_MODULE_7__["ActionsManager"]).service('archiveManager', _services__WEBPACK_IMPORTED_MODULE_7__["ArchiveManager"]).service('authManager', _services__WEBPACK_IMPORTED_MODULE_7__["AuthManager"]).service('componentManager', _services__WEBPACK_IMPORTED_MODULE_7__["ComponentManager"]).service('dbManager', _services__WEBPACK_IMPORTED_MODULE_7__["DBManager"]).service('desktopManager', _services__WEBPACK_IMPORTED_MODULE_7__["DesktopManager"]).service('httpManager', _services__WEBPACK_IMPORTED_MODULE_7__["HttpManager"]).service('keyboardManager', _services__WEBPACK_IMPORTED_MODULE_7__["KeyboardManager"]).service('migrationManager', _services__WEBPACK_IMPORTED_MODULE_7__["MigrationManager"]).service('modelManager', _services__WEBPACK_IMPORTED_MODULE_7__["ModelManager"]).service('nativeExtManager', _services__WEBPACK_IMPORTED_MODULE_7__["NativeExtManager"]).service('passcodeManager', _services__WEBPACK_IMPORTED_MODULE_7__["PasscodeManager"]).service('privilegesManager', _services__WEBPACK_IMPORTED_MODULE_7__["PrivilegesManager"]).service('sessionHistory', _services__WEBPACK_IMPORTED_MODULE_7__["SessionHistory"]).service('singletonManager', _services__WEBPACK_IMPORTED_MODULE_7__["SingletonManager"]).service('statusManager', _services__WEBPACK_IMPORTED_MODULE_7__["StatusManager"]).service('storageManager', _services__WEBPACK_IMPORTED_MODULE_7__["StorageManager"]).service('syncManager', _services__WEBPACK_IMPORTED_MODULE_7__["SyncManager"]).service('alertManager', _services__WEBPACK_IMPORTED_MODULE_7__["AlertManager"]).service('themeManager', _services__WEBPACK_IMPORTED_MODULE_7__["ThemeManager"]);
+angular__WEBPACK_IMPORTED_MODULE_0___default.a.module('app').service('appState', _state__WEBPACK_IMPORTED_MODULE_2__["AppState"]).service('preferencesManager', _services__WEBPACK_IMPORTED_MODULE_7__["PreferencesManager"]).service('actionsManager', _services__WEBPACK_IMPORTED_MODULE_7__["ActionsManager"]).service('archiveManager', _services__WEBPACK_IMPORTED_MODULE_7__["ArchiveManager"]).service('authManager', _services__WEBPACK_IMPORTED_MODULE_7__["AuthManager"]).service('componentManager', _services__WEBPACK_IMPORTED_MODULE_7__["ComponentManager"]).service('dbManager', _services__WEBPACK_IMPORTED_MODULE_7__["DBManager"]).service('desktopManager', _services__WEBPACK_IMPORTED_MODULE_7__["DesktopManager"]).service('httpManager', _services__WEBPACK_IMPORTED_MODULE_7__["HttpManager"]).service('keyboardManager', _services__WEBPACK_IMPORTED_MODULE_7__["KeyboardManager"]).service('migrationManager', _services__WEBPACK_IMPORTED_MODULE_7__["MigrationManager"]).service('modelManager', _services__WEBPACK_IMPORTED_MODULE_7__["ModelManager"]).service('nativeExtManager', _services__WEBPACK_IMPORTED_MODULE_7__["NativeExtManager"]).service('passcodeManager', _services__WEBPACK_IMPORTED_MODULE_7__["PasscodeManager"]).service('privilegesManager', _services__WEBPACK_IMPORTED_MODULE_7__["PrivilegesManager"]).service('sessionHistory', _services__WEBPACK_IMPORTED_MODULE_7__["SessionHistory"]).service('singletonManager', _services__WEBPACK_IMPORTED_MODULE_7__["SingletonManager"]).service('statusManager', _services__WEBPACK_IMPORTED_MODULE_7__["StatusManager"]).service('storageManager', _services__WEBPACK_IMPORTED_MODULE_7__["StorageManager"]).service('syncManager', _services__WEBPACK_IMPORTED_MODULE_7__["SyncManager"]).service('alertManager', _services__WEBPACK_IMPORTED_MODULE_7__["AlertManager"]).service('themeManager', _services__WEBPACK_IMPORTED_MODULE_7__["ThemeManager"]);
+
+/***/ }),
+
+/***/ "./app/assets/javascripts/app/controllers/constants.js":
+/*!*************************************************************!*\
+  !*** ./app/assets/javascripts/app/controllers/constants.js ***!
+  \*************************************************************/
+/*! exports provided: PANEL_NAME_NOTES, PANEL_NAME_TAGS */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PANEL_NAME_NOTES", function() { return PANEL_NAME_NOTES; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PANEL_NAME_TAGS", function() { return PANEL_NAME_TAGS; });
+var PANEL_NAME_NOTES = 'notes';
+var PANEL_NAME_TAGS = 'tags';
 
 /***/ }),
 
@@ -210,6 +226,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+var NOTE_PREVIEW_CHAR_LIMIT = 80;
 var EditorPanel =
 /*#__PURE__*/
 function () {
@@ -228,7 +245,7 @@ function () {
 
   _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(EditorPanel, [{
     key: "controller",
-    value: ["$timeout", "authManager", "$rootScope", "actionsManager", "syncManager", "modelManager", "themeManager", "componentManager", "storageManager", "sessionHistory", "privilegesManager", "keyboardManager", "desktopManager", "alertManager", "appState", function controller($timeout, authManager, $rootScope, actionsManager, syncManager, modelManager, themeManager, componentManager, storageManager, sessionHistory, privilegesManager, keyboardManager, desktopManager, alertManager, appState) {
+    value: ["$timeout", "authManager", "$rootScope", "actionsManager", "syncManager", "modelManager", "themeManager", "componentManager", "storageManager", "sessionHistory", "privilegesManager", "keyboardManager", "desktopManager", "alertManager", "appState", "preferencesManager", function controller($timeout, authManager, $rootScope, actionsManager, syncManager, modelManager, themeManager, componentManager, storageManager, sessionHistory, privilegesManager, keyboardManager, desktopManager, alertManager, appState, preferencesManager) {
       var _this = this;
 
       this.spellcheck = true;
@@ -243,6 +260,8 @@ function () {
           _this.setNote(_this.note, data.previousNote);
 
           _this.reloadComponentContext();
+        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_9__["APP_STATE_EVENT_PREFERENCES_CHANGED"]) {
+          _this.loadPreferences();
         }
       });
       syncManager.addEventHandler(function (eventName, data) {
@@ -250,12 +269,13 @@ function () {
           return;
         }
 
-        if (eventName == "sync:taking-too-long") {
+        if (eventName === "sync:taking-too-long") {
           _this.syncTakingTooLong = true;
-        } else if (eventName == "sync:completed") {
+        } else if (eventName === "sync:completed") {
           _this.syncTakingTooLong = false;
 
-          if (_this.note.dirty) {// if we're still dirty, don't change status, a sync is likely upcoming.
+          if (_this.note.dirty) {
+            /** if we're still dirty, don't change status, a sync is likely upcoming. */
           } else {
             var savedItem = data.savedItems.find(function (item) {
               return item.uuid == _this.note.uuid;
@@ -266,15 +286,14 @@ function () {
               _this.showAllChangesSavedStatus();
             }
           }
-        } else if (eventName == "sync:error") {
+        } else if (eventName === "sync:error") {
           // only show error status in editor if the note is dirty. Otherwise, it means the originating sync
           // came from somewhere else and we don't want to display an error here.
           if (_this.note.dirty) {
             _this.showErrorStatus();
           }
         }
-      }); // Right now this only handles offline saving status changes.
-
+      });
       this.syncStatusObserver = syncManager.registerSyncStatusObserver(function (status) {
         if (status.localError) {
           $timeout(function () {
@@ -285,7 +304,7 @@ function () {
           }, 500);
         } else {}
       });
-      modelManager.addItemSyncObserver("editor-note-observer", "Note", function (allItems, validItems, deletedItems, source) {
+      modelManager.addItemSyncObserver('editor-note-observer', 'Note', function (allItems, validItems, deletedItems, source) {
         if (!_this.note) {
           return;
         }
@@ -308,7 +327,7 @@ function () {
 
         _this.loadTagsString();
       });
-      modelManager.addItemSyncObserver("editor-tag-observer", "Tag", function (allItems, validItems, deletedItems, source) {
+      modelManager.addItemSyncObserver('editor-tag-observer', 'Tag', function (allItems, validItems, deletedItems, source) {
         if (!_this.note) {
           return;
         }
@@ -321,7 +340,6 @@ function () {
           for (var _iterator = allItems[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
             var tag = _step.value;
 
-            // If a tag is deleted then we'll have lost references to notes. Reload anyway.
             if (_this.note.savedTagsString == null || tag.deleted || tag.hasRelationshipWithItem(_this.note)) {
               _this.loadTagsString();
 
@@ -343,7 +361,7 @@ function () {
           }
         }
       });
-      modelManager.addItemSyncObserver("editor-component-observer", "SN|Component", function (allItems, validItems, deletedItems, source) {
+      modelManager.addItemSyncObserver('editor-component-observer', 'SN|Component', function (allItems, validItems, deletedItems, source) {
         if (!_this.note) {
           return;
         } // Reload componentStack in case new ones were added or removed
@@ -542,10 +560,11 @@ function () {
         this.showSavingStatus();
 
         if (!dontUpdatePreviews) {
-          var limit = 80;
+          var limit = NOTE_PREVIEW_CHAR_LIMIT;
           var text = note.text || "";
           var truncate = text.length > limit;
-          note.content.preview_plain = text.substring(0, limit) + (truncate ? "..." : ""); // Clear dynamic previews if using plain editor
+          note.content.preview_plain = text.substring(0, limit) + (truncate ? "..." : "");
+          /** Clear dynamic previews if using plain editor */
 
           note.content.preview_html = null;
         }
@@ -657,7 +676,7 @@ function () {
       };
 
       this.onContentFocus = function () {
-        $rootScope.$broadcast("editorFocused");
+        appState.editorDidFocus();
       };
 
       this.onNameBlur = function () {
@@ -977,34 +996,30 @@ function () {
 
       this.onPanelResizeFinish = function (width, left, isMaxWidth) {
         if (isMaxWidth) {
-          authManager.setUserPrefValue("editorWidth", null);
+          preferencesManager.setUserPrefValue("editorWidth", null);
         } else {
           if (width !== undefined && width !== null) {
-            authManager.setUserPrefValue("editorWidth", width);
+            preferencesManager.setUserPrefValue("editorWidth", width);
 
             _this.leftResizeControl.setWidth(width);
           }
         }
 
         if (left !== undefined && left !== null) {
-          authManager.setUserPrefValue("editorLeft", left);
+          preferencesManager.setUserPrefValue("editorLeft", left);
 
           _this.rightResizeControl.setLeft(left);
         }
 
-        authManager.syncUserPreferences();
+        preferencesManager.syncUserPreferences();
       };
 
-      $rootScope.$on("user-preferences-changed", function () {
-        _this.loadPreferences();
-      });
-
       this.loadPreferences = function () {
-        this.monospaceFont = authManager.getUserPrefValue("monospaceFont", "monospace"); // On desktop application, disable spellcheck by default, as it is not performant.
+        this.monospaceFont = preferencesManager.getValue("monospaceFont", "monospace"); // On desktop application, disable spellcheck by default, as it is not performant.
 
         var defaultSpellcheckStatus = Object(_utils__WEBPACK_IMPORTED_MODULE_5__["isDesktopApplication"])() ? false : true;
-        this.spellcheck = authManager.getUserPrefValue("spellcheck", defaultSpellcheckStatus);
-        this.marginResizersEnabled = authManager.getUserPrefValue("marginResizersEnabled", true);
+        this.spellcheck = preferencesManager.getValue("spellcheck", defaultSpellcheckStatus);
+        this.marginResizersEnabled = preferencesManager.getValue("marginResizersEnabled", true);
 
         if (!document.getElementById("editor-content")) {
           // Elements have not yet loaded due to ng-if around wrapper
@@ -1014,14 +1029,14 @@ function () {
         this.reloadFont();
 
         if (this.marginResizersEnabled) {
-          var width = authManager.getUserPrefValue("editorWidth", null);
+          var width = preferencesManager.getValue("editorWidth", null);
 
           if (width !== null) {
             this.leftResizeControl.setWidth(width);
             this.rightResizeControl.setWidth(width);
           }
 
-          var left = authManager.getUserPrefValue("editorLeft", null);
+          var left = preferencesManager.getValue("editorLeft", null);
 
           if (left !== null) {
             this.leftResizeControl.setLeft(left);
@@ -1052,7 +1067,7 @@ function () {
         var _this7 = this;
 
         this[key] = !this[key];
-        authManager.setUserPrefValue(key, this[key], true);
+        preferencesManager.setUserPrefValue(key, this[key], true);
         this.reloadFont();
 
         if (key == "spellcheck") {
@@ -1376,6 +1391,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/app/services/privilegesManager.js");
 /* harmony import */ var _footer_pug__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! %/footer.pug */ "./app/assets/templates/footer.pug");
 /* harmony import */ var _footer_pug__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_footer_pug__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/app/state.js");
+
 
 
 
@@ -1412,9 +1429,16 @@ function () {
 
   }, {
     key: "controller",
-    value: ["$rootScope", "authManager", "modelManager", "$timeout", "dbManager", "syncManager", "storageManager", "passcodeManager", "componentManager", "singletonManager", "nativeExtManager", "privilegesManager", "statusManager", "alertManager", function controller($rootScope, authManager, modelManager, $timeout, dbManager, syncManager, storageManager, passcodeManager, componentManager, singletonManager, nativeExtManager, privilegesManager, statusManager, alertManager) {
+    value: ["$rootScope", "authManager", "modelManager", "$timeout", "dbManager", "syncManager", "storageManager", "passcodeManager", "componentManager", "singletonManager", "nativeExtManager", "privilegesManager", "statusManager", "alertManager", "appState", function controller($rootScope, authManager, modelManager, $timeout, dbManager, syncManager, storageManager, passcodeManager, componentManager, singletonManager, nativeExtManager, privilegesManager, statusManager, alertManager, appState) {
       var _this = this;
 
+      appState.addObserver(function (eventName, data) {
+        if (eventName === _state__WEBPACK_IMPORTED_MODULE_5__["APP_STATE_EVENT_EDITOR_FOCUSED"]) {
+          _this.closeAllRooms();
+
+          _this.closeAccountMenu();
+        }
+      });
       authManager.checkForSecurityUpdate().then(function (available) {
         _this.securityUpdateAvailable = available;
       });
@@ -1546,8 +1570,8 @@ function () {
           performIntegrityCheck: true
         }).then(function (response) {
           $timeout(function () {
-            this.isRefreshing = false;
-          }.bind(_this2), 200);
+            _this2.isRefreshing = false;
+          }, 200);
 
           if (response && response.error) {
             alertManager.alert({
@@ -1602,7 +1626,7 @@ function () {
         }).sort(function (a, b) {
           return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
         });
-        var differ = themes.length != _this.themesWithIcons.length;
+        var differ = themes.length !== _this.themesWithIcons.length;
         _this.themesWithIcons = themes;
 
         if (differ) {
@@ -1648,11 +1672,11 @@ function () {
         }
 
         this.dockShortcuts = shortcuts.sort(function (a, b) {
-          // circles first, then images
+          /** Circles first, then images */
           var aType = a.icon.type;
           var bType = b.icon.type;
 
-          if (aType == bType) {
+          if (aType === bType) {
             return 0;
           } else if (aType == "circle" && bType == "svg") {
             return -1;
@@ -1678,12 +1702,9 @@ function () {
       componentManager.registerHandler({
         identifier: "roomBar",
         areas: ["rooms", "modal"],
-        activationHandler: function activationHandler(component) {// RIP: There used to be code here that checked if component.active was true, and if so, displayed the component.
-          // However, we no longer want to persist active state for footer extensions. If you open Extensions on one computer,
-          // it shouldn't open on another computer. Active state should only be persisted for persistent extensions, like Folders.
-        },
+        activationHandler: function activationHandler(component) {},
         actionHandler: function actionHandler(component, action, data) {
-          if (action == "set-size") {
+          if (action === "set-size") {
             component.setLastSize(data);
           }
         },
@@ -1694,11 +1715,6 @@ function () {
             _this.closeAccountMenu();
           }
         }
-      });
-      $rootScope.$on("editorFocused", function () {
-        _this.closeAllRooms();
-
-        _this.closeAccountMenu();
       });
 
       this.onRoomDismiss = function (room) {
@@ -1952,6 +1968,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/app/state.js");
 /* harmony import */ var _notes_pug__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! %/notes.pug */ "./app/assets/templates/notes.pug");
 /* harmony import */ var _notes_pug__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(_notes_pug__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var _services_preferencesManager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @/services/preferencesManager */ "./app/assets/javascripts/app/services/preferencesManager.js");
+/* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/app/controllers/constants.js");
 
 
 
@@ -1962,6 +1980,20 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+
+/**
+ * This is the height of a note cell with nothing but the title,
+ * which *is* a display option
+ */
+
+var MIN_NOTE_CELL_HEIGHT = 51.0;
+var DEFAULT_LIST_NUM_NOTES = 20;
+var SORT_KEY_CREATED_AT = 'created_at';
+var SORT_KEY_UPDATED_AT = 'updated_at';
+var SORT_KEY_CLIENT_UPDATED_AT = 'client_updated_at';
+var SORT_KEY_TITLE = 'title';
+var ELEMENT_ID_SEARCH_BAR = 'search-bar';
 var NotesPanel =
 /*#__PURE__*/
 function () {
@@ -1979,16 +2011,18 @@ function () {
 
   _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(NotesPanel, [{
     key: "controller",
-    value: ["authManager", "$timeout", "$rootScope", "modelManager", "syncManager", "storageManager", "desktopManager", "privilegesManager", "keyboardManager", "appState", function controller(authManager, $timeout, $rootScope, modelManager, syncManager, storageManager, desktopManager, privilegesManager, keyboardManager, appState) {
+    value: ["authManager", "$timeout", "$rootScope", "modelManager", "syncManager", "storageManager", "desktopManager", "privilegesManager", "keyboardManager", "appState", "preferencesManager", function controller(authManager, $timeout, $rootScope, modelManager, syncManager, storageManager, desktopManager, privilegesManager, keyboardManager, appState, preferencesManager) {
       var _this = this;
 
       this.panelController = {};
       this.searchSubmitted = false;
-      $rootScope.$on("user-preferences-changed", function () {
-        _this.loadPreferences();
 
-        _this.reloadNotes();
-      });
+      window.onresize = function (event) {
+        _this.resetPagination({
+          keepCurrentIfLarger: true
+        });
+      };
+
       appState.addObserver(function (eventName, data) {
         if (eventName === _state__WEBPACK_IMPORTED_MODULE_8__["APP_STATE_EVENT_TAG_CHANGED"]) {
           if (_this.selectedNote && _this.selectedNote.dummy) {
@@ -2008,11 +2042,15 @@ function () {
               _this.selectNextOrCreateNew();
             });
           }
+        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_8__["APP_STATE_EVENT_PREFERENCES_CHANGED"]) {
+          _this.loadPreferences();
+
+          _this.reloadNotes();
         }
       });
       authManager.addEventHandler(function (event) {
-        if (event == snjs__WEBPACK_IMPORTED_MODULE_5__["SFAuthManager"].DidSignInEvent) {
-          // Delete dummy note if applicable
+        if (event === snjs__WEBPACK_IMPORTED_MODULE_5__["SFAuthManager"].DidSignInEvent) {
+          /** Delete dummy note if applicable */
           if (_this.selectedNote && _this.selectedNote.dummy) {
             modelManager.removeItemLocally(_this.selectedNote);
 
@@ -2020,8 +2058,12 @@ function () {
 
             _this.selectedNote = null;
 
-            _this.selectNote(null); // We now want to see if the user will download any items from the server.
-            // If the next sync completes and our notes are still 0, we need to create a dummy.
+            _this.selectNote(null);
+            /**
+             * We want to see if the user will download any items from the server.
+             * If the next sync completes and our notes are still 0,
+             * we need to create a dummy.
+             */
 
 
             _this.createDummyOnSynCompletionIfNoNotes = true;
@@ -2029,22 +2071,21 @@ function () {
         }
       });
       syncManager.addEventHandler(function (syncEvent, data) {
-        if (syncEvent == "local-data-loaded") {
+        if (syncEvent === 'local-data-loaded') {
           if (_this.notes.length == 0) {
             _this.createNewNote();
           }
-        } else if (syncEvent == "sync:completed") {
-          // Pad with a timeout just to be extra patient
+        } else if (syncEvent === 'sync:completed') {
           $timeout(function () {
             if (_this.createDummyOnSynCompletionIfNoNotes && _this.notes.length == 0) {
               _this.createDummyOnSynCompletionIfNoNotes = false;
 
               _this.createNewNote();
             }
-          }, 100);
+          });
         }
       });
-      modelManager.addItemSyncObserver("note-list", "*", function (allItems, validItems, deletedItems, source, sourceKey) {
+      modelManager.addItemSyncObserver('note-list', '*', function (allItems, validItems, deletedItems, source, sourceKey) {
         if (_this.selectedNote && (_this.selectedNote.deleted || _this.selectedNote.content.trashed)) {
           _this.selectNextOrCreateNew();
         }
@@ -2054,7 +2095,7 @@ function () {
 
 
         var notes = allItems.filter(function (item) {
-          return item.content_type === "Note";
+          return item.content_type === 'Note';
         });
         var _iteratorNormalCompletion = true;
         var _didIteratorError = false;
@@ -2237,12 +2278,12 @@ function () {
         var _this3 = this;
 
         var prevSortValue = this.sortBy;
-        this.sortBy = authManager.getUserPrefValue("sortBy", "created_at");
-        this.sortReverse = authManager.getUserPrefValue("sortReverse", false);
+        this.sortBy = preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_10__["PREF_SORT_NOTES_BY"], SORT_KEY_CREATED_AT);
+        this.sortReverse = preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_10__["PREF_SORT_NOTES_REVERSE"], false);
 
-        if (this.sortBy == "updated_at") {
-          // use client_updated_at instead
-          this.sortBy = "client_updated_at";
+        if (this.sortBy === SORT_KEY_UPDATED_AT) {
+          /** Use client_updated_at instead */
+          this.sortBy = SORT_KEY_CLIENT_UPDATED_AT;
         }
 
         if (prevSortValue && prevSortValue != this.sortBy) {
@@ -2251,19 +2292,19 @@ function () {
           });
         }
 
-        this.showArchived = authManager.getUserPrefValue("showArchived", false);
-        this.hidePinned = authManager.getUserPrefValue("hidePinned", false);
-        this.hideNotePreview = authManager.getUserPrefValue("hideNotePreview", false);
-        this.hideDate = authManager.getUserPrefValue("hideDate", false);
-        this.hideTags = authManager.getUserPrefValue("hideTags", false);
-        var width = authManager.getUserPrefValue("notesPanelWidth");
+        this.showArchived = preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_10__["PREF_NOTES_SHOW_ARCHIVED"], false);
+        this.hidePinned = preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_10__["PREF_NOTES_HIDE_PINNED"], false);
+        this.hideNotePreview = preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_10__["PREF_NOTES_HIDE_NOTE_PREVIEW"], false);
+        this.hideDate = preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_10__["PREF_NOTES_HIDE_DATE"], false);
+        this.hideTags = preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_10__["PREF_NOTES_HIDE_TAGS"], false);
+        var width = preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_10__["PREF_NOTES_PANEL_WIDTH"]);
 
         if (width) {
           this.panelController.setWidth(width);
 
           if (this.panelController.isCollapsed()) {
-            $rootScope.$broadcast("panel-resized", {
-              panel: "notes",
+            appState.panelDidResize({
+              name: _controllers_constants__WEBPACK_IMPORTED_MODULE_11__["PANEL_NAME_NOTES"],
               collapsed: this.panelController.isCollapsed()
             });
           }
@@ -2273,10 +2314,10 @@ function () {
       this.loadPreferences();
 
       this.onPanelResize = function (newWidth, lastLeft, isAtMaxWidth, isCollapsed) {
-        authManager.setUserPrefValue("notesPanelWidth", newWidth);
-        authManager.syncUserPreferences();
-        $rootScope.$broadcast("panel-resized", {
-          panel: "notes",
+        preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_10__["PREF_NOTES_PANEL_WIDTH"], newWidth);
+        preferencesManager.syncUserPreferences();
+        appState.panelDidResize({
+          name: _controllers_constants__WEBPACK_IMPORTED_MODULE_11__["PANEL_NAME_NOTES"],
           collapsed: isCollapsed
         });
       };
@@ -2284,10 +2325,10 @@ function () {
       angular__WEBPACK_IMPORTED_MODULE_4___default.a.element(document).ready(function () {
         _this.loadPreferences();
       });
-      $rootScope.$on("editorFocused", function () {
+      $rootScope.$on('editorFocused', function () {
         this.showMenu = false;
       }.bind(this));
-      $rootScope.$on("noteArchived", function () {
+      $rootScope.$on('noteArchived', function () {
         $timeout(this.selectNextOrCreateNew.bind(this));
       }.bind(this));
 
@@ -2312,14 +2353,8 @@ function () {
         }
       };
 
-      window.onresize = function (event) {
-        _this.resetPagination({
-          keepCurrentIfLarger: true
-        });
-      };
-
       this.paginate = function () {
-        this.notesToDisplay += this.DefaultNotesToDisplayValue;
+        this.notesToDisplay += this.pageSize;
 
         if (this.searchSubmitted) {
           desktopManager.searchText(this.noteFilter.text);
@@ -2330,24 +2365,28 @@ function () {
         var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
             keepCurrentIfLarger = _ref.keepCurrentIfLarger;
 
-        var MinNoteHeight = 51.0; // This is the height of a note cell with nothing but the title, which *is* a display option
+        var clientHeight = document.documentElement.clientHeight;
+        this.pageSize = clientHeight / MIN_NOTE_CELL_HEIGHT;
 
-        this.DefaultNotesToDisplayValue = document.documentElement.clientHeight / MinNoteHeight || 20;
+        if (this.pageSize === 0) {
+          this.pageSize = DEFAULT_LIST_NUM_NOTES;
+        }
 
-        if (keepCurrentIfLarger && this.notesToDisplay > this.DefaultNotesToDisplayValue) {
+        if (keepCurrentIfLarger && this.notesToDisplay > this.pageSize) {
           return;
         }
 
-        this.notesToDisplay = this.DefaultNotesToDisplayValue;
+        this.notesToDisplay = this.pageSize;
       };
 
       this.resetPagination();
 
       this.reloadPanelTitle = function () {
         if (this.isFiltering()) {
-          this.panelTitle = "".concat(this.notes.filter(function (i) {
+          var resultCount = this.notes.filter(function (i) {
             return i.visible;
-          }).length, " search results");
+          }).length;
+          this.panelTitle = "".concat(resultCount, " search results");
         } else if (this.tag) {
           this.panelTitle = "".concat(this.tag.title);
         }
@@ -2356,11 +2395,11 @@ function () {
       this.optionsSubtitle = function () {
         var base = "";
 
-        if (this.sortBy == "created_at") {
+        if (this.sortBy == 'created_at') {
           base += " Date Added";
-        } else if (this.sortBy == "client_updated_at") {
+        } else if (this.sortBy == 'client_updated_at') {
           base += " Date Modified";
-        } else if (this.sortBy == "title") {
+        } else if (this.sortBy == 'title') {
           base += " Title";
         }
 
@@ -2385,56 +2424,56 @@ function () {
         if (note.pinned) {
           flags.push({
             text: "Pinned",
-            class: "info"
+            class: 'info'
           });
         }
 
         if (note.archived) {
           flags.push({
             text: "Archived",
-            class: "warning"
+            class: 'warning'
           });
         }
 
         if (note.content.protected) {
           flags.push({
             text: "Protected",
-            class: "success"
+            class: 'success'
           });
         }
 
         if (note.locked) {
           flags.push({
             text: "Locked",
-            class: "neutral"
+            class: 'neutral'
           });
         }
 
         if (note.content.trashed) {
           flags.push({
             text: "Deleted",
-            class: "danger"
+            class: 'danger'
           });
         }
 
         if (note.content.conflict_of) {
           flags.push({
             text: "Conflicted Copy",
-            class: "danger"
+            class: 'danger'
           });
         }
 
         if (note.errorDecrypting) {
           flags.push({
             text: "Missing Keys",
-            class: "danger"
+            class: 'danger'
           });
         }
 
         if (note.deleted) {
           flags.push({
             text: "Deletion Pending Sync",
-            class: "danger"
+            class: 'danger'
           });
         }
 
@@ -2445,7 +2484,7 @@ function () {
       this.tagDidChange = function (tag, oldTag) {
         var _this4 = this;
 
-        var scrollable = document.getElementById("notes-scrollable");
+        var scrollable = document.getElementById('notes-scrollable');
 
         if (scrollable) {
           scrollable.scrollTop = 0;
@@ -2553,7 +2592,7 @@ function () {
                     var dummyNote;
 
                     if (_this5.selectedNote && _this5.selectedNote !== note && _this5.selectedNote.dummy) {
-                      // remove dummy
+                      /** Set this dummy to be removed */
                       dummyNote = _this5.selectedNote;
                     }
 
@@ -2561,12 +2600,15 @@ function () {
                     _this5.selectedIndex = Math.max(_this5.displayableNotes().indexOf(note), 0);
 
                     if (note.content.conflict_of) {
-                      note.content.conflict_of = null; // clear conflict
-
+                      note.content.conflict_of = null;
                       modelManager.setItemDirty(note, true);
                       syncManager.sync();
-                    } // There needs to be a long timeout after setting selection before removing the dummy
-                    // Otherwise, you'll click a note, remove this one, and strangely, the click event registers for a lower cell
+                    }
+                    /**
+                     * There needs to be a long timeout after setting selection before
+                     * removing the dummy. Otherwise, you'll click a note, remove this one,
+                     * and strangely, the click event registers for a lower cell.
+                     */
 
 
                     if (dummyNote && dummyNote.dummy == true) {
@@ -2626,13 +2668,11 @@ function () {
       this.createNewNote = function () {
         if (this.selectedNote && this.selectedNote.dummy) {
           return;
-        } // The "Note X" counter is based off this.notes.length, but sometimes, what you see in the list is only a subset.
-        // We can use this.displayableNotes().length, but that only accounts for non-paginated results, so first 15 or so.
-
+        }
 
         var title = "Note" + (this.notes ? " " + (this.notes.length + 1) : "");
         var newNote = modelManager.createItem({
-          content_type: "Note",
+          content_type: 'Note',
           content: {
             text: "",
             title: title
@@ -2694,36 +2734,36 @@ function () {
 
       this.togglePrefKey = function (key) {
         this[key] = !this[key];
-        authManager.setUserPrefValue(key, this[key]);
-        authManager.syncUserPreferences();
+        preferencesManager.setUserPrefValue(key, this[key]);
+        preferencesManager.syncUserPreferences();
         this.reloadNotes();
       };
 
       this.selectedSortByCreated = function () {
-        this.setSortBy("created_at");
+        this.setSortBy(SORT_KEY_CREATED_AT);
       };
 
       this.selectedSortByUpdated = function () {
-        this.setSortBy("client_updated_at");
+        this.setSortBy(SORT_KEY_CLIENT_UPDATED_AT);
       };
 
       this.selectedSortByTitle = function () {
-        this.setSortBy("title");
+        this.setSortBy(SORT_KEY_TITLE);
       };
 
       this.toggleReverseSort = function () {
         this.selectedMenuItem();
         this.sortReverse = !this.sortReverse;
         this.reorderNotes();
-        authManager.setUserPrefValue("sortReverse", this.sortReverse);
-        authManager.syncUserPreferences();
+        preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_10__["PREF_SORT_NOTES_REVERSE"], this.sortReverse);
+        preferencesManager.syncUserPreferences();
       };
 
       this.setSortBy = function (type) {
         this.sortBy = type;
         this.reorderNotes();
-        authManager.setUserPrefValue("sortBy", this.sortBy);
-        authManager.syncUserPreferences();
+        preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_10__["PREF_SORT_NOTES_BY"], this.sortBy);
+        preferencesManager.syncUserPreferences();
       };
 
       this.shouldShowTagsForNote = function (note) {
@@ -2858,7 +2898,7 @@ function () {
 
 
       this.newNoteKeyObserver = keyboardManager.addKeyObserver({
-        key: "n",
+        key: 'n',
         modifiers: [_services_keyboardManager__WEBPACK_IMPORTED_MODULE_7__["KeyboardManager"].KeyModifierMeta, _services_keyboardManager__WEBPACK_IMPORTED_MODULE_7__["KeyboardManager"].KeyModifierCtrl],
         onKeyDown: function onKeyDown(event) {
           event.preventDefault();
@@ -2869,7 +2909,7 @@ function () {
       });
 
       this.getSearchBar = function () {
-        return document.getElementById("search-bar");
+        return document.getElementById(ELEMENT_ID_SEARCH_BAR);
       };
 
       this.nextNoteKeyObserver = keyboardManager.addKeyObserver({
@@ -2940,6 +2980,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/app/utils.js");
 /* harmony import */ var _root_pug__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! %/root.pug */ "./app/assets/templates/root.pug");
 /* harmony import */ var _root_pug__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_root_pug__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/app/state.js");
+/* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/app/controllers/constants.js");
+
+
 
 
 
@@ -2960,7 +3004,7 @@ function () {
 
   _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(Root, [{
     key: "controller",
-    value: ["$scope", "$location", "$rootScope", "$timeout", "modelManager", "dbManager", "syncManager", "authManager", "themeManager", "passcodeManager", "storageManager", "migrationManager", "privilegesManager", "statusManager", "alertManager", function controller($scope, $location, $rootScope, $timeout, modelManager, dbManager, syncManager, authManager, themeManager, passcodeManager, storageManager, migrationManager, privilegesManager, statusManager, alertManager) {
+    value: ["$scope", "$location", "$rootScope", "$timeout", "modelManager", "dbManager", "syncManager", "authManager", "themeManager", "passcodeManager", "storageManager", "migrationManager", "privilegesManager", "statusManager", "alertManager", "preferencesManager", "appState", function controller($scope, $location, $rootScope, $timeout, modelManager, dbManager, syncManager, authManager, themeManager, passcodeManager, storageManager, migrationManager, privilegesManager, statusManager, alertManager, preferencesManager, appState) {
       var _this = this;
 
       storageManager.initialize(passcodeManager.hasPasscode(), authManager.isEphemeralSession());
@@ -2970,26 +3014,28 @@ function () {
         $rootScope.$broadcast('new-update-available');
       };
 
-      $rootScope.$on('panel-resized', function (event, info) {
-        if (info.panel == 'notes') {
-          _this.notesCollapsed = info.collapsed;
+      appState.addObserver(function (eventName, data) {
+        if (eventName === _state__WEBPACK_IMPORTED_MODULE_7__["APP_STATE_EVENT_PANEL_RESIZED"]) {
+          if (data.panel === _controllers_constants__WEBPACK_IMPORTED_MODULE_8__["PANEL_NAME_NOTES"]) {
+            _this.notesCollapsed = data.collapsed;
+          }
+
+          if (data.panel === _controllers_constants__WEBPACK_IMPORTED_MODULE_8__["PANEL_NAME_TAGS"]) {
+            _this.tagsCollapsed = data.collapsed;
+          }
+
+          var appClass = "";
+
+          if (_this.notesCollapsed) {
+            appClass += "collapsed-notes";
+          }
+
+          if (_this.tagsCollapsed) {
+            appClass += " collapsed-tags";
+          }
+
+          $scope.appClass = appClass;
         }
-
-        if (info.panel == 'tags') {
-          _this.tagsCollapsed = info.collapsed;
-        }
-
-        var appClass = "";
-
-        if (_this.notesCollapsed) {
-          appClass += "collapsed-notes";
-        }
-
-        if (_this.tagsCollapsed) {
-          appClass += " collapsed-tags";
-        }
-
-        $scope.appClass = appClass;
       });
       /* Used to avoid circular dependencies where syncManager cannot be imported but rootScope can */
 
@@ -3004,6 +3050,7 @@ function () {
 
       var initiateSync = function initiateSync() {
         authManager.loadInitialData();
+        preferencesManager.load();
         _this.syncStatusObserver = syncManager.registerSyncStatusObserver(function (status) {
           if (status.retrievedCount > 20) {
             var text = "Downloading ".concat(status.retrievedCount, " items. Keep app open.");
@@ -3290,6 +3337,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _tags_pug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! %/tags.pug */ "./app/assets/templates/tags.pug");
 /* harmony import */ var _tags_pug__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_tags_pug__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/app/state.js");
+/* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/app/controllers/constants.js");
+/* harmony import */ var _services_preferencesManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/services/preferencesManager */ "./app/assets/javascripts/app/services/preferencesManager.js");
+
+
+
 
 
 
@@ -3312,7 +3365,7 @@ function () {
 
   _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(TagsPanel, [{
     key: "controller",
-    value: ["$rootScope", "modelManager", "syncManager", "$timeout", "componentManager", "authManager", "appState", "alertManager", function controller($rootScope, modelManager, syncManager, $timeout, componentManager, authManager, appState, alertManager) {
+    value: ["$rootScope", "modelManager", "syncManager", "$timeout", "componentManager", "authManager", "appState", "alertManager", "preferencesManager", function controller($rootScope, modelManager, syncManager, $timeout, componentManager, authManager, appState, alertManager, preferencesManager) {
       var _this = this;
 
       // Wrap in timeout so that selectTag is defined
@@ -3322,9 +3375,14 @@ function () {
         _this.selectTag(_this.smartTags[0]);
       });
       syncManager.addEventHandler(function (syncEvent, data) {
-        if (syncEvent == 'local-data-loaded' || syncEvent == 'sync:completed' || syncEvent == 'local-data-incremental-load') {
+        if (syncEvent === 'local-data-loaded' || syncEvent === 'sync:completed' || syncEvent === 'local-data-incremental-load') {
           _this.tags = modelManager.tags;
           _this.smartTags = modelManager.getSmartTags();
+        }
+      });
+      appState.addObserver(function (eventName, data) {
+        if (eventName === _state__WEBPACK_IMPORTED_MODULE_4__["APP_STATE_EVENT_PREFERENCES_CHANGED"]) {
+          _this.loadPreferences();
         }
       });
       modelManager.addItemSyncObserver('tags-list', '*', function (allItems, validItems, deletedItems, source, sourceKey) {
@@ -3386,19 +3444,16 @@ function () {
       };
 
       this.panelController = {};
-      $rootScope.$on("user-preferences-changed", function () {
-        _this.loadPreferences();
-      });
 
       this.loadPreferences = function () {
-        var width = authManager.getUserPrefValue("tagsPanelWidth");
+        var width = preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_6__["PREF_TAGS_PANEL_WIDTH"]);
 
         if (width) {
           this.panelController.setWidth(width);
 
           if (this.panelController.isCollapsed()) {
-            $rootScope.$broadcast("panel-resized", {
-              panel: "tags",
+            appState.panelDidResize({
+              name: _controllers_constants__WEBPACK_IMPORTED_MODULE_5__["PANEL_NAME_TAGS"],
               collapsed: this.panelController.isCollapsed()
             });
           }
@@ -3408,17 +3463,17 @@ function () {
       this.loadPreferences();
 
       this.onPanelResize = function (newWidth, lastLeft, isAtMaxWidth, isCollapsed) {
-        authManager.setUserPrefValue("tagsPanelWidth", newWidth, true);
-        $rootScope.$broadcast("panel-resized", {
-          panel: "tags",
+        preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_6__["PREF_TAGS_PANEL_WIDTH"], newWidth, true);
+        appState.panelDidResize({
+          name: _controllers_constants__WEBPACK_IMPORTED_MODULE_5__["PANEL_NAME_TAGS"],
           collapsed: isCollapsed
         });
       };
 
       this.componentManager = componentManager;
       componentManager.registerHandler({
-        identifier: "tags",
-        areas: ["tags-list"],
+        identifier: 'tags',
+        areas: ['tags-list'],
         activationHandler: function activationHandler(component) {
           _this.component = component;
         },
@@ -3426,19 +3481,19 @@ function () {
           return null;
         },
         actionHandler: function actionHandler(component, action, data) {
-          if (action === "select-item") {
-            if (data.item.content_type == "Tag") {
+          if (action === 'select-item') {
+            if (data.item.content_type === 'Tag') {
               var tag = modelManager.findItem(data.item.uuid);
 
               if (tag) {
                 _this.selectTag(tag);
               }
-            } else if (data.item.content_type == "SN|SmartTag") {
+            } else if (data.item.content_type === 'SN|SmartTag') {
               var smartTag = new snjs__WEBPACK_IMPORTED_MODULE_2__["SNSmartTag"](data.item);
 
               _this.selectTag(smartTag);
             }
-          } else if (action === "clear-selection") {
+          } else if (action === 'clear-selection') {
             _this.selectTag(_this.smartTags[0]);
           }
         }
@@ -3446,7 +3501,7 @@ function () {
 
       this.selectTag = function (tag) {
         if (tag.isSmartTag()) {
-          Object.defineProperty(tag, "notes", {
+          Object.defineProperty(tag, 'notes', {
             get: function get() {
               return modelManager.notesMatchingSmartTag(tag);
             }
@@ -3470,7 +3525,7 @@ function () {
         }
 
         this.newTag = modelManager.createItem({
-          content_type: "Tag"
+          content_type: 'Tag'
         });
         this.selectedTag = this.newTag;
         this.editingTag = this.newTag;
@@ -3524,10 +3579,10 @@ function () {
       };
 
       function inputElementForTag(tag) {
-        return document.getElementById("tag-" + tag.uuid);
+        return document.getElementById('tag-' + tag.uuid);
       }
 
-      var originalTagName = "";
+      var originalTagName = '';
 
       this.selectedRenameTag = function ($event, tag) {
         originalTagName = tag.title;
@@ -8388,8 +8443,6 @@ function (_SFAuthManager) {
   _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(AuthManager, [{
     key: "loadInitialData",
     value: function loadInitialData() {
-      var _this2 = this;
-
       var userData = this.storageManager.getItemSync("user");
 
       if (userData) {
@@ -8405,11 +8458,7 @@ function (_SFAuthManager) {
         }
       }
 
-      this.configureUserPrefs();
       this.checkForSecurityUpdate();
-      this.modelManager.addItemSyncObserver("user-prefs", "SN|UserPreferences", function (allItems, validItems, deletedItems, source, sourceKey) {
-        _this2.userPreferencesDidChange();
-      });
     }
   }, {
     key: "offline",
@@ -8458,7 +8507,7 @@ function (_SFAuthManager) {
   }, {
     key: "login",
     value: function login(url, email, password, ephemeral, strictSignin, extraParams) {
-      var _this3 = this;
+      var _this2 = this;
 
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function login$(_context2) {
         while (1) {
@@ -8466,9 +8515,9 @@ function (_SFAuthManager) {
             case 0:
               return _context2.abrupt("return", _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_5___default()(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(AuthManager.prototype), "login", this).call(this, url, email, password, strictSignin, extraParams).then(function (response) {
                 if (!response.error) {
-                  _this3.setEphemeral(ephemeral);
+                  _this2.setEphemeral(ephemeral);
 
-                  _this3.checkForSecurityUpdate();
+                  _this2.checkForSecurityUpdate();
                 }
 
                 return response;
@@ -8484,7 +8533,7 @@ function (_SFAuthManager) {
   }, {
     key: "register",
     value: function register(url, email, password, ephemeral) {
-      var _this4 = this;
+      var _this3 = this;
 
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function register$(_context3) {
         while (1) {
@@ -8492,7 +8541,7 @@ function (_SFAuthManager) {
             case 0:
               return _context3.abrupt("return", _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_5___default()(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(AuthManager.prototype), "register", this).call(this, url, email, password).then(function (response) {
                 if (!response.error) {
-                  _this4.setEphemeral(ephemeral);
+                  _this3.setEphemeral(ephemeral);
                 }
 
                 return response;
@@ -8508,7 +8557,7 @@ function (_SFAuthManager) {
   }, {
     key: "changePassword",
     value: function changePassword(url, email, current_server_pw, newKeys, newAuthParams) {
-      var _this5 = this;
+      var _this4 = this;
 
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function changePassword$(_context4) {
         while (1) {
@@ -8516,7 +8565,7 @@ function (_SFAuthManager) {
             case 0:
               return _context4.abrupt("return", _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_5___default()(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(AuthManager.prototype), "changePassword", this).call(this, url, email, current_server_pw, newKeys, newAuthParams).then(function (response) {
                 if (!response.error) {
-                  _this5.checkForSecurityUpdate();
+                  _this4.checkForSecurityUpdate();
                 }
 
                 return response;
@@ -8646,64 +8695,6 @@ function (_SFAuthManager) {
 
       this.user = null;
       this._authParams = null;
-    }
-    /* User Preferences */
-
-  }, {
-    key: "configureUserPrefs",
-    value: function configureUserPrefs() {
-      var _this6 = this;
-
-      var prefsContentType = "SN|UserPreferences";
-      var contentTypePredicate = new snjs__WEBPACK_IMPORTED_MODULE_9__["SFPredicate"]("content_type", "=", prefsContentType);
-      this.singletonManager.registerSingleton([contentTypePredicate], function (resolvedSingleton) {
-        _this6.userPreferences = resolvedSingleton;
-      }, function (valueCallback) {
-        // Safe to create. Create and return object.
-        var prefs = new snjs__WEBPACK_IMPORTED_MODULE_9__["SFItem"]({
-          content_type: prefsContentType
-        });
-
-        _this6.modelManager.addItem(prefs);
-
-        _this6.modelManager.setItemDirty(prefs, true);
-
-        _this6.$rootScope.sync();
-
-        valueCallback(prefs);
-      });
-    }
-  }, {
-    key: "userPreferencesDidChange",
-    value: function userPreferencesDidChange() {
-      this.$rootScope.$broadcast("user-preferences-changed");
-    }
-  }, {
-    key: "syncUserPreferences",
-    value: function syncUserPreferences() {
-      if (this.userPreferences) {
-        this.modelManager.setItemDirty(this.userPreferences, true);
-        this.$rootScope.sync();
-      }
-    }
-  }, {
-    key: "getUserPrefValue",
-    value: function getUserPrefValue(key, defaultValue) {
-      if (!this.userPreferences) {
-        return defaultValue;
-      }
-
-      var value = this.userPreferences.getAppDataItem(key);
-      return value !== undefined && value != null ? value : defaultValue;
-    }
-  }, {
-    key: "setUserPrefValue",
-    value: function setUserPrefValue(key, value, sync) {
-      this.userPreferences.setAppDataItem(key, value);
-
-      if (sync) {
-        this.syncUserPreferences();
-      }
     }
   }]);
 
@@ -9731,7 +9722,7 @@ function (_SFHttpManager) {
 /*!******************************************************!*\
   !*** ./app/assets/javascripts/app/services/index.js ***!
   \******************************************************/
-/*! exports provided: ActionsManager, ArchiveManager, AuthManager, ComponentManager, DBManager, DesktopManager, HttpManager, KeyboardManager, MigrationManager, ModelManager, NativeExtManager, PasscodeManager, PrivilegesManager, SessionHistory, SingletonManager, StatusManager, StorageManager, SyncManager, ThemeManager, AlertManager */
+/*! exports provided: ActionsManager, ArchiveManager, AuthManager, ComponentManager, DBManager, DesktopManager, HttpManager, KeyboardManager, MigrationManager, ModelManager, NativeExtManager, PasscodeManager, PrivilegesManager, SessionHistory, SingletonManager, StatusManager, StorageManager, SyncManager, ThemeManager, AlertManager, PreferencesManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9795,6 +9786,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony import */ var _alertManager__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./alertManager */ "./app/assets/javascripts/app/services/alertManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "AlertManager", function() { return _alertManager__WEBPACK_IMPORTED_MODULE_19__["AlertManager"]; });
+
+/* harmony import */ var _preferencesManager__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./preferencesManager */ "./app/assets/javascripts/app/services/preferencesManager.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PreferencesManager", function() { return _preferencesManager__WEBPACK_IMPORTED_MODULE_20__["PreferencesManager"]; });
+
 
 
 
@@ -11566,6 +11561,126 @@ function () {
 
 /***/ }),
 
+/***/ "./app/assets/javascripts/app/services/preferencesManager.js":
+/*!*******************************************************************!*\
+  !*** ./app/assets/javascripts/app/services/preferencesManager.js ***!
+  \*******************************************************************/
+/*! exports provided: PREF_TAGS_PANEL_WIDTH, PREF_NOTES_PANEL_WIDTH, PREF_SORT_NOTES_BY, PREF_SORT_NOTES_REVERSE, PREF_NOTES_SHOW_ARCHIVED, PREF_NOTES_HIDE_PINNED, PREF_NOTES_HIDE_NOTE_PREVIEW, PREF_NOTES_HIDE_DATE, PREF_NOTES_HIDE_TAGS, PreferencesManager */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PREF_TAGS_PANEL_WIDTH", function() { return PREF_TAGS_PANEL_WIDTH; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PREF_NOTES_PANEL_WIDTH", function() { return PREF_NOTES_PANEL_WIDTH; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PREF_SORT_NOTES_BY", function() { return PREF_SORT_NOTES_BY; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PREF_SORT_NOTES_REVERSE", function() { return PREF_SORT_NOTES_REVERSE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PREF_NOTES_SHOW_ARCHIVED", function() { return PREF_NOTES_SHOW_ARCHIVED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PREF_NOTES_HIDE_PINNED", function() { return PREF_NOTES_HIDE_PINNED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PREF_NOTES_HIDE_NOTE_PREVIEW", function() { return PREF_NOTES_HIDE_NOTE_PREVIEW; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PREF_NOTES_HIDE_DATE", function() { return PREF_NOTES_HIDE_DATE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PREF_NOTES_HIDE_TAGS", function() { return PREF_NOTES_HIDE_TAGS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PreferencesManager", function() { return PreferencesManager; });
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
+/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_2__);
+
+
+
+var PREF_TAGS_PANEL_WIDTH = 'tagsPanelWidth';
+var PREF_NOTES_PANEL_WIDTH = 'notesPanelWidth';
+var PREF_SORT_NOTES_BY = 'sortBy';
+var PREF_SORT_NOTES_REVERSE = 'sortReverse';
+var PREF_NOTES_SHOW_ARCHIVED = 'showArchived';
+var PREF_NOTES_HIDE_PINNED = 'hidePinned';
+var PREF_NOTES_HIDE_NOTE_PREVIEW = 'hideNotePreview';
+var PREF_NOTES_HIDE_DATE = 'hideDate';
+var PREF_NOTES_HIDE_TAGS = 'hideTags';
+var PreferencesManager =
+/*#__PURE__*/
+function () {
+  PreferencesManager.$inject = ["modelManager", "singletonManager", "appState", "syncManager"];
+
+  /* @ngInject */
+  function PreferencesManager(modelManager, singletonManager, appState, syncManager) {
+    var _this = this;
+
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, PreferencesManager);
+
+    this.singletonManager = singletonManager;
+    this.modelManager = modelManager;
+    this.syncManager = syncManager;
+    this.appState = appState;
+    this.modelManager.addItemSyncObserver('user-prefs', 'SN|UserPreferences', function (allItems, validItems, deletedItems, source, sourceKey) {
+      _this.preferencesDidChange();
+    });
+  }
+
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(PreferencesManager, [{
+    key: "load",
+    value: function load() {
+      var _this2 = this;
+
+      var prefsContentType = 'SN|UserPreferences';
+      var contentTypePredicate = new snjs__WEBPACK_IMPORTED_MODULE_2__["SFPredicate"]('content_type', '=', prefsContentType);
+      this.singletonManager.registerSingleton([contentTypePredicate], function (resolvedSingleton) {
+        _this2.userPreferences = resolvedSingleton;
+      }, function (valueCallback) {
+        // Safe to create. Create and return object.
+        var prefs = new SFItem({
+          content_type: prefsContentType
+        });
+
+        _this2.modelManager.addItem(prefs);
+
+        _this2.modelManager.setItemDirty(prefs);
+
+        _this2.syncManager.sync();
+
+        valueCallback(prefs);
+      });
+    }
+  }, {
+    key: "preferencesDidChange",
+    value: function preferencesDidChange() {
+      this.appState.setUserPreferences(this.userPreferences);
+    }
+  }, {
+    key: "syncUserPreferences",
+    value: function syncUserPreferences() {
+      if (this.userPreferences) {
+        this.modelManager.setItemDirty(this.userPreferences);
+        this.syncManager.sync();
+      }
+    }
+  }, {
+    key: "getValue",
+    value: function getValue(key, defaultValue) {
+      if (!this.userPreferences) {
+        return defaultValue;
+      }
+
+      var value = this.userPreferences.getAppDataItem(key);
+      return value !== undefined && value != null ? value : defaultValue;
+    }
+  }, {
+    key: "setUserPrefValue",
+    value: function setUserPrefValue(key, value, sync) {
+      this.userPreferences.setAppDataItem(key, value);
+
+      if (sync) {
+        this.syncUserPreferences();
+      }
+    }
+  }]);
+
+  return PreferencesManager;
+}();
+
+/***/ }),
+
 /***/ "./app/assets/javascripts/app/services/privilegesManager.js":
 /*!******************************************************************!*\
   !*** ./app/assets/javascripts/app/services/privilegesManager.js ***!
@@ -12875,13 +12990,16 @@ function () {
 /*!*********************************************!*\
   !*** ./app/assets/javascripts/app/state.js ***!
   \*********************************************/
-/*! exports provided: APP_STATE_EVENT_TAG_CHANGED, APP_STATE_EVENT_NOTE_CHANGED, AppState */
+/*! exports provided: APP_STATE_EVENT_TAG_CHANGED, APP_STATE_EVENT_NOTE_CHANGED, APP_STATE_EVENT_PREFERENCES_CHANGED, APP_STATE_EVENT_PANEL_RESIZED, APP_STATE_EVENT_EDITOR_FOCUSED, AppState */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "APP_STATE_EVENT_TAG_CHANGED", function() { return APP_STATE_EVENT_TAG_CHANGED; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "APP_STATE_EVENT_NOTE_CHANGED", function() { return APP_STATE_EVENT_NOTE_CHANGED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "APP_STATE_EVENT_PREFERENCES_CHANGED", function() { return APP_STATE_EVENT_PREFERENCES_CHANGED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "APP_STATE_EVENT_PANEL_RESIZED", function() { return APP_STATE_EVENT_PANEL_RESIZED; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "APP_STATE_EVENT_EDITOR_FOCUSED", function() { return APP_STATE_EVENT_EDITOR_FOCUSED; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AppState", function() { return AppState; });
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
@@ -12891,6 +13009,9 @@ __webpack_require__.r(__webpack_exports__);
 
 var APP_STATE_EVENT_TAG_CHANGED = 1;
 var APP_STATE_EVENT_NOTE_CHANGED = 2;
+var APP_STATE_EVENT_PREFERENCES_CHANGED = 3;
+var APP_STATE_EVENT_PANEL_RESIZED = 4;
+var APP_STATE_EVENT_EDITOR_FOCUSED = 5;
 var AppState =
 /*#__PURE__*/
 function () {
@@ -12964,6 +13085,26 @@ function () {
     key: "getSelectedNote",
     value: function getSelectedNote() {
       return this.selectedNote;
+    }
+  }, {
+    key: "setUserPreferences",
+    value: function setUserPreferences(preferences) {
+      this.notifyEvent(APP_STATE_EVENT_PREFERENCES_CHANGED);
+    }
+  }, {
+    key: "panelDidResize",
+    value: function panelDidResize(_ref) {
+      var name = _ref.name,
+          collapsed = _ref.collapsed;
+      this.notifyEvent(APP_STATE_EVENT_PANEL_RESIZED, {
+        panel: name,
+        collapsed: collapsed
+      });
+    }
+  }, {
+    key: "editorDidFocus",
+    value: function editorDidFocus() {
+      this.notifyEvent(APP_STATE_EVENT_EDITOR_FOCUSED);
     }
   }]);
 

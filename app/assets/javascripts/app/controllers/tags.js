@@ -1,5 +1,14 @@
 import { SNNote, SNSmartTag } from 'snjs';
 import template from '%/tags.pug';
+import {
+  APP_STATE_EVENT_PREFERENCES_CHANGED
+} from '@/state';
+import {
+  PANEL_NAME_TAGS
+} from '@/controllers/constants';
+import {
+  PREF_TAGS_PANEL_WIDTH
+} from '@/services/preferencesManager';
 
 export class TagsPanel {
   constructor() {
@@ -20,7 +29,8 @@ export class TagsPanel {
     componentManager,
     authManager,
     appState,
-    alertManager
+    alertManager,
+    preferencesManager
   ) {
     // Wrap in timeout so that selectTag is defined
     $timeout(() => {
@@ -29,13 +39,21 @@ export class TagsPanel {
     })
 
     syncManager.addEventHandler((syncEvent, data) => {
-      if(syncEvent == 'local-data-loaded'
-        || syncEvent == 'sync:completed'
-        || syncEvent == 'local-data-incremental-load') {
+      if(
+        syncEvent === 'local-data-loaded' ||
+        syncEvent === 'sync:completed' ||
+        syncEvent === 'local-data-incremental-load'
+      ) {
         this.tags = modelManager.tags;
         this.smartTags = modelManager.getSmartTags();
       }
     });
+
+    appState.addObserver((eventName, data) => {
+      if(eventName === APP_STATE_EVENT_PREFERENCES_CHANGED) {
+        this.loadPreferences();
+      }
+    })
 
     modelManager.addItemSyncObserver(
       'tags-list',
@@ -53,7 +71,9 @@ export class TagsPanel {
           return;
         }
         /** If the selected tag has been deleted, revert to All view. */
-        const selectedTag = allItems.find((tag) => tag.uuid === this.selectedTag.uuid);
+        const selectedTag = allItems.find((tag) => {
+          return tag.uuid === this.selectedTag.uuid
+        });
         if(selectedTag && selectedTag.deleted) {
           this.selectTag(this.smartTags[0]);
         }
@@ -65,27 +85,25 @@ export class TagsPanel {
       if(this.tags) { allTags = allTags.concat(this.tags);}
       if(this.smartTags) { allTags = allTags.concat(this.smartTags);}
 
-      for(let tag of allTags) {
-        var validNotes = SNNote.filterDummyNotes(tag.notes).filter((note) => {
+      for(const tag of allTags) {
+        const validNotes = SNNote.filterDummyNotes(tag.notes).filter((note) => {
           return !note.archived && !note.content.trashed;
         });
-
         tag.cachedNoteCount = validNotes.length;
       }
     }
 
     this.panelController = {};
 
-    $rootScope.$on("user-preferences-changed", () => {
-      this.loadPreferences();
-    });
-
     this.loadPreferences = function() {
-      let width = authManager.getUserPrefValue("tagsPanelWidth");
+      let width = preferencesManager.getValue(PREF_TAGS_PANEL_WIDTH);
       if(width) {
         this.panelController.setWidth(width);
         if(this.panelController.isCollapsed()) {
-          $rootScope.$broadcast("panel-resized", {panel: "tags", collapsed: this.panelController.isCollapsed()})
+          appState.panelDidResize({
+            name: PANEL_NAME_TAGS,
+            collapsed: this.panelController.isCollapsed()
+          })
         }
       }
     }
@@ -93,14 +111,18 @@ export class TagsPanel {
     this.loadPreferences();
 
     this.onPanelResize = function(newWidth, lastLeft, isAtMaxWidth, isCollapsed) {
-      authManager.setUserPrefValue("tagsPanelWidth", newWidth, true);
-      $rootScope.$broadcast("panel-resized", {panel: "tags", collapsed: isCollapsed})
+      preferencesManager.setUserPrefValue(PREF_TAGS_PANEL_WIDTH, newWidth, true);
+      appState.panelDidResize({
+        name: PANEL_NAME_TAGS,
+        collapsed: isCollapsed
+      });
     }
 
     this.componentManager = componentManager;
 
     componentManager.registerHandler({
-      identifier: "tags", areas: ["tags-list"],
+      identifier: 'tags',
+      areas: ['tags-list'],
       activationHandler: (component) => {
         this.component = component;
       },
@@ -108,17 +130,17 @@ export class TagsPanel {
         return null;
       },
       actionHandler: (component, action, data) => {
-        if(action === "select-item") {
-          if(data.item.content_type == "Tag") {
+        if(action === 'select-item') {
+          if(data.item.content_type === 'Tag') {
             let tag = modelManager.findItem(data.item.uuid);
             if(tag) {
               this.selectTag(tag);
             }
-          } else if(data.item.content_type == "SN|SmartTag") {
+          } else if(data.item.content_type === 'SN|SmartTag') {
             let smartTag = new SNSmartTag(data.item);
             this.selectTag(smartTag);
           }
-        } else if(action === "clear-selection") {
+        } else if(action === 'clear-selection') {
           this.selectTag(this.smartTags[0]);
         }
       }
@@ -126,7 +148,7 @@ export class TagsPanel {
 
     this.selectTag = function(tag) {
       if(tag.isSmartTag()) {
-        Object.defineProperty(tag, "notes", {
+        Object.defineProperty(tag, 'notes', {
           get: () => {
             return modelManager.notesMatchingSmartTag(tag);
           }
@@ -147,7 +169,7 @@ export class TagsPanel {
         return;
       }
       this.newTag = modelManager.createItem({
-        content_type: "Tag"
+        content_type: 'Tag'
       });
       this.selectedTag = this.newTag;
       this.editingTag = this.newTag;
@@ -200,10 +222,10 @@ export class TagsPanel {
     }
 
     function inputElementForTag(tag) {
-      return document.getElementById("tag-" + tag.uuid);
+      return document.getElementById('tag-' + tag.uuid);
     }
 
-    var originalTagName = "";
+    let originalTagName = '';
     this.selectedRenameTag = function($event, tag) {
       originalTagName = tag.title;
       this.editingTag = tag;

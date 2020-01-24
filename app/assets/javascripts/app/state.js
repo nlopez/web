@@ -1,5 +1,8 @@
-export const APP_STATE_EVENT_TAG_CHANGED = 1;
-export const APP_STATE_EVENT_NOTE_CHANGED = 2;
+export const APP_STATE_EVENT_TAG_CHANGED          = 1;
+export const APP_STATE_EVENT_NOTE_CHANGED         = 2;
+export const APP_STATE_EVENT_PREFERENCES_CHANGED  = 3;
+export const APP_STATE_EVENT_PANEL_RESIZED        = 4;
+export const APP_STATE_EVENT_EDITOR_FOCUSED       = 5;
 
 export class AppState {
 
@@ -45,6 +48,28 @@ export class AppState {
 
   getSelectedNote() {
     return this.selectedNote;
+  }
+
+  setUserPreferences(preferences) {
+    this.notifyEvent(
+      APP_STATE_EVENT_PREFERENCES_CHANGED
+    );
+  }
+
+  panelDidResize({name, collapsed}) {
+    this.notifyEvent(
+      APP_STATE_EVENT_PANEL_RESIZED,
+      {
+        panel: name,
+        collapsed: collapsed
+      }
+    )
+  }
+
+  editorDidFocus() {
+    this.notifyEvent(
+      APP_STATE_EVENT_EDITOR_FOCUSED
+    );
   }
 
 }

@@ -5,7 +5,12 @@ import { isDesktopApplication } from '@/utils';
 import { KeyboardManager } from '@/services/keyboardManager';
 import { PrivilegesManager } from '@/services/privilegesManager';
 import template from '%/editor.pug';
-import { APP_STATE_EVENT_NOTE_CHANGED } from '@/state';
+import {
+  APP_STATE_EVENT_NOTE_CHANGED,
+  APP_STATE_EVENT_PREFERENCES_CHANGED
+} from '@/state';
+
+const NOTE_PREVIEW_CHAR_LIMIT = 80;
 
 export class EditorPanel {
   constructor() {
@@ -33,7 +38,8 @@ export class EditorPanel {
     keyboardManager,
     desktopManager,
     alertManager,
-    appState
+    appState,
+    preferencesManager
   ) {
     this.spellcheck = true;
     this.componentManager = componentManager;
@@ -47,6 +53,8 @@ export class EditorPanel {
         this.note = appState.getSelectedNote();
         this.setNote(this.note, data.previousNote);
         this.reloadComponentContext();
+      } else if(eventName === APP_STATE_EVENT_PREFERENCES_CHANGED) {
+        this.loadPreferences();
       }
     })
 
@@ -54,23 +62,20 @@ export class EditorPanel {
       if(!this.note) {
         return;
       }
-
-      if(eventName == "sync:taking-too-long") {
+      if(eventName === "sync:taking-too-long") {
         this.syncTakingTooLong = true;
-      }
-
-      else if(eventName == "sync:completed") {
+      } else if(eventName === "sync:completed") {
         this.syncTakingTooLong = false;
         if(this.note.dirty) {
-          // if we're still dirty, don't change status, a sync is likely upcoming.
+          /** if we're still dirty, don't change status, a sync is likely upcoming. */
         } else {
-          let savedItem = data.savedItems.find((item) => item.uuid == this.note.uuid);
-          let isInErrorState = this.saveError;
+          const savedItem = data.savedItems.find((item) => item.uuid == this.note.uuid);
+          const isInErrorState = this.saveError;
           if(isInErrorState || savedItem) {
             this.showAllChangesSavedStatus();
           }
         }
-      } else if(eventName == "sync:error") {
+      } else if(eventName === "sync:error") {
         // only show error status in editor if the note is dirty. Otherwise, it means the originating sync
         // came from somewhere else and we don't want to display an error here.
         if(this.note.dirty){
@@ -79,7 +84,6 @@ export class EditorPanel {
       }
     });
 
-    // Right now this only handles offline saving status changes.
     this.syncStatusObserver = syncManager.registerSyncStatusObserver((status) => {
       if(status.localError) {
         $timeout(() => {
@@ -93,8 +97,8 @@ export class EditorPanel {
     })
 
     modelManager.addItemSyncObserver(
-      "editor-note-observer",
-      "Note",
+      'editor-note-observer',
+      'Note',
       (allItems, validItems, deletedItems, source) => {
         if(!this.note) {
           return;
@@ -115,16 +119,18 @@ export class EditorPanel {
     });
 
     modelManager.addItemSyncObserver(
-      "editor-tag-observer",
-      "Tag",
+      'editor-tag-observer',
+      'Tag',
       (allItems, validItems, deletedItems, source) => {
         if(!this.note) {
           return;
         }
-
         for(const tag of allItems) {
-          // If a tag is deleted then we'll have lost references to notes. Reload anyway.
-          if(this.note.savedTagsString == null || tag.deleted || tag.hasRelationshipWithItem(this.note)) {
+          if(
+            this.note.savedTagsString == null ||
+            tag.deleted ||
+            tag.hasRelationshipWithItem(this.note)
+          ) {
             this.loadTagsString();
             return;
           }
@@ -132,8 +138,8 @@ export class EditorPanel {
     });
 
     modelManager.addItemSyncObserver(
-      "editor-component-observer",
-      "SN|Component",
+      'editor-component-observer',
+      'SN|Component',
       (allItems, validItems, deletedItems, source) => {
         if(!this.note) { return; }
 
@@ -218,9 +224,13 @@ export class EditorPanel {
 
     this.toggleMenu = function(menu) {
       this[menu] = !this[menu];
-
-      let allMenus = ['showMenu', 'showEditorMenu', 'showExtensions', 'showSessionHistory'];
-      for(var candidate of allMenus) {
+      const allMenus = [
+        'showMenu',
+        'showEditorMenu',
+        'showExtensions',
+        'showSessionHistory'
+      ];
+      for(const candidate of allMenus) {
         if(candidate != menu) {
           this[candidate] = false;
         }
@@ -294,23 +304,27 @@ export class EditorPanel {
       note.dummy = false;
 
       if(note.deleted) {
-        alertManager.alert({text: "The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded."});
+        alertManager.alert({
+          text: "The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded."
+        });
         return;
       }
 
       if(!modelManager.findItem(note.uuid)) {
-        alertManager.alert({text: "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."});
+        alertManager.alert({
+          text: "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
+        });
         return;
       }
 
       this.showSavingStatus();
 
       if(!dontUpdatePreviews) {
-        let limit = 80;
-        var text = note.text || "";
-        var truncate = text.length > limit;
+        const limit = NOTE_PREVIEW_CHAR_LIMIT;
+        const text = note.text || "";
+        const truncate = text.length > limit;
         note.content.preview_plain = text.substring(0, limit) + (truncate ? "..." : "");
-        // Clear dynamic previews if using plain editor
+        /** Clear dynamic previews if using plain editor */
         note.content.preview_html = null;
       }
 
@@ -331,7 +345,9 @@ export class EditorPanel {
         syncManager.sync().then((response) => {
           if(response && response.error && !this.didShowErrorAlert) {
             this.didShowErrorAlert = true;
-            alertManager.alert({text: "There was an error saving your note. Please try again."});
+            alertManager.alert({
+              text: "There was an error saving your note. Please try again."
+            });
           }
         })
       }, syncDebouceMs)
@@ -345,7 +361,7 @@ export class EditorPanel {
       this.saveError = false;
       this.syncTakingTooLong = false;
 
-      var status = "All changes saved";
+      let status = "All changes saved";
       if(authManager.offline()) {
         status += " (offline)";
       }
@@ -400,7 +416,7 @@ export class EditorPanel {
     }
 
     this.onContentFocus = function() {
-      $rootScope.$broadcast("editorFocused");
+      appState.editorDidFocus();
     }
 
     this.onNameBlur = function() {
@@ -619,33 +635,29 @@ export class EditorPanel {
 
     this.onPanelResizeFinish = (width, left, isMaxWidth) => {
       if(isMaxWidth) {
-        authManager.setUserPrefValue("editorWidth", null);
+        preferencesManager.setUserPrefValue("editorWidth", null);
       } else {
         if(width !== undefined && width !== null) {
-          authManager.setUserPrefValue("editorWidth", width);
+          preferencesManager.setUserPrefValue("editorWidth", width);
           this.leftResizeControl.setWidth(width);
         }
       }
 
       if(left !== undefined && left !== null) {
-        authManager.setUserPrefValue("editorLeft", left);
+        preferencesManager.setUserPrefValue("editorLeft", left);
         this.rightResizeControl.setLeft(left);
       }
-      authManager.syncUserPreferences();
+      preferencesManager.syncUserPreferences();
     }
 
-    $rootScope.$on("user-preferences-changed", () => {
-      this.loadPreferences();
-    });
-
     this.loadPreferences = function() {
-      this.monospaceFont = authManager.getUserPrefValue("monospaceFont", "monospace");
+      this.monospaceFont = preferencesManager.getValue("monospaceFont", "monospace");
 
       // On desktop application, disable spellcheck by default, as it is not performant.
       let defaultSpellcheckStatus = isDesktopApplication() ? false : true;
-      this.spellcheck = authManager.getUserPrefValue("spellcheck", defaultSpellcheckStatus);
+      this.spellcheck = preferencesManager.getValue("spellcheck", defaultSpellcheckStatus);
 
-      this.marginResizersEnabled = authManager.getUserPrefValue("marginResizersEnabled", true);
+      this.marginResizersEnabled = preferencesManager.getValue("marginResizersEnabled", true);
 
       if(!document.getElementById("editor-content")) {
         // Elements have not yet loaded due to ng-if around wrapper
@@ -655,13 +667,13 @@ export class EditorPanel {
       this.reloadFont();
 
       if(this.marginResizersEnabled) {
-        let width = authManager.getUserPrefValue("editorWidth", null);
+        let width = preferencesManager.getValue("editorWidth", null);
         if(width !== null) {
           this.leftResizeControl.setWidth(width);
           this.rightResizeControl.setWidth(width);
         }
 
-        let left = authManager.getUserPrefValue("editorLeft", null);
+        let left = preferencesManager.getValue("editorLeft", null);
         if(left !== null) {
           this.leftResizeControl.setLeft(left);
           this.rightResizeControl.setLeft(left);
@@ -689,7 +701,7 @@ export class EditorPanel {
 
     this.toggleKey = function(key) {
       this[key] = !this[key];
-      authManager.setUserPrefValue(key, this[key], true);
+      preferencesManager.setUserPrefValue(key, this[key], true);
       this.reloadFont();
 
       if(key == "spellcheck") {

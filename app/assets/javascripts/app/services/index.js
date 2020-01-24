@@ -18,3 +18,4 @@ export { StorageManager } from './storageManager';
 export { SyncManager } from './syncManager';
 export { ThemeManager } from './themeManager';
 export { AlertManager } from './alertManager';
+export { PreferencesManager } from './preferencesManager';

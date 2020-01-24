@@ -69,7 +69,8 @@ import {
   StorageManager,
   SyncManager,
   ThemeManager,
-  AlertManager
+  AlertManager,
+  PreferencesManager
 } from './services';
 
 angular.module('app', ['ngSanitize']);
@@ -143,6 +144,7 @@ angular
 angular
   .module('app')
   .service('appState', AppState)
+  .service('preferencesManager', PreferencesManager)
   .service('actionsManager', ActionsManager)
   .service('archiveManager', ArchiveManager)
   .service('authManager', AuthManager)

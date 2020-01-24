@@ -24,24 +24,17 @@ export class AuthManager extends SFAuthManager {
   }
 
   loadInitialData() {
-    var userData = this.storageManager.getItemSync("user");
+    const userData = this.storageManager.getItemSync("user");
     if(userData) {
       this.user = JSON.parse(userData);
     } else {
       // legacy, check for uuid
-      var idData = this.storageManager.getItemSync("uuid");
+      const idData = this.storageManager.getItemSync("uuid");
       if(idData) {
         this.user = {uuid: idData};
       }
     }
-
-    this.configureUserPrefs();
     this.checkForSecurityUpdate();
-
-    this.modelManager.addItemSyncObserver("user-prefs", "SN|UserPreferences", (allItems, validItems, deletedItems, source, sourceKey) => {
-      this.userPreferencesDidChange();
-    });
-
   }
 
   offline() {
@@ -143,48 +136,5 @@ export class AuthManager extends SFAuthManager {
     super.signout();
     this.user = null;
     this._authParams = null;
-  }
-
-
-  /* User Preferences */
-
-  configureUserPrefs() {
-    let prefsContentType = "SN|UserPreferences";
-
-    let contentTypePredicate = new SFPredicate("content_type", "=", prefsContentType);
-    this.singletonManager.registerSingleton([contentTypePredicate], (resolvedSingleton) => {
-      this.userPreferences = resolvedSingleton;
-    }, (valueCallback) => {
-      // Safe to create. Create and return object.
-      var prefs = new SFItem({content_type: prefsContentType});
-      this.modelManager.addItem(prefs);
-      this.modelManager.setItemDirty(prefs, true);
-      this.$rootScope.sync();
-      valueCallback(prefs);
-    });
-  }
-
-  userPreferencesDidChange() {
-    this.$rootScope.$broadcast("user-preferences-changed");
-  }
-
-  syncUserPreferences() {
-    if(this.userPreferences) {
-      this.modelManager.setItemDirty(this.userPreferences, true);
-      this.$rootScope.sync();
-    }
-  }
-
-  getUserPrefValue(key, defaultValue) {
-    if(!this.userPreferences) { return defaultValue; }
-    var value = this.userPreferences.getAppDataItem(key);
-    return (value !== undefined && value != null) ? value : defaultValue;
-  }
-
-  setUserPrefValue(key, value, sync) {
-    this.userPreferences.setAppDataItem(key, value);
-    if(sync) {
-      this.syncUserPreferences();
-    }
   }
 }
