@@ -350,7 +350,7 @@ export class AccountMenu {
             })
           }
           catch (e) {
-            console.log("Error decrypting", e);
+            console.error("Error decrypting", e);
             alertManager.alert({text: "There was an error decrypting your items. Make sure the password you entered is correct and try again."});
             callback(null);
             return;

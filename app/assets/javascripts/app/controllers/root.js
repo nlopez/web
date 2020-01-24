@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import { SFAuthManager } from 'snjs';
 import { getPlatformString } from '@/utils';
-import template from '%/home.pug';
+import template from '%/root.pug';
 
-export class Home {
+export class Root {
   constructor() {
     this.template = template;
   }
@@ -27,21 +27,17 @@ export class Home {
     alertManager
   ) {
     storageManager.initialize(passcodeManager.hasPasscode(), authManager.isEphemeralSession());
-
     $scope.platform = getPlatformString();
-
     $scope.onUpdateAvailable = function() {
       $rootScope.$broadcast('new-update-available');
     }
 
-    $rootScope.$on("panel-resized", (event, info) => {
-      if(info.panel == "notes") { this.notesCollapsed = info.collapsed; }
-      if(info.panel == "tags") { this.tagsCollapsed = info.collapsed; }
-
+    $rootScope.$on('panel-resized', (event, info) => {
+      if(info.panel == 'notes') { this.notesCollapsed = info.collapsed; }
+      if(info.panel == 'tags') { this.tagsCollapsed = info.collapsed; }
       let appClass = "";
       if(this.notesCollapsed) { appClass += "collapsed-notes"; }
       if(this.tagsCollapsed) { appClass += " collapsed-tags"; }
-
       $scope.appClass = appClass;
     })
 
@@ -140,12 +136,7 @@ export class Home {
     }
 
     function load() {
-      // pass keys to storageManager to decrypt storage
-      // Update: Wait, why? passcodeManager already handles this.
-      // storageManager.setKeys(passcodeManager.keys());
-
       openDatabase();
-      // Retrieve local data and begin sycing timer
       initiateSync();
     }
 
@@ -174,104 +165,6 @@ export class Home {
     }
 
     /*
-    Editor Callbacks
-    */
-
-    $scope.updateTagsForNote = function(note, stringTags) {
-      var toRemove = [];
-      for(var tag of note.tags) {
-        if(stringTags.indexOf(tag.title) === -1) {
-          // remove this tag
-          toRemove.push(tag);
-        }
-      }
-
-      for(var tagToRemove of toRemove) {
-        tagToRemove.removeItemAsRelationship(note);
-      }
-
-      modelManager.setItemsDirty(toRemove, true);
-
-      var tags = [];
-      for(var tagString of stringTags) {
-        var existingRelationship = _.find(note.tags, {title: tagString});
-        if(!existingRelationship) {
-          tags.push(modelManager.findOrCreateTagByTitle(tagString));
-        }
-      }
-
-      for(var tag of tags) {
-        tag.addItemAsRelationship(note);
-      }
-
-      modelManager.setItemsDirty(tags, true);
-
-      syncManager.sync();
-    }
-
-    /*
-    Tags Ctrl Callbacks
-    */
-
-    $scope.tagsSelectionMade = function(tag) {
-      // If a tag is selected twice, then the needed dummy note is removed.
-      // So we perform this check.
-      if($scope.selectedTag && tag && $scope.selectedTag.uuid == tag.uuid) {
-        return;
-      }
-
-      if($scope.selectedNote && $scope.selectedNote.dummy) {
-        modelManager.removeItemLocally($scope.selectedNote);
-        $scope.selectedNote = null;
-      }
-
-      $scope.selectedTag = tag;
-    }
-
-    $scope.tagsAddNew = function(tag) {
-      modelManager.addItem(tag);
-    }
-
-    $scope.tagsSave = function(tag, callback) {
-      if(!tag.title || tag.title.length == 0) {
-        $scope.removeTag(tag);
-        return;
-      }
-
-      modelManager.setItemDirty(tag, true);
-      syncManager.sync().then(callback);
-      modelManager.resortTag(tag);
-    }
-
-    /*
-    Notes Ctrl Callbacks
-    */
-
-    $scope.removeTag = function(tag) {
-      alertManager.confirm({text: "Are you sure you want to delete this tag? Note: deleting a tag will not delete its notes.", destructive: true, onConfirm: () => {
-        modelManager.setItemToBeDeleted(tag);
-        syncManager.sync().then(() => {
-          // force scope tags to update on sub directives
-          $rootScope.safeApply();
-        });
-      }})
-    }
-
-    $scope.notesSelectionMade = function(note) {
-      $scope.selectedNote = note;
-    }
-
-    $scope.notesAddNew = function(note) {
-      modelManager.addItem(note);
-      modelManager.setItemDirty(note);
-
-      if(!$scope.selectedTag.isSmartTag()) {
-        $scope.selectedTag.addItemAsRelationship(note);
-        modelManager.setItemDirty($scope.selectedTag, true);
-      }
-    }
-
-    /*
     Shared Callbacks
     */
 
@@ -282,40 +175,6 @@ export class Home {
       else
       this.$apply(fn);
     };
-
-    $rootScope.notifyDelete = function() {
-      $timeout(function() {
-        $rootScope.$broadcast("noteDeleted");
-      }.bind(this), 0);
-    }
-
-    $scope.deleteNote = function(note) {
-      modelManager.setItemToBeDeleted(note);
-
-      if(note == $scope.selectedNote) {
-        $scope.selectedNote = null;
-      }
-
-      if(note.dummy) {
-        modelManager.removeItemLocally(note);
-        $rootScope.notifyDelete();
-        return;
-      }
-
-      syncManager.sync().then(() => {
-        if(authManager.offline()) {
-          // when deleting items while ofline, we need to explictly tell angular to refresh UI
-          setTimeout(function () {
-            $rootScope.notifyDelete();
-            $rootScope.safeApply();
-          }, 50);
-        } else {
-          $timeout(() => {
-            $rootScope.notifyDelete();
-          });
-        }
-      });
-    }
 
     /*
     Disable dragging and dropping of files into main SN interface.

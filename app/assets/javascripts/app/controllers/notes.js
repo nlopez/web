@@ -3,29 +3,16 @@ import angular from 'angular';
 import { SFAuthManager } from 'snjs';
 import { PrivilegesManager } from '@/services/privilegesManager';
 import { KeyboardManager } from '@/services/keyboardManager';
+import { APP_STATE_EVENT_TAG_CHANGED, APP_STATE_EVENT_NOTE_CHANGED } from '@/state';
 import template from '%/notes.pug';
 
 export class NotesPanel {
   constructor() {
-    this.scope = {
-      addNew: '&',
-      selectionMade: '&',
-      tag: '='
-    };
-
+    this.scope = {};
     this.template = template;
     this.replace = true;
-
     this.controllerAs = 'ctrl';
     this.bindToController = true;
-  }
-
-  link(scope, elem, attrs, ctrl) {
-    scope.$watch('ctrl.tag', (tag, oldTag) => {
-      if (tag) {
-        ctrl.tagDidChange(tag, oldTag);
-      }
-    });
   }
 
   /* @ngInject */
@@ -38,7 +25,8 @@ export class NotesPanel {
     storageManager,
     desktopManager,
     privilegesManager,
-    keyboardManager
+    keyboardManager,
+    appState
   ) {
     this.panelController = {};
     this.searchSubmitted = false;
@@ -47,6 +35,24 @@ export class NotesPanel {
       this.loadPreferences();
       this.reloadNotes();
     });
+
+    appState.addObserver((eventName, data) => {
+      if(eventName === APP_STATE_EVENT_TAG_CHANGED) {
+        if(this.selectedNote && this.selectedNote.dummy) {
+          modelManager.removeItemLocally(this.selectedNote);
+          this.selectNote(null);
+        }
+        this.tag = appState.getSelectedTag();
+        this.tagDidChange(this.tag, data.previousTag);
+      } else if(eventName === APP_STATE_EVENT_NOTE_CHANGED) {
+        this.selectedNote = appState.getSelectedNote();
+        if(!this.selectedNote) {
+          this.reloadNotes().then(() => {
+            this.selectNextOrCreateNew();
+          });
+        }
+      }
+    })
 
     authManager.addEventHandler((event) => {
       if(event == SFAuthManager.DidSignInEvent) {
@@ -80,59 +86,63 @@ export class NotesPanel {
       }
     });
 
-    modelManager.addItemSyncObserver("note-list", "*", (allItems, validItems, deletedItems, source, sourceKey) => {
-      // reload our notes
-      this.reloadNotes();
+    modelManager.addItemSyncObserver(
+      "note-list",
+      "*",
+      (allItems, validItems, deletedItems, source, sourceKey) => {
+        if(this.selectedNote &&
+          (this.selectedNote.deleted || this.selectedNote.content.trashed)) {
+          this.selectNextOrCreateNew();
+        }
+        this.reloadNotes();
 
-      // Note has changed values, reset its flags
-      let notes = allItems.filter((item) => item.content_type == "Note");
-      for(let note of notes) {
-        this.loadFlagsForNote(note);
-        note.cachedCreatedAtString = note.createdAtString();
-        note.cachedUpdatedAtString = note.updatedAtString();
-      }
+        /** Note has changed values, reset its flags */
+        const notes = allItems.filter((item) => item.content_type === "Note");
+        for(const note of notes) {
+          this.loadFlagsForNote(note);
+          note.cachedCreatedAtString = note.createdAtString();
+          note.cachedUpdatedAtString = note.updatedAtString();
+        }
 
-      // select first note if none is selected
-      if(!this.selectedNote) {
-        $timeout(() => {
-          // required to be in timeout since selecting notes depends on rendered notes
-          this.selectFirstNote();
-        })
-      }
+        /** Select first note if none is selected */
+        if(!this.selectedNote) {
+          $timeout(() => {
+            /** Required to be in timeout since selecting notes depends on rendered notes */
+            this.selectFirstNote();
+          })
+        }
     });
 
-    this.setNotes = function(notes) {
+    this.setNotes = async function(notes) {
       notes = this.filterNotes(notes);
       notes = this.sortNotes(notes, this.sortBy, this.sortReverse);
       for(let note of notes) {
         note.shouldShowTags = this.shouldShowTagsForNote(note);
       }
       this.notes = notes;
-
       this.reloadPanelTitle();
     }
 
-    this.reloadNotes = function() {
-      let notes = this.tag.notes;
-
-      // Typically we reload flags via modelManager.addItemSyncObserver,
-      // but sync observers are not notified of errored items, so we'll do it here instead
-      for(let note of notes) {
+    this.reloadNotes = async function() {
+      const notes = this.tag.notes;
+      for(const note of notes) {
         if(note.errorDecrypting) {
           this.loadFlagsForNote(note);
         }
       }
-
-      this.setNotes(notes);
+      this.setNotes(notes).then(() => {
+        if(!this.notes.includes(this.selectedNote)) {
+          this.selectNextOrCreateNew();
+        }
+      })
     }
 
     this.reorderNotes = function() {
-      this.setNotes(this.notes);
+      this.reloadNotes();
     }
 
     this.loadPreferences = function() {
-      let prevSortValue = this.sortBy;
-
+      const prevSortValue = this.sortBy;
       this.sortBy = authManager.getUserPrefValue("sortBy", "created_at");
       this.sortReverse = authManager.getUserPrefValue("sortReverse", false);
 
@@ -157,7 +167,10 @@ export class NotesPanel {
       if(width) {
         this.panelController.setWidth(width);
         if(this.panelController.isCollapsed()) {
-          $rootScope.$broadcast("panel-resized", {panel: "notes", collapsed: this.panelController.isCollapsed()})
+          $rootScope.$broadcast("panel-resized", {
+            panel: "notes",
+            collapsed: this.panelController.isCollapsed()
+          })
         }
       }
     }
@@ -167,7 +180,10 @@ export class NotesPanel {
     this.onPanelResize = function(newWidth, lastLeft, isAtMaxWidth, isCollapsed) {
       authManager.setUserPrefValue("notesPanelWidth", newWidth);
       authManager.syncUserPreferences();
-      $rootScope.$broadcast("panel-resized", {panel: "notes", collapsed: isCollapsed})
+      $rootScope.$broadcast(
+        "panel-resized",
+        {panel: "notes", collapsed: isCollapsed}
+      )
     }
 
     angular.element(document).ready(() => {
@@ -178,30 +194,26 @@ export class NotesPanel {
       this.showMenu = false;
     }.bind(this))
 
-    $rootScope.$on("noteDeleted", function() {
-      $timeout(this.onNoteRemoval.bind(this));
-    }.bind(this))
-
     $rootScope.$on("noteArchived", function() {
-      $timeout(this.onNoteRemoval.bind(this));
+      $timeout(this.selectNextOrCreateNew.bind(this));
     }.bind(this));
 
-
-    // When a note is removed from the list
-    this.onNoteRemoval = function() {
-      let visibleNotes = this.visibleNotes();
+    this.selectNextOrCreateNew = function() {
+      const displayableNotes = this.displayableNotes();
       let index;
-      if(this.selectedIndex < visibleNotes.length) {
+      if(this.selectedIndex < displayableNotes.length) {
         index = Math.max(this.selectedIndex, 0);
       } else {
-        index = visibleNotes.length - 1;
+        index = 0;
       }
 
-      let note = visibleNotes[index];
+      const note = displayableNotes[index];
       if(note) {
         this.selectNote(note);
-      } else {
+      } else if(!this.tag || !this.tag.isSmartTag()) {
         this.createNewNote();
+      } else {
+        this.selectNote(null);
       }
     }
 
@@ -324,14 +336,13 @@ export class NotesPanel {
     }
 
     this.tagDidChange = function(tag, oldTag) {
-      var scrollable = document.getElementById("notes-scrollable");
+      const scrollable = document.getElementById("notes-scrollable");
       if(scrollable) {
         scrollable.scrollTop = 0;
         scrollable.scrollLeft = 0;
       }
 
       this.resetPagination();
-
       this.showMenu = false;
 
       if(this.selectedNote) {
@@ -343,11 +354,7 @@ export class NotesPanel {
 
       this.noteFilter.text = "";
       desktopManager.searchText();
-
-      this.setNotes(tag.notes);
-
-      // perform in timeout since visibleNotes relies on renderedNotes which relies on render to complete
-      $timeout(() => {
+      this.reloadNotes().then(() => {
         if(this.notes.length > 0) {
           this.notes.forEach((note) => { note.visible = true; })
           this.selectFirstNote();
@@ -363,32 +370,32 @@ export class NotesPanel {
       })
     }
 
-    this.visibleNotes = function() {
-      return this.renderedNotes.filter(function(note){
+    this.displayableNotes = function() {
+      return this.renderedNotes.filter((note) => {
         return note.visible;
       });
     }
 
     this.selectFirstNote = function() {
-      var visibleNotes = this.visibleNotes();
-      if(visibleNotes.length > 0) {
-        this.selectNote(visibleNotes[0]);
+      var displayableNotes = this.displayableNotes();
+      if(displayableNotes.length > 0) {
+        this.selectNote(displayableNotes[0]);
       }
     }
 
     this.selectNextNote = function() {
-      var visibleNotes = this.visibleNotes();
-      let currentIndex = visibleNotes.indexOf(this.selectedNote);
-      if(currentIndex + 1 < visibleNotes.length) {
-        this.selectNote(visibleNotes[currentIndex + 1]);
+      var displayableNotes = this.displayableNotes();
+      let currentIndex = displayableNotes.indexOf(this.selectedNote);
+      if(currentIndex + 1 < displayableNotes.length) {
+        this.selectNote(displayableNotes[currentIndex + 1]);
       }
     }
 
     this.selectPreviousNote = function() {
-      var visibleNotes = this.visibleNotes();
-      let currentIndex = visibleNotes.indexOf(this.selectedNote);
+      var displayableNotes = this.displayableNotes();
+      let currentIndex = displayableNotes.indexOf(this.selectedNote);
       if(currentIndex - 1 >= 0) {
-        this.selectNote(visibleNotes[currentIndex - 1]);
+        this.selectNote(displayableNotes[currentIndex - 1]);
         return true;
       } else {
         return false;
@@ -399,29 +406,26 @@ export class NotesPanel {
       if(this.selectedNote === note) {
         return;
       }
-
       if(!note) {
-        this.selectedNote = null;
-        this.selectionMade()(null);
+        appState.setSelectedNote(null);
         return;
       }
-
-      let run = () => {
+      const run = () => {
         $timeout(() => {
           let dummyNote;
-          if(this.selectedNote && this.selectedNote != note && this.selectedNote.dummy == true) {
+          if(this.selectedNote && this.selectedNote !== note && this.selectedNote.dummy) {
             // remove dummy
             dummyNote = this.selectedNote;
           }
 
-          this.selectedNote = note;
+          appState.setSelectedNote(note);
+          this.selectedIndex = Math.max(this.displayableNotes().indexOf(note), 0);
+
           if(note.content.conflict_of) {
             note.content.conflict_of = null; // clear conflict
             modelManager.setItemDirty(note, true);
             syncManager.sync();
           }
-          this.selectionMade()(note);
-          this.selectedIndex = Math.max(this.visibleNotes().indexOf(note), 0);
 
           // There needs to be a long timeout after setting selection before removing the dummy
           // Otherwise, you'll click a note, remove this one, and strangely, the click event registers for a lower cell
@@ -456,16 +460,34 @@ export class NotesPanel {
         return;
       }
       // The "Note X" counter is based off this.notes.length, but sometimes, what you see in the list is only a subset.
-      // We can use this.visibleNotes().length, but that only accounts for non-paginated results, so first 15 or so.
-      let title = "Note" + (this.notes ? (" " + (this.notes.length + 1)) : "");
-      let newNote = modelManager.createItem({content_type: "Note", content: {text: "", title: title}});
+      // We can use this.displayableNotes().length, but that only accounts for non-paginated results, so first 15 or so.
+      const title = "Note" + (this.notes ? (" " + (this.notes.length + 1)) : "");
+      const newNote = modelManager.createItem({
+        content_type: "Note",
+        content: {
+          text: "",
+          title: title
+        }
+      });
       newNote.client_updated_at = new Date();
       newNote.dummy = true;
+      this.addNew(newNote);
       this.selectNote(newNote);
-      this.addNew()(newNote);
     }
 
-    this.noteFilter = {text : ''};
+    this.addNew = function(note) {
+      modelManager.addItem(note);
+      modelManager.setItemDirty(note);
+      const selectedTag = appState.getSelectedTag();
+      if(!selectedTag.isSmartTag()) {
+        selectedTag.addItemAsRelationship(note);
+        modelManager.setItemDirty(selectedTag);
+      }
+    }
+
+    this.noteFilter = {
+      text : ''
+    };
 
     this.onFilterEnter = function() {
       // For Desktop, performing a search right away causes input to lose focus.
@@ -487,14 +509,11 @@ export class NotesPanel {
       if(this.searchSubmitted) {
         this.searchSubmitted = false;
       }
-
-      this.reloadNotes();
-
-      $timeout(() => {
+      this.reloadNotes().then(() => {
         if(!this.selectedNote.visible) {
           this.selectFirstNote();
         }
-      }, 100)
+      })
     }
 
     this.selectedMenuItem = function() {
@@ -572,13 +591,17 @@ export class NotesPanel {
           return note.visible;
         }
 
-        var filterText = this.noteFilter.text.toLowerCase();
+        const filterText = this.noteFilter.text.toLowerCase();
         if(filterText.length == 0) {
           note.visible = true;
         } else {
-          var words = filterText.split(" ");
-          var matchesTitle = words.every(function(word) { return  note.safeTitle().toLowerCase().indexOf(word) >= 0; });
-          var matchesBody = words.every(function(word) { return  note.safeText().toLowerCase().indexOf(word) >= 0; });
+          const words = filterText.split(" ");
+          const matchesTitle = words.every(function(word) {
+            return note.safeTitle().toLowerCase().indexOf(word) >= 0;
+          });
+          const matchesBody = words.every(function(word) {
+            return note.safeText().toLowerCase().indexOf(word) >= 0;
+          });
           note.visible = matchesTitle || matchesBody;
         }
 

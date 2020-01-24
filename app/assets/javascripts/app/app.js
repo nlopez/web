@@ -4,7 +4,11 @@ import angular from 'angular';
 import { configRoutes } from './routes';
 
 import {
-  Home,
+  AppState
+} from './state';
+
+import {
+  Root,
   TagsPanel,
   NotesPanel,
   EditorPanel,
@@ -79,7 +83,7 @@ angular
 // Controllers
 angular
   .module('app')
-  .directive('home', () => new Home())
+  .directive('root', () => new Root())
   .directive('tagsPanel', () => new TagsPanel())
   .directive('notesPanel', () => new NotesPanel())
   .directive('editorPanel', () => new EditorPanel())
@@ -138,6 +142,7 @@ angular
 // Services
 angular
   .module('app')
+  .service('appState', AppState)
   .service('actionsManager', ActionsManager)
   .service('archiveManager', ArchiveManager)
   .service('authManager', AuthManager)

@@ -5,28 +5,16 @@ import { isDesktopApplication } from '@/utils';
 import { KeyboardManager } from '@/services/keyboardManager';
 import { PrivilegesManager } from '@/services/privilegesManager';
 import template from '%/editor.pug';
+import { APP_STATE_EVENT_NOTE_CHANGED } from '@/state';
 
 export class EditorPanel {
   constructor() {
     this.restrict = 'E';
-    this.scope = {
-      remove: '&',
-      note: '=',
-      updateTags: '&'
-    };
-
+    this.scope = {};
     this.template = template;
     this.replace = true;
     this.controllerAs = 'ctrl';
     this.bindToController = true;
-  }
-
-  link(scope, elem, attrs, ctrl)  {
-    scope.$watch('ctrl.note', (note, oldNote) => {
-      if (note) {
-        ctrl.noteDidChange(note, oldNote);
-      }
-    });
   }
 
   /* @ngInject */
@@ -44,7 +32,8 @@ export class EditorPanel {
     privilegesManager,
     keyboardManager,
     desktopManager,
-    alertManager
+    alertManager,
+    appState
   ) {
     this.spellcheck = true;
     this.componentManager = componentManager;
@@ -52,6 +41,14 @@ export class EditorPanel {
     this.isDesktop = isDesktopApplication();
 
     const MinimumStatusDurationMs = 400;
+
+    appState.addObserver((eventName, data) => {
+      if(eventName === APP_STATE_EVENT_NOTE_CHANGED) {
+        this.note = appState.getSelectedNote();
+        this.setNote(this.note, data.previousNote);
+        this.reloadComponentContext();
+      }
+    })
 
     syncManager.addEventHandler((eventName, data) => {
       if(!this.note) {
@@ -95,74 +92,71 @@ export class EditorPanel {
       }
     })
 
-    modelManager.addItemSyncObserver("editor-note-observer", "Note", (allItems, validItems, deletedItems, source) => {
-      if(!this.note) { return; }
-
-      // Before checking if isMappingSourceRetrieved, we check if this item was deleted via a local source,
-      // such as alternating uuids during sign in. Otherwise, we only want to make interface updates if it's a
-      // remote retrieved source.
-      if(this.note.deleted || this.note.content.trashed) {
-        $rootScope.notifyDelete();
-        return;
-      }
-
-      if(!SFModelManager.isMappingSourceRetrieved(source)) {
-        return;
-      }
-
-      var matchingNote = allItems.find((item) => {
-        return item.uuid == this.note.uuid;
-      });
-
-      if(!matchingNote) {
-        return;
-      }
-
-      // Update tags
-      this.loadTagsString();
-    });
-
-    modelManager.addItemSyncObserver("editor-tag-observer", "Tag", (allItems, validItems, deletedItems, source) => {
-      if(!this.note) { return; }
-
-      for(var tag of allItems) {
-        // If a tag is deleted then we'll have lost references to notes. Reload anyway.
-        if(this.note.savedTagsString == null || tag.deleted || tag.hasRelationshipWithItem(this.note)) {
-          this.loadTagsString();
+    modelManager.addItemSyncObserver(
+      "editor-note-observer",
+      "Note",
+      (allItems, validItems, deletedItems, source) => {
+        if(!this.note) {
           return;
         }
-      }
+        if(this.note.deleted || this.note.content.trashed) {
+          return;
+        }
+        if(!SFModelManager.isMappingSourceRetrieved(source)) {
+          return;
+        }
+        const matchingNote = allItems.find((item) => {
+          return item.uuid == this.note.uuid;
+        });
+        if(!matchingNote) {
+          return;
+        }
+        this.loadTagsString();
     });
 
+    modelManager.addItemSyncObserver(
+      "editor-tag-observer",
+      "Tag",
+      (allItems, validItems, deletedItems, source) => {
+        if(!this.note) {
+          return;
+        }
 
-    modelManager.addItemSyncObserver("editor-component-observer", "SN|Component", (allItems, validItems, deletedItems, source) => {
-      if(!this.note) { return; }
-
-      // Reload componentStack in case new ones were added or removed
-      this.reloadComponentStackArray();
-
-      // Observe editor changes to see if the current note should update its editor
-      var editors = allItems.filter(function(item) {
-        return item.isEditor();
-      });
-
-      // If no editors have changed
-      if(editors.length == 0) {
-        return;
-      }
-
-      // Look through editors again and find the most proper one
-      var editor = this.editorForNote(this.note);
-      this.selectedEditor = editor;
-      if(!editor) {
-        this.reloadFont();
-      }
+        for(const tag of allItems) {
+          // If a tag is deleted then we'll have lost references to notes. Reload anyway.
+          if(this.note.savedTagsString == null || tag.deleted || tag.hasRelationshipWithItem(this.note)) {
+            this.loadTagsString();
+            return;
+          }
+        }
     });
 
-    this.noteDidChange = function(note, oldNote) {
-      this.setNote(note, oldNote);
-      this.reloadComponentContext();
-    }
+    modelManager.addItemSyncObserver(
+      "editor-component-observer",
+      "SN|Component",
+      (allItems, validItems, deletedItems, source) => {
+        if(!this.note) { return; }
+
+        // Reload componentStack in case new ones were added or removed
+        this.reloadComponentStackArray();
+
+        // Observe editor changes to see if the current note should update its editor
+        var editors = allItems.filter(function(item) {
+          return item.isEditor();
+        });
+
+        // If no editors have changed
+        if(editors.length == 0) {
+          return;
+        }
+
+        // Look through editors again and find the most proper one
+        var editor = this.editorForNote(this.note);
+        this.selectedEditor = editor;
+        if(!editor) {
+          this.reloadFont();
+        }
+    });
 
     this.setNote = function(note, oldNote) {
       this.showExtensions = false;
@@ -171,16 +165,18 @@ export class EditorPanel {
       // When setting alt key down and deleting note, an alert will come up and block the key up event when alt is released.
       // We reset it on set note so that the alt menu restores to default.
       this.altKeyDown = false;
+      if(!note) {
+        return;
+      }
       this.loadTagsString();
-
-      let onReady = () => {
+      const onReady = () => {
         this.noteReady = true;
         $timeout(() => {
           this.loadPreferences();
         })
       }
 
-      let associatedEditor = this.editorForNote(note);
+      const associatedEditor = this.editorForNote(note);
       if(associatedEditor && associatedEditor != this.selectedEditor) {
         // setting note to not ready will remove the editor from view in a flash,
         // so we only want to do this if switching between external editors
@@ -205,7 +201,7 @@ export class EditorPanel {
 
       if(oldNote && oldNote != note) {
         if(oldNote.dummy) {
-          this.remove()(oldNote);
+          this.performNoteDeletion(oldNote);
         }
       }
     }
@@ -419,28 +415,35 @@ export class EditorPanel {
 
     this.deleteNote = async function(permanently) {
       if(this.note.dummy) {
-        alertManager.alert({text: "This note is a placeholder and cannot be deleted. To remove from your list, simply navigate to a different note."});
+        alertManager.alert({
+          text: "This note is a placeholder and cannot be deleted. To remove from your list, simply navigate to a different note."
+        });
         return;
       }
 
-      let run = () => {
+      const run = () => {
         $timeout(() => {
           if(this.note.locked) {
-            alertManager.alert({text: "This note is locked. If you'd like to delete it, unlock it, and try again."});
+            alertManager.alert({
+              text: "This note is locked. If you'd like to delete it, unlock it, and try again."
+            });
             return;
           }
 
-          let title = this.note.safeTitle().length ? `'${this.note.title}'` : "this note";
-          let text = permanently ? `Are you sure you want to permanently delete ${title}?`
+          const title = this.note.safeTitle().length ? `'${this.note.title}'` : "this note";
+          const text = permanently ? `Are you sure you want to permanently delete ${title}?`
           : `Are you sure you want to move ${title} to the trash?`
-
           alertManager.confirm({text, destructive: true, onConfirm: () => {
             if(permanently) {
-              this.remove()(this.note);
+              this.performNoteDeletion(this.note);
             } else {
               this.note.content.trashed = true;
-              this.saveNote({bypassDebouncer: true, dontUpdatePreviews: true});
+              this.saveNote({
+                bypassDebouncer: true,
+                dontUpdatePreviews: true
+              });
             }
+            appState.setSelectedNote(null);
             this.showMenu = false;
           }})
         });
@@ -455,9 +458,33 @@ export class EditorPanel {
       }
     }
 
+    this.performNoteDeletion = function(note) {
+      modelManager.setItemToBeDeleted(note);
+      if(note === this.note) {
+        this.note = null;
+      }
+      if(note.dummy) {
+        modelManager.removeItemLocally(note);
+        return;
+      }
+
+      syncManager.sync().then(() => {
+        if(authManager.offline()) {
+          // when deleting items while ofline, we need to explictly tell angular to refresh UI
+          setTimeout(function () {
+            $rootScope.safeApply();
+          }, 50);
+        }
+      });
+    }
+
     this.restoreTrashedNote = function() {
       this.note.content.trashed = false;
-      this.saveNote({bypassDebouncer: true, dontUpdatePreviews: true});
+      this.saveNote({
+        bypassDebouncer: true,
+        dontUpdatePreviews: true
+      });
+      appState.setSelectedNote(null);
     }
 
     this.deleteNotePermanantely = function() {
@@ -514,12 +541,6 @@ export class EditorPanel {
     }
 
 
-
-
-
-
-
-
     /*
     Tags
     */
@@ -534,7 +555,7 @@ export class EditorPanel {
         return _tag.title;
       })
       strings.push(tag.title);
-      this.updateTags()(this.note, strings);
+      this.updateTags(strings);
       this.loadTagsString();
     }
 
@@ -545,8 +566,34 @@ export class EditorPanel {
       }).filter(function(_tag){
         return _tag !== tag.title;
       })
-      this.updateTags()(this.note, strings);
+      this.updateTags(strings);
       this.loadTagsString();
+    }
+
+    this.updateTags = function(stringTags) {
+      const toRemove = [];
+      for(const tag of this.note.tags) {
+        if(stringTags.indexOf(tag.title) === -1) {
+          toRemove.push(tag);
+        }
+      }
+      for(const tagToRemove of toRemove) {
+        tagToRemove.removeItemAsRelationship(this.note);
+      }
+      modelManager.setItemsDirty(toRemove);
+
+      const tags = [];
+      for(const tagString of stringTags) {
+        const existingRelationship = _.find(this.note.tags, {title: tagString});
+        if(!existingRelationship) {
+          tags.push(modelManager.findOrCreateTagByTitle(tagString));
+        }
+      }
+      for(const tag of tags) {
+        tag.addItemAsRelationship(this.note);
+      }
+      modelManager.setItemsDirty(tags);
+      syncManager.sync();
     }
 
     this.updateTagsFromTagsString = function() {
@@ -561,7 +608,7 @@ export class EditorPanel {
       })
 
       this.note.dummy = false;
-      this.updateTags()(this.note, strings);
+      this.updateTags(strings);
     }
 
 
@@ -662,8 +709,6 @@ export class EditorPanel {
       }
     }
 
-
-
     /*
     Components
     */
@@ -672,48 +717,54 @@ export class EditorPanel {
       desktopManager.redoSearch();
     }
 
-    componentManager.registerHandler({identifier: "editor", areas: ["note-tags", "editor-stack", "editor-editor"], activationHandler: (component) => {
-      if(component.area === "note-tags") {
-        // Autocomplete Tags
-        this.tagsComponent = component.active ? component : null;
-      } else if(component.area == "editor-editor") {
-        // An editor is already active, ensure the potential replacement is explicitely enabled for this item
-        // We also check if the selectedEditor is active. If it's inactive, we want to treat it as an external reference wishing to deactivate this editor (i.e componentView)
-        if(this.selectedEditor && this.selectedEditor == component && component.active == false) {
-          this.selectedEditor = null;
-        }
-        else if(this.selectedEditor) {
-          if(this.selectedEditor.active) {
-            // In the case where an editor is duplicated, then you'll have two editors who are explicitely enabled for the same note.
-            // This will cause an infinite loop, where as soon as the first is enabled, the second will come in, pass the `isExplicitlyEnabledForItem` check,
-            // and replace the previous one. So we now check to make the current editor isn't also explicitely enabled, and if it is, then we'll just keep that one active.
-            if(component.isExplicitlyEnabledForItem(this.note) && !this.selectedEditor.isExplicitlyEnabledForItem(this.note)) {
-              this.selectedEditor = component;
-            }
-          }
-        }
-        else {
-          // If no selected editor, let's see if the incoming one is a candidate
-          if(component.active && this.note && (component.isExplicitlyEnabledForItem(this.note) || component.isDefaultEditor())) {
-            this.selectedEditor = component;
-          } else {
-            // Not a candidate, and no selected editor. Disable the current editor by setting selectedEditor to null
+    componentManager.registerHandler({
+      identifier: "editor",
+      areas: ["note-tags", "editor-stack", "editor-editor"],
+      activationHandler: (component) => {
+        if(component.area === "note-tags") {
+          // Autocomplete Tags
+          this.tagsComponent = component.active ? component : null;
+        } else if(component.area == "editor-editor") {
+          // An editor is already active, ensure the potential replacement is explicitely enabled for this item
+          // We also check if the selectedEditor is active. If it's inactive, we want to treat it as an external reference wishing to deactivate this editor (i.e componentView)
+          if(this.selectedEditor && this.selectedEditor == component && component.active == false) {
             this.selectedEditor = null;
           }
-        }
+          else if(this.selectedEditor) {
+            if(this.selectedEditor.active) {
+              // In the case where an editor is duplicated, then you'll have two editors who are explicitely enabled for the same note.
+              // This will cause an infinite loop, where as soon as the first is enabled, the second will come in, pass the `isExplicitlyEnabledForItem` check,
+              // and replace the previous one. So we now check to make the current editor isn't also explicitely enabled, and if it is, then we'll just keep that one active.
+              if(component.isExplicitlyEnabledForItem(this.note) && !this.selectedEditor.isExplicitlyEnabledForItem(this.note)) {
+                this.selectedEditor = component;
+              }
+            }
+          }
+          else {
+            // If no selected editor, let's see if the incoming one is a candidate
+            if(component.active && this.note && (component.isExplicitlyEnabledForItem(this.note) || component.isDefaultEditor())) {
+              this.selectedEditor = component;
+            } else {
+              // Not a candidate, and no selected editor. Disable the current editor by setting selectedEditor to null
+              this.selectedEditor = null;
+            }
+          }
 
-      } else if(component.area == "editor-stack") {
-        this.reloadComponentContext();
-      }
-    }, contextRequestHandler: (component) => {
+        } else if(component.area == "editor-stack") {
+          this.reloadComponentContext();
+        }
+    },
+    contextRequestHandler: (component) => {
       if(component == this.selectedEditor || component == this.tagsComponent || this.componentStack.includes(component)) {
         return this.note;
       }
-    }, focusHandler: (component, focused) => {
+    },
+    focusHandler: (component, focused) => {
       if(component.isEditor() && focused) {
         this.closeAllMenus();
       }
-    }, actionHandler: (component, action, data) => {
+    },
+    actionHandler: (component, action, data) => {
       if(action === "set-size") {
         var setSize = function(element, size) {
           var widthString = typeof size.width === 'string' ? size.width : `${data.width}px`;
@@ -758,21 +809,9 @@ export class EditorPanel {
     }
 
     this.reloadComponentContext = function() {
-      // componentStack is used by the template to ng-repeat
       this.reloadComponentStackArray();
-      /*
-      In the past, we were doing this looping code even if the note wasn't currently defined.
-      The problem is if an editor stack item loaded first, requested to stream items, and the note was undefined,
-      we would set component.hidden = true. Which means messages would not be sent to the component.
-      Theoretically, upon the note loading, we would run this code again, and unhide the extension.
-      However, if you had requested to stream items when it was hidden, and then it unhid, it would never
-      resend those items upon unhiding.
-
-      Our solution here is to check that the note is defined before setting hidden. The question remains, when
-      would note really ever be undefined? Maybe temprarily when you're deleting a note?
-      */
       if(this.note) {
-        for(var component of this.componentStack) {
+        for(const component of this.componentStack) {
           if(component.active) {
             componentManager.setComponentHidden(component, !component.isExplicitlyEnabledForItem(this.note));
           }
@@ -785,10 +824,7 @@ export class EditorPanel {
     }
 
     this.toggleStackComponentForCurrentItem = function(component) {
-      // If it's hidden, we want to show it
-      // If it's not active, then hidden won't be set, and we mean to activate and show it.
       if(component.hidden || !component.active) {
-        // Unhide, associate with current item
         componentManager.setComponentHidden(component, false);
         this.associateComponentWithCurrentNote(component);
         if(!component.active) {
@@ -796,14 +832,15 @@ export class EditorPanel {
         }
         componentManager.contextItemDidChangeInArea("editor-stack");
       } else {
-        // not hidden, hide
         componentManager.setComponentHidden(component, true);
         this.disassociateComponentWithCurrentNote(component);
       }
     }
 
     this.disassociateComponentWithCurrentNote = function(component) {
-      component.associatedItemIds = component.associatedItemIds.filter((id) => {return id !== this.note.uuid});
+      component.associatedItemIds = component.associatedItemIds.filter((id) => {
+        return id !== this.note.uuid
+      });
 
       if(!component.disassociatedItemIds.includes(this.note.uuid)) {
         component.disassociatedItemIds.push(this.note.uuid);
@@ -814,7 +851,9 @@ export class EditorPanel {
     }
 
     this.associateComponentWithCurrentNote = function(component) {
-      component.disassociatedItemIds = component.disassociatedItemIds.filter((id) => {return id !== this.note.uuid});
+      component.disassociatedItemIds = component.disassociatedItemIds.filter((id) => {
+        return id !== this.note.uuid
+      });
 
       if(!component.associatedItemIds.includes(this.note.uuid)) {
         component.associatedItemIds.push(this.note.uuid);
@@ -851,7 +890,11 @@ export class EditorPanel {
 
     this.deleteKeyObserver = keyboardManager.addKeyObserver({
       key: KeyboardManager.KeyBackspace,
-      modifiers: [KeyboardManager.KeyModifierMeta, KeyboardManager.KeyModifierShift, KeyboardManager.KeyModifierAlt],
+      modifiers: [
+        KeyboardManager.KeyModifierMeta,
+        KeyboardManager.KeyModifierShift,
+        KeyboardManager.KeyModifierAlt
+      ],
       onKeyDown: (event) => {
         event.preventDefault();
         $timeout(() => {

@@ -47,7 +47,7 @@ export class ActionsManager {
       this.updateExtensionFromRemoteResponse(extension, response);
       callback && callback(extension);
     }.bind(this), function(response){
-      console.log("Error loading extension", response);
+      console.error("Error loading extension", response);
       if(callback) {
         callback(null);
       }
@@ -216,7 +216,7 @@ export class ActionsManager {
       }
     }.bind(this), function(response){
       action.error = true;
-      console.log("Action error response:", response);
+      console.error("Action error response:", response);
       if(callback) {
         callback({error: "Request error"});
       }

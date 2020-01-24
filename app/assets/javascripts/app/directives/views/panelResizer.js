@@ -44,7 +44,7 @@ export class PanelResizer {
   controller($scope, $element, modelManager, actionsManager, $timeout, $compile) {
     let panel = document.getElementById($scope.panelId);
     if(!panel) {
-      console.log("Panel not found for", $scope.panelId);
+      console.error("Panel not found for", $scope.panelId);
     }
 
     let resizerColumn = $element[0];

@@ -40,7 +40,7 @@ export class DBManager {
           db.close();
         };
         db.onerror = function(errorEvent) {
-          console.log("Database error: " + errorEvent.target.errorCode);
+          console.error("Database error: " + errorEvent.target.errorCode);
         }
         resolve(db);
       };
@@ -161,12 +161,11 @@ export class DBManager {
 
     return new Promise((resolve, reject) => {
       deleteRequest.onerror = function(event) {
-        console.log("Error deleting database.");
+        console.error("Error deleting database.");
         resolve();
       };
 
       deleteRequest.onsuccess = function(event) {
-        console.log("Database deleted successfully");
         resolve();
       };
 

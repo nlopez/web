@@ -152,18 +152,11 @@ export class ComponentView {
     */
 
     this.componentValueChanging = (component, prevComponent) => {
-      //
-      // See comment above about passing true to componentManager.ac/detivateComponent
-      //
       if(prevComponent && component !== prevComponent) {
-        // Deactive old component
         componentManager.deactivateComponent(prevComponent, true);
       }
-
       if(component) {
         componentManager.activateComponent(component, true);
-        // console.log("Loading", $scope.component.name, $scope.getUrl(), component.valid_until);
-
         $scope.reloadStatus();
       }
     }
@@ -173,7 +166,6 @@ export class ComponentView {
     })
 
     $scope.reloadComponent = function() {
-      // console.log("Reloading component", $scope.component);
       // force iFrame to deinit, allows new one to be created
       $scope.componentValid = false;
       componentManager.reloadComponent($scope.component).then(() => {
@@ -185,9 +177,7 @@ export class ComponentView {
       let component = $scope.component;
       $scope.reloading = true;
       let previouslyValid = $scope.componentValid;
-
       let offlineRestricted = component.offlineOnly && !isDesktopApplication();
-
       let urlError =
         (!isDesktopApplication() && !component.hasValidHostedUrl())
         ||

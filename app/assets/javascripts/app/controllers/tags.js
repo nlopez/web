@@ -4,12 +4,7 @@ import template from '%/tags.pug';
 export class TagsPanel {
   constructor() {
     this.restrict = 'E';
-    this.scope = {
-      addNew: '&',
-      selectionMade: '&',
-      save: '&',
-      removeTag: '&'
-    };
+    this.scope = {};
     this.template = template;
     this.replace = true;
     this.controllerAs = 'ctrl';
@@ -23,7 +18,9 @@ export class TagsPanel {
     syncManager,
     $timeout,
     componentManager,
-    authManager
+    authManager,
+    appState,
+    alertManager
   ) {
     // Wrap in timeout so that selectTag is defined
     $timeout(() => {
@@ -102,25 +99,30 @@ export class TagsPanel {
 
     this.componentManager = componentManager;
 
-    componentManager.registerHandler({identifier: "tags", areas: ["tags-list"], activationHandler: function(component){
-      this.component = component;
-    }.bind(this), contextRequestHandler: function(component){
-      return null;
-    }.bind(this), actionHandler: function(component, action, data){
-      if(action === "select-item") {
-        if(data.item.content_type == "Tag") {
-          let tag = modelManager.findItem(data.item.uuid);
-          if(tag) {
-            this.selectTag(tag);
+    componentManager.registerHandler({
+      identifier: "tags", areas: ["tags-list"],
+      activationHandler: (component) => {
+        this.component = component;
+      },
+      contextRequestHandler: (component) => {
+        return null;
+      },
+      actionHandler: (component, action, data) => {
+        if(action === "select-item") {
+          if(data.item.content_type == "Tag") {
+            let tag = modelManager.findItem(data.item.uuid);
+            if(tag) {
+              this.selectTag(tag);
+            }
+          } else if(data.item.content_type == "SN|SmartTag") {
+            let smartTag = new SNSmartTag(data.item);
+            this.selectTag(smartTag);
           }
-        } else if(data.item.content_type == "SN|SmartTag") {
-          let smartTag = new SNSmartTag(data.item);
-          this.selectTag(smartTag);
+        } else if(action === "clear-selection") {
+          this.selectTag(this.smartTags[0]);
         }
-      } else if(action === "clear-selection") {
-        this.selectTag(this.smartTags[0]);
       }
-    }.bind(this)});
+    });
 
     this.selectTag = function(tag) {
       if(tag.isSmartTag()) {
@@ -136,18 +138,20 @@ export class TagsPanel {
         modelManager.setItemDirty(tag, true);
         syncManager.sync();
       }
-      this.selectionMade()(tag);
+
+      appState.setSelectedTag(tag);
     }
 
     this.clickedAddNewTag = function() {
       if(this.editingTag) {
         return;
       }
-
-      this.newTag = modelManager.createItem({content_type: "Tag"});
+      this.newTag = modelManager.createItem({
+        content_type: "Tag"
+      });
       this.selectedTag = this.newTag;
       this.editingTag = this.newTag;
-      this.addNew()(this.newTag);
+      modelManager.addItem(this.newTag);
     }
 
     this.tagTitleDidChange = function(tag) {
@@ -169,11 +173,29 @@ export class TagsPanel {
         return;
       }
 
-      this.save()(tag, (savedTag) => {
-        $timeout(() => {
-          this.selectTag(tag);
-          this.newTag = null;
-        })
+      if(!tag.title || tag.title.length == 0) {
+        this.removeTag(tag);
+        return;
+      }
+
+      modelManager.setItemDirty(tag, true);
+      syncManager.sync().then();
+      modelManager.resortTag(tag);
+      this.selectTag(tag);
+      this.newTag = null;
+    }
+
+    this.removeTag = function(tag) {
+      alertManager.confirm({
+        text: "Are you sure you want to delete this tag? Note: deleting a tag will not delete its notes.",
+        destructive: true,
+        onConfirm: () => {
+          modelManager.setItemToBeDeleted(tag);
+          syncManager.sync().then(() => {
+            // force scope tags to update on sub directives
+            $rootScope.safeApply();
+          });
+        }
       });
     }
 
@@ -191,7 +213,7 @@ export class TagsPanel {
     }
 
     this.selectedDeleteTag = function(tag) {
-      this.removeTag()(tag);
+      this.removeTag(tag);
       this.selectTag(this.smartTags[0]);
     }
   }

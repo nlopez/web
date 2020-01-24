@@ -109,32 +109,26 @@ export class DesktopManager {
   }
 
   desktop_onComponentInstallationComplete(componentData, error) {
-    // console.log("Web|Component Installation/Update Complete", componentData, error);
-
     // Desktop is only allowed to change these keys:
-    let permissableKeys = ["package_info", "local_url"];
-    var component = this.modelManager.findItem(componentData.uuid);
-
+    const permissableKeys = ["package_info", "local_url"];
+    const component = this.modelManager.findItem(componentData.uuid);
     if(!component) {
       console.error("desktop_onComponentInstallationComplete component is null for uuid", componentData.uuid);
       return;
     }
-
     if(error) {
       component.setAppDataItem("installError", error);
     } else {
-      for(var key of permissableKeys) {
+      for(const key of permissableKeys) {
         component[key] = componentData.content[key];
       }
       this.modelManager.notifySyncObserversOfModels([component], SFModelManager.MappingSourceDesktopInstalled);
       component.setAppDataItem("installError", null);
     }
-
     this.modelManager.setItemDirty(component, true);
     this.syncManager.sync();
-
     this.timeout(() => {
-      for(var observer of this.updateObservers) {
+      for(const observer of this.updateObservers) {
         observer.callback(component);
       }
     });

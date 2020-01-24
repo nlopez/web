@@ -182,7 +182,6 @@ export class AuthManager extends SFAuthManager {
   }
 
   setUserPrefValue(key, value, sync) {
-    if(!this.userPreferences) { console.log("Prefs are null, not setting value", key); return; }
     this.userPreferences.setAppDataItem(key, value);
     if(sync) {
       this.syncUserPreferences();
