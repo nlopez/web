@@ -21,11 +21,11 @@ class TagsPanelCtrl {
     this.modelManager = modelManager;
     this.syncManager = syncManager;
     this.appState = appState;
-    this.modelManager = modelManager;
     this.alertManager = alertManager;
     this.preferencesManager = preferencesManager;
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
+    this.panelController = {};
     $timeout(() => {
       this.selectDefaultTag();
     })
@@ -92,7 +92,6 @@ class TagsPanelCtrl {
   }
 
   loadPreferences() {
-    this.panelController = {};
     const width = this.preferencesManager.getValue(PREF_TAGS_PANEL_WIDTH);
     if(width) {
       this.panelController.setWidth(width);
@@ -105,7 +104,7 @@ class TagsPanelCtrl {
     }
   }
 
-  onPanelResize(newWidth, lastLeft, isAtMaxWidth, isCollapsed) {
+  onPanelResize = (newWidth, lastLeft, isAtMaxWidth, isCollapsed) => {
     this.preferencesManager.setUserPrefValue(
       PREF_TAGS_PANEL_WIDTH,
       newWidth,
