@@ -2,7 +2,7 @@
 
 // css
 import 'sn-stylekit/dist/stylekit.css';
-import '../stylesheets/main.css.scss';
+import '../stylesheets/index.css.scss';
 
 // Vendor
 import 'angular';
@@ -19,4 +19,4 @@ SFItem.AppDomain = 'org.standardnotes.sn';
 
 // entry point
 // eslint-disable-next-line import/first
-import './app/app';
+import './app';

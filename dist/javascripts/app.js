@@ -81,15 +81,15 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./app/assets/javascripts/main.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./app/assets/javascripts/index.js");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./app/assets/javascripts/app/app.js":
-/*!*******************************************!*\
-  !*** ./app/assets/javascripts/app/app.js ***!
-  \*******************************************/
+/***/ "./app/assets/javascripts/app.js":
+/*!***************************************!*\
+  !*** ./app/assets/javascripts/app.js ***!
+  \***************************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -97,13 +97,13 @@
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! angular */ "./node_modules/angular/index.js");
 /* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(angular__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _routes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./routes */ "./app/assets/javascripts/app/routes.js");
-/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./state */ "./app/assets/javascripts/app/state.js");
-/* harmony import */ var _controllers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./controllers */ "./app/assets/javascripts/app/controllers/index.js");
-/* harmony import */ var _directives_functional__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./directives/functional */ "./app/assets/javascripts/app/directives/functional/index.js");
-/* harmony import */ var _directives_views__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./directives/views */ "./app/assets/javascripts/app/directives/views/index.js");
-/* harmony import */ var _filters__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./filters */ "./app/assets/javascripts/app/filters/index.js");
-/* harmony import */ var _services__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./services */ "./app/assets/javascripts/app/services/index.js");
+/* harmony import */ var _routes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./routes */ "./app/assets/javascripts/routes.js");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./state */ "./app/assets/javascripts/state.js");
+/* harmony import */ var _controllers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./controllers */ "./app/assets/javascripts/controllers/index.js");
+/* harmony import */ var _directives_functional__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./directives/functional */ "./app/assets/javascripts/directives/functional/index.js");
+/* harmony import */ var _directives_views__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./directives/views */ "./app/assets/javascripts/directives/views/index.js");
+/* harmony import */ var _filters__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./filters */ "./app/assets/javascripts/filters/index.js");
+/* harmony import */ var _services__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./services */ "./app/assets/javascripts/services/index.js");
 
 
 
@@ -174,10 +174,10 @@ angular__WEBPACK_IMPORTED_MODULE_0___default.a.module('app').service('appState',
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/controllers/constants.js":
-/*!*************************************************************!*\
-  !*** ./app/assets/javascripts/app/controllers/constants.js ***!
-  \*************************************************************/
+/***/ "./app/assets/javascripts/controllers/constants.js":
+/*!*********************************************************!*\
+  !*** ./app/assets/javascripts/controllers/constants.js ***!
+  \*********************************************************/
 /*! exports provided: PANEL_NAME_NOTES, PANEL_NAME_TAGS */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -190,10 +190,10 @@ var PANEL_NAME_TAGS = 'tags';
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/controllers/editor.js":
-/*!**********************************************************!*\
-  !*** ./app/assets/javascripts/app/controllers/editor.js ***!
-  \**********************************************************/
+/***/ "./app/assets/javascripts/controllers/editor.js":
+/*!******************************************************!*\
+  !*** ./app/assets/javascripts/controllers/editor.js ***!
+  \******************************************************/
 /*! exports provided: EditorPanel */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -210,12 +210,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(angular__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/app/utils.js");
-/* harmony import */ var _services_keyboardManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/services/keyboardManager */ "./app/assets/javascripts/app/services/keyboardManager.js");
-/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/app/services/privilegesManager.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/utils.js");
+/* harmony import */ var _services_keyboardManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/services/keyboardManager */ "./app/assets/javascripts/services/keyboardManager.js");
+/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/services/privilegesManager.js");
 /* harmony import */ var _editor_pug__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! %/editor.pug */ "./app/assets/templates/editor.pug");
 /* harmony import */ var _editor_pug__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(_editor_pug__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/app/state.js");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
 
 
 
@@ -1372,10 +1372,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/controllers/footer.js":
-/*!**********************************************************!*\
-  !*** ./app/assets/javascripts/app/controllers/footer.js ***!
-  \**********************************************************/
+/***/ "./app/assets/javascripts/controllers/footer.js":
+/*!******************************************************!*\
+  !*** ./app/assets/javascripts/controllers/footer.js ***!
+  \******************************************************/
 /*! exports provided: Footer */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1388,10 +1388,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/app/services/privilegesManager.js");
+/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/services/privilegesManager.js");
 /* harmony import */ var _footer_pug__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! %/footer.pug */ "./app/assets/templates/footer.pug");
 /* harmony import */ var _footer_pug__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_footer_pug__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/app/state.js");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
 
 
 
@@ -1806,31 +1806,31 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/controllers/index.js":
-/*!*********************************************************!*\
-  !*** ./app/assets/javascripts/app/controllers/index.js ***!
-  \*********************************************************/
+/***/ "./app/assets/javascripts/controllers/index.js":
+/*!*****************************************************!*\
+  !*** ./app/assets/javascripts/controllers/index.js ***!
+  \*****************************************************/
 /*! exports provided: EditorPanel, Footer, NotesPanel, TagsPanel, Root, LockScreen */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _editor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./editor */ "./app/assets/javascripts/app/controllers/editor.js");
+/* harmony import */ var _editor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./editor */ "./app/assets/javascripts/controllers/editor.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EditorPanel", function() { return _editor__WEBPACK_IMPORTED_MODULE_0__["EditorPanel"]; });
 
-/* harmony import */ var _footer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./footer */ "./app/assets/javascripts/app/controllers/footer.js");
+/* harmony import */ var _footer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./footer */ "./app/assets/javascripts/controllers/footer.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Footer", function() { return _footer__WEBPACK_IMPORTED_MODULE_1__["Footer"]; });
 
-/* harmony import */ var _notes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./notes */ "./app/assets/javascripts/app/controllers/notes.js");
+/* harmony import */ var _notes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./notes */ "./app/assets/javascripts/controllers/notes.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "NotesPanel", function() { return _notes__WEBPACK_IMPORTED_MODULE_2__["NotesPanel"]; });
 
-/* harmony import */ var _tags__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./tags */ "./app/assets/javascripts/app/controllers/tags.js");
+/* harmony import */ var _tags__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./tags */ "./app/assets/javascripts/controllers/tags.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "TagsPanel", function() { return _tags__WEBPACK_IMPORTED_MODULE_3__["TagsPanel"]; });
 
-/* harmony import */ var _root__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./root */ "./app/assets/javascripts/app/controllers/root.js");
+/* harmony import */ var _root__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./root */ "./app/assets/javascripts/controllers/root.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Root", function() { return _root__WEBPACK_IMPORTED_MODULE_4__["Root"]; });
 
-/* harmony import */ var _lockScreen__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./lockScreen */ "./app/assets/javascripts/app/controllers/lockScreen.js");
+/* harmony import */ var _lockScreen__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./lockScreen */ "./app/assets/javascripts/controllers/lockScreen.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "LockScreen", function() { return _lockScreen__WEBPACK_IMPORTED_MODULE_5__["LockScreen"]; });
 
 
@@ -1842,10 +1842,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/controllers/lockScreen.js":
-/*!**************************************************************!*\
-  !*** ./app/assets/javascripts/app/controllers/lockScreen.js ***!
-  \**************************************************************/
+/***/ "./app/assets/javascripts/controllers/lockScreen.js":
+/*!**********************************************************!*\
+  !*** ./app/assets/javascripts/controllers/lockScreen.js ***!
+  \**********************************************************/
 /*! exports provided: LockScreen */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1935,10 +1935,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/controllers/notes.js":
-/*!*********************************************************!*\
-  !*** ./app/assets/javascripts/app/controllers/notes.js ***!
-  \*********************************************************/
+/***/ "./app/assets/javascripts/controllers/notes.js":
+/*!*****************************************************!*\
+  !*** ./app/assets/javascripts/controllers/notes.js ***!
+  \*****************************************************/
 /*! exports provided: NotesPanel */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1957,13 +1957,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(angular__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/app/services/privilegesManager.js");
-/* harmony import */ var _services_keyboardManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/services/keyboardManager */ "./app/assets/javascripts/app/services/keyboardManager.js");
-/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/app/state.js");
+/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/services/privilegesManager.js");
+/* harmony import */ var _services_keyboardManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/services/keyboardManager */ "./app/assets/javascripts/services/keyboardManager.js");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
 /* harmony import */ var _notes_pug__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! %/notes.pug */ "./app/assets/templates/notes.pug");
 /* harmony import */ var _notes_pug__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(_notes_pug__WEBPACK_IMPORTED_MODULE_9__);
-/* harmony import */ var _services_preferencesManager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @/services/preferencesManager */ "./app/assets/javascripts/app/services/preferencesManager.js");
-/* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/app/controllers/constants.js");
+/* harmony import */ var _services_preferencesManager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @/services/preferencesManager */ "./app/assets/javascripts/services/preferencesManager.js");
+/* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/controllers/constants.js");
 
 
 
@@ -2951,10 +2951,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/controllers/root.js":
-/*!********************************************************!*\
-  !*** ./app/assets/javascripts/app/controllers/root.js ***!
-  \********************************************************/
+/***/ "./app/assets/javascripts/controllers/root.js":
+/*!****************************************************!*\
+  !*** ./app/assets/javascripts/controllers/root.js ***!
+  \****************************************************/
 /*! exports provided: RootCtrl, Root */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -2972,12 +2972,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/app/utils.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/utils.js");
 /* harmony import */ var _root_pug__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! %/root.pug */ "./app/assets/templates/root.pug");
 /* harmony import */ var _root_pug__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_root_pug__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/app/state.js");
-/* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/app/controllers/constants.js");
-/* harmony import */ var _strings__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/strings */ "./app/assets/javascripts/app/strings.js");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
+/* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/controllers/constants.js");
+/* harmony import */ var _strings__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/strings */ "./app/assets/javascripts/strings.js");
 
 
 
@@ -3407,10 +3407,10 @@ var Root = function Root() {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/controllers/tags.js":
-/*!********************************************************!*\
-  !*** ./app/assets/javascripts/app/controllers/tags.js ***!
-  \********************************************************/
+/***/ "./app/assets/javascripts/controllers/tags.js":
+/*!****************************************************!*\
+  !*** ./app/assets/javascripts/controllers/tags.js ***!
+  \****************************************************/
 /*! exports provided: TagsPanel */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -3425,9 +3425,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _tags_pug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! %/tags.pug */ "./app/assets/templates/tags.pug");
 /* harmony import */ var _tags_pug__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_tags_pug__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/app/state.js");
-/* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/app/controllers/constants.js");
-/* harmony import */ var _services_preferencesManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/services/preferencesManager */ "./app/assets/javascripts/app/services/preferencesManager.js");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
+/* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/controllers/constants.js");
+/* harmony import */ var _services_preferencesManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/services/preferencesManager */ "./app/assets/javascripts/services/preferencesManager.js");
 
 
 
@@ -3692,10 +3692,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/functional/autofocus.js":
-/*!***********************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/functional/autofocus.js ***!
-  \***********************************************************************/
+/***/ "./app/assets/javascripts/directives/functional/autofocus.js":
+/*!*******************************************************************!*\
+  !*** ./app/assets/javascripts/directives/functional/autofocus.js ***!
+  \*******************************************************************/
 /*! exports provided: autofocus */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -3723,10 +3723,10 @@ function autofocus($timeout) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/functional/click-outside.js":
-/*!***************************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/functional/click-outside.js ***!
-  \***************************************************************************/
+/***/ "./app/assets/javascripts/directives/functional/click-outside.js":
+/*!***********************************************************************!*\
+  !*** ./app/assets/javascripts/directives/functional/click-outside.js ***!
+  \***********************************************************************/
 /*! exports provided: clickOutside */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -3766,10 +3766,10 @@ function clickOutside($document) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/functional/delay-hide.js":
-/*!************************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/functional/delay-hide.js ***!
-  \************************************************************************/
+/***/ "./app/assets/javascripts/directives/functional/delay-hide.js":
+/*!********************************************************************!*\
+  !*** ./app/assets/javascripts/directives/functional/delay-hide.js ***!
+  \********************************************************************/
 /*! exports provided: delayHide */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -3829,10 +3829,10 @@ function delayHide($timeout) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/functional/elemReady.js":
-/*!***********************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/functional/elemReady.js ***!
-  \***********************************************************************/
+/***/ "./app/assets/javascripts/directives/functional/elemReady.js":
+/*!*******************************************************************!*\
+  !*** ./app/assets/javascripts/directives/functional/elemReady.js ***!
+  \*******************************************************************/
 /*! exports provided: elemReady */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -3858,10 +3858,10 @@ function elemReady($parse) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/functional/file-change.js":
-/*!*************************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/functional/file-change.js ***!
-  \*************************************************************************/
+/***/ "./app/assets/javascripts/directives/functional/file-change.js":
+/*!*********************************************************************!*\
+  !*** ./app/assets/javascripts/directives/functional/file-change.js ***!
+  \*********************************************************************/
 /*! exports provided: fileChange */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -3889,40 +3889,40 @@ function fileChange() {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/functional/index.js":
-/*!*******************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/functional/index.js ***!
-  \*******************************************************************/
+/***/ "./app/assets/javascripts/directives/functional/index.js":
+/*!***************************************************************!*\
+  !*** ./app/assets/javascripts/directives/functional/index.js ***!
+  \***************************************************************/
 /*! exports provided: autofocus, clickOutside, delayHide, elemReady, fileChange, infiniteScroll, lowercase, selectOnClick, snEnter */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _autofocus__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./autofocus */ "./app/assets/javascripts/app/directives/functional/autofocus.js");
+/* harmony import */ var _autofocus__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./autofocus */ "./app/assets/javascripts/directives/functional/autofocus.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "autofocus", function() { return _autofocus__WEBPACK_IMPORTED_MODULE_0__["autofocus"]; });
 
-/* harmony import */ var _click_outside__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./click-outside */ "./app/assets/javascripts/app/directives/functional/click-outside.js");
+/* harmony import */ var _click_outside__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./click-outside */ "./app/assets/javascripts/directives/functional/click-outside.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "clickOutside", function() { return _click_outside__WEBPACK_IMPORTED_MODULE_1__["clickOutside"]; });
 
-/* harmony import */ var _delay_hide__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./delay-hide */ "./app/assets/javascripts/app/directives/functional/delay-hide.js");
+/* harmony import */ var _delay_hide__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./delay-hide */ "./app/assets/javascripts/directives/functional/delay-hide.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "delayHide", function() { return _delay_hide__WEBPACK_IMPORTED_MODULE_2__["delayHide"]; });
 
-/* harmony import */ var _elemReady__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./elemReady */ "./app/assets/javascripts/app/directives/functional/elemReady.js");
+/* harmony import */ var _elemReady__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./elemReady */ "./app/assets/javascripts/directives/functional/elemReady.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "elemReady", function() { return _elemReady__WEBPACK_IMPORTED_MODULE_3__["elemReady"]; });
 
-/* harmony import */ var _file_change__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./file-change */ "./app/assets/javascripts/app/directives/functional/file-change.js");
+/* harmony import */ var _file_change__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./file-change */ "./app/assets/javascripts/directives/functional/file-change.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "fileChange", function() { return _file_change__WEBPACK_IMPORTED_MODULE_4__["fileChange"]; });
 
-/* harmony import */ var _infiniteScroll__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./infiniteScroll */ "./app/assets/javascripts/app/directives/functional/infiniteScroll.js");
+/* harmony import */ var _infiniteScroll__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./infiniteScroll */ "./app/assets/javascripts/directives/functional/infiniteScroll.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "infiniteScroll", function() { return _infiniteScroll__WEBPACK_IMPORTED_MODULE_5__["infiniteScroll"]; });
 
-/* harmony import */ var _lowercase__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./lowercase */ "./app/assets/javascripts/app/directives/functional/lowercase.js");
+/* harmony import */ var _lowercase__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./lowercase */ "./app/assets/javascripts/directives/functional/lowercase.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "lowercase", function() { return _lowercase__WEBPACK_IMPORTED_MODULE_6__["lowercase"]; });
 
-/* harmony import */ var _selectOnClick__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./selectOnClick */ "./app/assets/javascripts/app/directives/functional/selectOnClick.js");
+/* harmony import */ var _selectOnClick__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./selectOnClick */ "./app/assets/javascripts/directives/functional/selectOnClick.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "selectOnClick", function() { return _selectOnClick__WEBPACK_IMPORTED_MODULE_7__["selectOnClick"]; });
 
-/* harmony import */ var _snEnter__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./snEnter */ "./app/assets/javascripts/app/directives/functional/snEnter.js");
+/* harmony import */ var _snEnter__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./snEnter */ "./app/assets/javascripts/directives/functional/snEnter.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "snEnter", function() { return _snEnter__WEBPACK_IMPORTED_MODULE_8__["snEnter"]; });
 
 
@@ -3937,10 +3937,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/functional/infiniteScroll.js":
-/*!****************************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/functional/infiniteScroll.js ***!
-  \****************************************************************************/
+/***/ "./app/assets/javascripts/directives/functional/infiniteScroll.js":
+/*!************************************************************************!*\
+  !*** ./app/assets/javascripts/directives/functional/infiniteScroll.js ***!
+  \************************************************************************/
 /*! exports provided: infiniteScroll */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -3966,10 +3966,10 @@ function infiniteScroll($rootScope, $window, $timeout) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/functional/lowercase.js":
-/*!***********************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/functional/lowercase.js ***!
-  \***********************************************************************/
+/***/ "./app/assets/javascripts/directives/functional/lowercase.js":
+/*!*******************************************************************!*\
+  !*** ./app/assets/javascripts/directives/functional/lowercase.js ***!
+  \*******************************************************************/
 /*! exports provided: lowercase */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -4001,10 +4001,10 @@ function lowercase() {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/functional/selectOnClick.js":
-/*!***************************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/functional/selectOnClick.js ***!
-  \***************************************************************************/
+/***/ "./app/assets/javascripts/directives/functional/selectOnClick.js":
+/*!***********************************************************************!*\
+  !*** ./app/assets/javascripts/directives/functional/selectOnClick.js ***!
+  \***********************************************************************/
 /*! exports provided: selectOnClick */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -4030,10 +4030,10 @@ function selectOnClick($window) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/functional/snEnter.js":
-/*!*********************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/functional/snEnter.js ***!
-  \*********************************************************************/
+/***/ "./app/assets/javascripts/directives/functional/snEnter.js":
+/*!*****************************************************************!*\
+  !*** ./app/assets/javascripts/directives/functional/snEnter.js ***!
+  \*****************************************************************/
 /*! exports provided: snEnter */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -4058,10 +4058,10 @@ function snEnter() {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/accountMenu.js":
-/*!********************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/accountMenu.js ***!
-  \********************************************************************/
+/***/ "./app/assets/javascripts/directives/views/accountMenu.js":
+/*!****************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/accountMenu.js ***!
+  \****************************************************************/
 /*! exports provided: AccountMenu */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -4074,8 +4074,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/app/utils.js");
-/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/app/services/privilegesManager.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/utils.js");
+/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/services/privilegesManager.js");
 /* harmony import */ var _directives_account_menu_pug__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! %/directives/account-menu.pug */ "./app/assets/templates/directives/account-menu.pug");
 /* harmony import */ var _directives_account_menu_pug__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_directives_account_menu_pug__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
@@ -4833,10 +4833,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/actionsMenu.js":
-/*!********************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/actionsMenu.js ***!
-  \********************************************************************/
+/***/ "./app/assets/javascripts/directives/views/actionsMenu.js":
+/*!****************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/actionsMenu.js ***!
+  \****************************************************************/
 /*! exports provided: ActionsMenu */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -4972,10 +4972,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/componentModal.js":
-/*!***********************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/componentModal.js ***!
-  \***********************************************************************/
+/***/ "./app/assets/javascripts/directives/views/componentModal.js":
+/*!*******************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/componentModal.js ***!
+  \*******************************************************************/
 /*! exports provided: ComponentModal */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -5031,10 +5031,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/componentView.js":
-/*!**********************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/componentView.js ***!
-  \**********************************************************************/
+/***/ "./app/assets/javascripts/directives/views/componentView.js":
+/*!******************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/componentView.js ***!
+  \******************************************************************/
 /*! exports provided: ComponentView */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -5047,7 +5047,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _directives_component_view_pug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! %/directives/component-view.pug */ "./app/assets/templates/directives/component-view.pug");
 /* harmony import */ var _directives_component_view_pug__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_directives_component_view_pug__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils */ "./app/assets/javascripts/app/utils.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils */ "./app/assets/javascripts/utils.js");
 
 
 
@@ -5316,10 +5316,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/conflictResolutionModal.js":
-/*!********************************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/conflictResolutionModal.js ***!
-  \********************************************************************************/
+/***/ "./app/assets/javascripts/directives/views/conflictResolutionModal.js":
+/*!****************************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/conflictResolutionModal.js ***!
+  \****************************************************************************/
 /*! exports provided: ConflictResolutionModal */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -5426,10 +5426,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/editorMenu.js":
-/*!*******************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/editorMenu.js ***!
-  \*******************************************************************/
+/***/ "./app/assets/javascripts/directives/views/editorMenu.js":
+/*!***************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/editorMenu.js ***!
+  \***************************************************************/
 /*! exports provided: EditorMenu */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -5440,7 +5440,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/app/utils.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/utils.js");
 /* harmony import */ var _directives_editor_menu_pug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! %/directives/editor-menu.pug */ "./app/assets/templates/directives/editor-menu.pug");
 /* harmony import */ var _directives_editor_menu_pug__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_directives_editor_menu_pug__WEBPACK_IMPORTED_MODULE_3__);
 
@@ -5545,61 +5545,61 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/index.js":
-/*!**************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/index.js ***!
-  \**************************************************************/
+/***/ "./app/assets/javascripts/directives/views/index.js":
+/*!**********************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/index.js ***!
+  \**********************************************************/
 /*! exports provided: AccountMenu, ActionsMenu, ComponentModal, ComponentView, ConflictResolutionModal, EditorMenu, InputModal, MenuRow, PanelResizer, PasswordWizard, PermissionsModal, PrivilegesAuthModal, PrivilegesManagementModal, RevisionPreviewModal, SessionHistoryMenu, SyncResolutionMenu */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _accountMenu__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./accountMenu */ "./app/assets/javascripts/app/directives/views/accountMenu.js");
+/* harmony import */ var _accountMenu__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./accountMenu */ "./app/assets/javascripts/directives/views/accountMenu.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "AccountMenu", function() { return _accountMenu__WEBPACK_IMPORTED_MODULE_0__["AccountMenu"]; });
 
-/* harmony import */ var _actionsMenu__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./actionsMenu */ "./app/assets/javascripts/app/directives/views/actionsMenu.js");
+/* harmony import */ var _actionsMenu__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./actionsMenu */ "./app/assets/javascripts/directives/views/actionsMenu.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ActionsMenu", function() { return _actionsMenu__WEBPACK_IMPORTED_MODULE_1__["ActionsMenu"]; });
 
-/* harmony import */ var _componentModal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./componentModal */ "./app/assets/javascripts/app/directives/views/componentModal.js");
+/* harmony import */ var _componentModal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./componentModal */ "./app/assets/javascripts/directives/views/componentModal.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ComponentModal", function() { return _componentModal__WEBPACK_IMPORTED_MODULE_2__["ComponentModal"]; });
 
-/* harmony import */ var _componentView__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./componentView */ "./app/assets/javascripts/app/directives/views/componentView.js");
+/* harmony import */ var _componentView__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./componentView */ "./app/assets/javascripts/directives/views/componentView.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ComponentView", function() { return _componentView__WEBPACK_IMPORTED_MODULE_3__["ComponentView"]; });
 
-/* harmony import */ var _conflictResolutionModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./conflictResolutionModal */ "./app/assets/javascripts/app/directives/views/conflictResolutionModal.js");
+/* harmony import */ var _conflictResolutionModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./conflictResolutionModal */ "./app/assets/javascripts/directives/views/conflictResolutionModal.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ConflictResolutionModal", function() { return _conflictResolutionModal__WEBPACK_IMPORTED_MODULE_4__["ConflictResolutionModal"]; });
 
-/* harmony import */ var _editorMenu__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./editorMenu */ "./app/assets/javascripts/app/directives/views/editorMenu.js");
+/* harmony import */ var _editorMenu__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./editorMenu */ "./app/assets/javascripts/directives/views/editorMenu.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EditorMenu", function() { return _editorMenu__WEBPACK_IMPORTED_MODULE_5__["EditorMenu"]; });
 
-/* harmony import */ var _inputModal__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./inputModal */ "./app/assets/javascripts/app/directives/views/inputModal.js");
+/* harmony import */ var _inputModal__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./inputModal */ "./app/assets/javascripts/directives/views/inputModal.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "InputModal", function() { return _inputModal__WEBPACK_IMPORTED_MODULE_6__["InputModal"]; });
 
-/* harmony import */ var _menuRow__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./menuRow */ "./app/assets/javascripts/app/directives/views/menuRow.js");
+/* harmony import */ var _menuRow__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./menuRow */ "./app/assets/javascripts/directives/views/menuRow.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MenuRow", function() { return _menuRow__WEBPACK_IMPORTED_MODULE_7__["MenuRow"]; });
 
-/* harmony import */ var _panelResizer__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./panelResizer */ "./app/assets/javascripts/app/directives/views/panelResizer.js");
+/* harmony import */ var _panelResizer__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./panelResizer */ "./app/assets/javascripts/directives/views/panelResizer.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PanelResizer", function() { return _panelResizer__WEBPACK_IMPORTED_MODULE_8__["PanelResizer"]; });
 
-/* harmony import */ var _passwordWizard__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./passwordWizard */ "./app/assets/javascripts/app/directives/views/passwordWizard.js");
+/* harmony import */ var _passwordWizard__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./passwordWizard */ "./app/assets/javascripts/directives/views/passwordWizard.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PasswordWizard", function() { return _passwordWizard__WEBPACK_IMPORTED_MODULE_9__["PasswordWizard"]; });
 
-/* harmony import */ var _permissionsModal__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./permissionsModal */ "./app/assets/javascripts/app/directives/views/permissionsModal.js");
+/* harmony import */ var _permissionsModal__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./permissionsModal */ "./app/assets/javascripts/directives/views/permissionsModal.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PermissionsModal", function() { return _permissionsModal__WEBPACK_IMPORTED_MODULE_10__["PermissionsModal"]; });
 
-/* harmony import */ var _privilegesAuthModal__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./privilegesAuthModal */ "./app/assets/javascripts/app/directives/views/privilegesAuthModal.js");
+/* harmony import */ var _privilegesAuthModal__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./privilegesAuthModal */ "./app/assets/javascripts/directives/views/privilegesAuthModal.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PrivilegesAuthModal", function() { return _privilegesAuthModal__WEBPACK_IMPORTED_MODULE_11__["PrivilegesAuthModal"]; });
 
-/* harmony import */ var _privilegesManagementModal__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./privilegesManagementModal */ "./app/assets/javascripts/app/directives/views/privilegesManagementModal.js");
+/* harmony import */ var _privilegesManagementModal__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./privilegesManagementModal */ "./app/assets/javascripts/directives/views/privilegesManagementModal.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PrivilegesManagementModal", function() { return _privilegesManagementModal__WEBPACK_IMPORTED_MODULE_12__["PrivilegesManagementModal"]; });
 
-/* harmony import */ var _revisionPreviewModal__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./revisionPreviewModal */ "./app/assets/javascripts/app/directives/views/revisionPreviewModal.js");
+/* harmony import */ var _revisionPreviewModal__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./revisionPreviewModal */ "./app/assets/javascripts/directives/views/revisionPreviewModal.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "RevisionPreviewModal", function() { return _revisionPreviewModal__WEBPACK_IMPORTED_MODULE_13__["RevisionPreviewModal"]; });
 
-/* harmony import */ var _sessionHistoryMenu__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./sessionHistoryMenu */ "./app/assets/javascripts/app/directives/views/sessionHistoryMenu.js");
+/* harmony import */ var _sessionHistoryMenu__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./sessionHistoryMenu */ "./app/assets/javascripts/directives/views/sessionHistoryMenu.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SessionHistoryMenu", function() { return _sessionHistoryMenu__WEBPACK_IMPORTED_MODULE_14__["SessionHistoryMenu"]; });
 
-/* harmony import */ var _syncResolutionMenu__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./syncResolutionMenu */ "./app/assets/javascripts/app/directives/views/syncResolutionMenu.js");
+/* harmony import */ var _syncResolutionMenu__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./syncResolutionMenu */ "./app/assets/javascripts/directives/views/syncResolutionMenu.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncResolutionMenu", function() { return _syncResolutionMenu__WEBPACK_IMPORTED_MODULE_15__["SyncResolutionMenu"]; });
 
 
@@ -5621,10 +5621,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/inputModal.js":
-/*!*******************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/inputModal.js ***!
-  \*******************************************************************/
+/***/ "./app/assets/javascripts/directives/views/inputModal.js":
+/*!***************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/inputModal.js ***!
+  \***************************************************************/
 /*! exports provided: InputModal */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -5686,10 +5686,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/menuRow.js":
-/*!****************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/menuRow.js ***!
-  \****************************************************************/
+/***/ "./app/assets/javascripts/directives/views/menuRow.js":
+/*!************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/menuRow.js ***!
+  \************************************************************/
 /*! exports provided: MenuRow */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -5764,10 +5764,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/panelResizer.js":
-/*!*********************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/panelResizer.js ***!
-  \*********************************************************************/
+/***/ "./app/assets/javascripts/directives/views/panelResizer.js":
+/*!*****************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/panelResizer.js ***!
+  \*****************************************************************/
 /*! exports provided: PanelResizer */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -6117,10 +6117,10 @@ function debounce(func, wait, immediate) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/passwordWizard.js":
-/*!***********************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/passwordWizard.js ***!
-  \***********************************************************************/
+/***/ "./app/assets/javascripts/directives/views/passwordWizard.js":
+/*!*******************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/passwordWizard.js ***!
+  \*******************************************************************/
 /*! exports provided: PasswordWizard */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -6523,10 +6523,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/permissionsModal.js":
-/*!*************************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/permissionsModal.js ***!
-  \*************************************************************************/
+/***/ "./app/assets/javascripts/directives/views/permissionsModal.js":
+/*!*********************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/permissionsModal.js ***!
+  \*********************************************************************/
 /*! exports provided: PermissionsModal */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -6587,10 +6587,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/privilegesAuthModal.js":
-/*!****************************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/privilegesAuthModal.js ***!
-  \****************************************************************************/
+/***/ "./app/assets/javascripts/directives/views/privilegesAuthModal.js":
+/*!************************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/privilegesAuthModal.js ***!
+  \************************************************************************/
 /*! exports provided: PrivilegesAuthModal */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -6731,10 +6731,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/privilegesManagementModal.js":
-/*!**********************************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/privilegesManagementModal.js ***!
-  \**********************************************************************************/
+/***/ "./app/assets/javascripts/directives/views/privilegesManagementModal.js":
+/*!******************************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/privilegesManagementModal.js ***!
+  \******************************************************************************/
 /*! exports provided: PrivilegesManagementModal */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -6747,7 +6747,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/app/services/privilegesManager.js");
+/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/services/privilegesManager.js");
 /* harmony import */ var _directives_privileges_management_modal_pug__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! %/directives/privileges-management-modal.pug */ "./app/assets/templates/directives/privileges-management-modal.pug");
 /* harmony import */ var _directives_privileges_management_modal_pug__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_directives_privileges_management_modal_pug__WEBPACK_IMPORTED_MODULE_4__);
 
@@ -6908,10 +6908,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/revisionPreviewModal.js":
-/*!*****************************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/revisionPreviewModal.js ***!
-  \*****************************************************************************/
+/***/ "./app/assets/javascripts/directives/views/revisionPreviewModal.js":
+/*!*************************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/revisionPreviewModal.js ***!
+  \*************************************************************************/
 /*! exports provided: RevisionPreviewModal */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -7050,10 +7050,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/sessionHistoryMenu.js":
-/*!***************************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/sessionHistoryMenu.js ***!
-  \***************************************************************************/
+/***/ "./app/assets/javascripts/directives/views/sessionHistoryMenu.js":
+/*!***********************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/sessionHistoryMenu.js ***!
+  \***********************************************************************/
 /*! exports provided: SessionHistoryMenu */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -7182,10 +7182,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/directives/views/syncResolutionMenu.js":
-/*!***************************************************************************!*\
-  !*** ./app/assets/javascripts/app/directives/views/syncResolutionMenu.js ***!
-  \***************************************************************************/
+/***/ "./app/assets/javascripts/directives/views/syncResolutionMenu.js":
+/*!***********************************************************************!*\
+  !*** ./app/assets/javascripts/directives/views/syncResolutionMenu.js ***!
+  \***********************************************************************/
 /*! exports provided: SyncResolutionMenu */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -7257,10 +7257,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/filters/appDate.js":
-/*!*******************************************************!*\
-  !*** ./app/assets/javascripts/app/filters/appDate.js ***!
-  \*******************************************************/
+/***/ "./app/assets/javascripts/filters/appDate.js":
+/*!***************************************************!*\
+  !*** ./app/assets/javascripts/filters/appDate.js ***!
+  \***************************************************/
 /*! exports provided: appDate, appDateTime */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -7304,21 +7304,21 @@ function appDateTime($filter) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/filters/index.js":
-/*!*****************************************************!*\
-  !*** ./app/assets/javascripts/app/filters/index.js ***!
-  \*****************************************************/
+/***/ "./app/assets/javascripts/filters/index.js":
+/*!*************************************************!*\
+  !*** ./app/assets/javascripts/filters/index.js ***!
+  \*************************************************/
 /*! exports provided: appDate, appDateTime, trusted */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _appDate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./appDate */ "./app/assets/javascripts/app/filters/appDate.js");
+/* harmony import */ var _appDate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./appDate */ "./app/assets/javascripts/filters/appDate.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "appDate", function() { return _appDate__WEBPACK_IMPORTED_MODULE_0__["appDate"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "appDateTime", function() { return _appDate__WEBPACK_IMPORTED_MODULE_0__["appDateTime"]; });
 
-/* harmony import */ var _trusted__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./trusted */ "./app/assets/javascripts/app/filters/trusted.js");
+/* harmony import */ var _trusted__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./trusted */ "./app/assets/javascripts/filters/trusted.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "trusted", function() { return _trusted__WEBPACK_IMPORTED_MODULE_1__["trusted"]; });
 
 
@@ -7326,10 +7326,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/filters/trusted.js":
-/*!*******************************************************!*\
-  !*** ./app/assets/javascripts/app/filters/trusted.js ***!
-  \*******************************************************/
+/***/ "./app/assets/javascripts/filters/trusted.js":
+/*!***************************************************!*\
+  !*** ./app/assets/javascripts/filters/trusted.js ***!
+  \***************************************************/
 /*! exports provided: trusted */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -7347,10 +7347,58 @@ function trusted($sce) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/models/noteHistoryEntry.js":
-/*!***************************************************************!*\
-  !*** ./app/assets/javascripts/app/models/noteHistoryEntry.js ***!
-  \***************************************************************/
+/***/ "./app/assets/javascripts/index.js":
+/*!*****************************************!*\
+  !*** ./app/assets/javascripts/index.js ***!
+  \*****************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var sn_stylekit_dist_stylekit_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sn-stylekit/dist/stylekit.css */ "./node_modules/sn-stylekit/dist/stylekit.css");
+/* harmony import */ var sn_stylekit_dist_stylekit_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sn_stylekit_dist_stylekit_css__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _stylesheets_index_css_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../stylesheets/index.css.scss */ "./app/assets/stylesheets/index.css.scss");
+/* harmony import */ var _stylesheets_index_css_scss__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_stylesheets_index_css_scss__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! angular */ "./node_modules/angular/index.js");
+/* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(angular__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _vendor_assets_javascripts_angular_sanitize__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../vendor/assets/javascripts/angular-sanitize */ "./vendor/assets/javascripts/angular-sanitize.js");
+/* harmony import */ var _vendor_assets_javascripts_angular_sanitize__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_vendor_assets_javascripts_angular_sanitize__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _vendor_assets_javascripts_zip_deflate__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../vendor/assets/javascripts/zip/deflate */ "./vendor/assets/javascripts/zip/deflate.js");
+/* harmony import */ var _vendor_assets_javascripts_zip_deflate__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_vendor_assets_javascripts_zip_deflate__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _vendor_assets_javascripts_zip_inflate__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../vendor/assets/javascripts/zip/inflate */ "./vendor/assets/javascripts/zip/inflate.js");
+/* harmony import */ var _vendor_assets_javascripts_zip_inflate__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_vendor_assets_javascripts_zip_inflate__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _vendor_assets_javascripts_zip_zip__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../vendor/assets/javascripts/zip/zip */ "./vendor/assets/javascripts/zip/zip.js");
+/* harmony import */ var _vendor_assets_javascripts_zip_zip__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_vendor_assets_javascripts_zip_zip__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _vendor_assets_javascripts_zip_z_worker__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../vendor/assets/javascripts/zip/z-worker */ "./vendor/assets/javascripts/zip/z-worker.js");
+/* harmony import */ var _vendor_assets_javascripts_zip_z_worker__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_vendor_assets_javascripts_zip_z_worker__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
+/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var _app__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./app */ "./app/assets/javascripts/app.js");
+//= require_tree ./app
+// css
+
+ // Vendor
+
+
+
+
+
+
+
+ // Set the app domain before starting the app
+
+snjs__WEBPACK_IMPORTED_MODULE_8__["SFItem"].AppDomain = 'org.standardnotes.sn'; // entry point
+// eslint-disable-next-line import/first
+
+
+
+/***/ }),
+
+/***/ "./app/assets/javascripts/models/noteHistoryEntry.js":
+/*!***********************************************************!*\
+  !*** ./app/assets/javascripts/models/noteHistoryEntry.js ***!
+  \***********************************************************/
 /*! exports provided: NoteHistoryEntry */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -7411,17 +7459,17 @@ function (_SFItemHistoryEntry) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/routes.js":
-/*!**********************************************!*\
-  !*** ./app/assets/javascripts/app/routes.js ***!
-  \**********************************************/
+/***/ "./app/assets/javascripts/routes.js":
+/*!******************************************!*\
+  !*** ./app/assets/javascripts/routes.js ***!
+  \******************************************/
 /*! exports provided: configRoutes */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "configRoutes", function() { return configRoutes; });
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./app/assets/javascripts/app/utils.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./app/assets/javascripts/utils.js");
 configRoutes.$inject = ["$locationProvider"];
 
 /* @ngInject */
@@ -7441,10 +7489,10 @@ function configRoutes($locationProvider) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/actionsManager.js":
-/*!***************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/actionsManager.js ***!
-  \***************************************************************/
+/***/ "./app/assets/javascripts/services/actionsManager.js":
+/*!***********************************************************!*\
+  !*** ./app/assets/javascripts/services/actionsManager.js ***!
+  \***********************************************************/
 /*! exports provided: ActionsManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -7982,10 +8030,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/alertManager.js":
-/*!*************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/alertManager.js ***!
-  \*************************************************************/
+/***/ "./app/assets/javascripts/services/alertManager.js":
+/*!*********************************************************!*\
+  !*** ./app/assets/javascripts/services/alertManager.js ***!
+  \*********************************************************/
 /*! exports provided: AlertManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -8179,10 +8227,10 @@ function (_SFAlertManager) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/archiveManager.js":
-/*!***************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/archiveManager.js ***!
-  \***************************************************************/
+/***/ "./app/assets/javascripts/services/archiveManager.js":
+/*!***********************************************************!*\
+  !*** ./app/assets/javascripts/services/archiveManager.js ***!
+  \***********************************************************/
 /*! exports provided: ArchiveManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -8195,7 +8243,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/app/services/privilegesManager.js");
+/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/services/privilegesManager.js");
 
 
 
@@ -8466,10 +8514,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/authManager.js":
-/*!************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/authManager.js ***!
-  \************************************************************/
+/***/ "./app/assets/javascripts/services/authManager.js":
+/*!********************************************************!*\
+  !*** ./app/assets/javascripts/services/authManager.js ***!
+  \********************************************************/
 /*! exports provided: AuthManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -8492,7 +8540,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6__);
 /* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! angular */ "./node_modules/angular/index.js");
 /* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(angular__WEBPACK_IMPORTED_MODULE_7__);
-/* harmony import */ var _storageManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./storageManager */ "./app/assets/javascripts/app/services/storageManager.js");
+/* harmony import */ var _storageManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./storageManager */ "./app/assets/javascripts/services/storageManager.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_9__);
 
@@ -8791,10 +8839,10 @@ function (_SFAuthManager) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/componentManager.js":
-/*!*****************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/componentManager.js ***!
-  \*****************************************************************/
+/***/ "./app/assets/javascripts/services/componentManager.js":
+/*!*************************************************************!*\
+  !*** ./app/assets/javascripts/services/componentManager.js ***!
+  \*************************************************************/
 /*! exports provided: ComponentManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -8815,7 +8863,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(angular__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/app/utils.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/utils.js");
 
 
 
@@ -8879,10 +8927,10 @@ function (_SNComponentManager) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/dbManager.js":
-/*!**********************************************************!*\
-  !*** ./app/assets/javascripts/app/services/dbManager.js ***!
-  \**********************************************************/
+/***/ "./app/assets/javascripts/services/dbManager.js":
+/*!******************************************************!*\
+  !*** ./app/assets/javascripts/services/dbManager.js ***!
+  \******************************************************/
 /*! exports provided: DBManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -9328,10 +9376,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/desktopManager.js":
-/*!***************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/desktopManager.js ***!
-  \***************************************************************/
+/***/ "./app/assets/javascripts/services/desktopManager.js":
+/*!***********************************************************!*\
+  !*** ./app/assets/javascripts/services/desktopManager.js ***!
+  \***********************************************************/
 /*! exports provided: DesktopManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -9346,7 +9394,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/app/utils.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/utils.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_5__);
 
@@ -9724,10 +9772,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/httpManager.js":
-/*!************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/httpManager.js ***!
-  \************************************************************/
+/***/ "./app/assets/javascripts/services/httpManager.js":
+/*!********************************************************!*\
+  !*** ./app/assets/javascripts/services/httpManager.js ***!
+  \********************************************************/
 /*! exports provided: HttpManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -9791,76 +9839,76 @@ function (_SFHttpManager) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/index.js":
-/*!******************************************************!*\
-  !*** ./app/assets/javascripts/app/services/index.js ***!
-  \******************************************************/
+/***/ "./app/assets/javascripts/services/index.js":
+/*!**************************************************!*\
+  !*** ./app/assets/javascripts/services/index.js ***!
+  \**************************************************/
 /*! exports provided: ActionsManager, ArchiveManager, AuthManager, ComponentManager, DBManager, DesktopManager, HttpManager, KeyboardManager, MigrationManager, ModelManager, NativeExtManager, PasscodeManager, PrivilegesManager, SessionHistory, SingletonManager, StatusManager, StorageManager, SyncManager, ThemeManager, AlertManager, PreferencesManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _actionsManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./actionsManager */ "./app/assets/javascripts/app/services/actionsManager.js");
+/* harmony import */ var _actionsManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./actionsManager */ "./app/assets/javascripts/services/actionsManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ActionsManager", function() { return _actionsManager__WEBPACK_IMPORTED_MODULE_0__["ActionsManager"]; });
 
-/* harmony import */ var _archiveManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./archiveManager */ "./app/assets/javascripts/app/services/archiveManager.js");
+/* harmony import */ var _archiveManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./archiveManager */ "./app/assets/javascripts/services/archiveManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ArchiveManager", function() { return _archiveManager__WEBPACK_IMPORTED_MODULE_1__["ArchiveManager"]; });
 
-/* harmony import */ var _authManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./authManager */ "./app/assets/javascripts/app/services/authManager.js");
+/* harmony import */ var _authManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./authManager */ "./app/assets/javascripts/services/authManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "AuthManager", function() { return _authManager__WEBPACK_IMPORTED_MODULE_2__["AuthManager"]; });
 
-/* harmony import */ var _componentManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./componentManager */ "./app/assets/javascripts/app/services/componentManager.js");
+/* harmony import */ var _componentManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./componentManager */ "./app/assets/javascripts/services/componentManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ComponentManager", function() { return _componentManager__WEBPACK_IMPORTED_MODULE_3__["ComponentManager"]; });
 
-/* harmony import */ var _dbManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./dbManager */ "./app/assets/javascripts/app/services/dbManager.js");
+/* harmony import */ var _dbManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./dbManager */ "./app/assets/javascripts/services/dbManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DBManager", function() { return _dbManager__WEBPACK_IMPORTED_MODULE_4__["DBManager"]; });
 
-/* harmony import */ var _desktopManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./desktopManager */ "./app/assets/javascripts/app/services/desktopManager.js");
+/* harmony import */ var _desktopManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./desktopManager */ "./app/assets/javascripts/services/desktopManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DesktopManager", function() { return _desktopManager__WEBPACK_IMPORTED_MODULE_5__["DesktopManager"]; });
 
-/* harmony import */ var _httpManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./httpManager */ "./app/assets/javascripts/app/services/httpManager.js");
+/* harmony import */ var _httpManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./httpManager */ "./app/assets/javascripts/services/httpManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HttpManager", function() { return _httpManager__WEBPACK_IMPORTED_MODULE_6__["HttpManager"]; });
 
-/* harmony import */ var _keyboardManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./keyboardManager */ "./app/assets/javascripts/app/services/keyboardManager.js");
+/* harmony import */ var _keyboardManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./keyboardManager */ "./app/assets/javascripts/services/keyboardManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "KeyboardManager", function() { return _keyboardManager__WEBPACK_IMPORTED_MODULE_7__["KeyboardManager"]; });
 
-/* harmony import */ var _migrationManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./migrationManager */ "./app/assets/javascripts/app/services/migrationManager.js");
+/* harmony import */ var _migrationManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./migrationManager */ "./app/assets/javascripts/services/migrationManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MigrationManager", function() { return _migrationManager__WEBPACK_IMPORTED_MODULE_8__["MigrationManager"]; });
 
-/* harmony import */ var _modelManager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./modelManager */ "./app/assets/javascripts/app/services/modelManager.js");
+/* harmony import */ var _modelManager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./modelManager */ "./app/assets/javascripts/services/modelManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ModelManager", function() { return _modelManager__WEBPACK_IMPORTED_MODULE_9__["ModelManager"]; });
 
-/* harmony import */ var _nativeExtManager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./nativeExtManager */ "./app/assets/javascripts/app/services/nativeExtManager.js");
+/* harmony import */ var _nativeExtManager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./nativeExtManager */ "./app/assets/javascripts/services/nativeExtManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "NativeExtManager", function() { return _nativeExtManager__WEBPACK_IMPORTED_MODULE_10__["NativeExtManager"]; });
 
-/* harmony import */ var _passcodeManager__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./passcodeManager */ "./app/assets/javascripts/app/services/passcodeManager.js");
+/* harmony import */ var _passcodeManager__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./passcodeManager */ "./app/assets/javascripts/services/passcodeManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PasscodeManager", function() { return _passcodeManager__WEBPACK_IMPORTED_MODULE_11__["PasscodeManager"]; });
 
-/* harmony import */ var _privilegesManager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./privilegesManager */ "./app/assets/javascripts/app/services/privilegesManager.js");
+/* harmony import */ var _privilegesManager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./privilegesManager */ "./app/assets/javascripts/services/privilegesManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PrivilegesManager", function() { return _privilegesManager__WEBPACK_IMPORTED_MODULE_12__["PrivilegesManager"]; });
 
-/* harmony import */ var _sessionHistory__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./sessionHistory */ "./app/assets/javascripts/app/services/sessionHistory.js");
+/* harmony import */ var _sessionHistory__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./sessionHistory */ "./app/assets/javascripts/services/sessionHistory.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SessionHistory", function() { return _sessionHistory__WEBPACK_IMPORTED_MODULE_13__["SessionHistory"]; });
 
-/* harmony import */ var _singletonManager__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./singletonManager */ "./app/assets/javascripts/app/services/singletonManager.js");
+/* harmony import */ var _singletonManager__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./singletonManager */ "./app/assets/javascripts/services/singletonManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SingletonManager", function() { return _singletonManager__WEBPACK_IMPORTED_MODULE_14__["SingletonManager"]; });
 
-/* harmony import */ var _statusManager__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./statusManager */ "./app/assets/javascripts/app/services/statusManager.js");
+/* harmony import */ var _statusManager__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./statusManager */ "./app/assets/javascripts/services/statusManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StatusManager", function() { return _statusManager__WEBPACK_IMPORTED_MODULE_15__["StatusManager"]; });
 
-/* harmony import */ var _storageManager__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./storageManager */ "./app/assets/javascripts/app/services/storageManager.js");
+/* harmony import */ var _storageManager__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./storageManager */ "./app/assets/javascripts/services/storageManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "StorageManager", function() { return _storageManager__WEBPACK_IMPORTED_MODULE_16__["StorageManager"]; });
 
-/* harmony import */ var _syncManager__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./syncManager */ "./app/assets/javascripts/app/services/syncManager.js");
+/* harmony import */ var _syncManager__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./syncManager */ "./app/assets/javascripts/services/syncManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SyncManager", function() { return _syncManager__WEBPACK_IMPORTED_MODULE_17__["SyncManager"]; });
 
-/* harmony import */ var _themeManager__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./themeManager */ "./app/assets/javascripts/app/services/themeManager.js");
+/* harmony import */ var _themeManager__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./themeManager */ "./app/assets/javascripts/services/themeManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ThemeManager", function() { return _themeManager__WEBPACK_IMPORTED_MODULE_18__["ThemeManager"]; });
 
-/* harmony import */ var _alertManager__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./alertManager */ "./app/assets/javascripts/app/services/alertManager.js");
+/* harmony import */ var _alertManager__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./alertManager */ "./app/assets/javascripts/services/alertManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "AlertManager", function() { return _alertManager__WEBPACK_IMPORTED_MODULE_19__["AlertManager"]; });
 
-/* harmony import */ var _preferencesManager__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./preferencesManager */ "./app/assets/javascripts/app/services/preferencesManager.js");
+/* harmony import */ var _preferencesManager__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./preferencesManager */ "./app/assets/javascripts/services/preferencesManager.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PreferencesManager", function() { return _preferencesManager__WEBPACK_IMPORTED_MODULE_20__["PreferencesManager"]; });
 
 
@@ -9887,10 +9935,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/keyboardManager.js":
-/*!****************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/keyboardManager.js ***!
-  \****************************************************************/
+/***/ "./app/assets/javascripts/services/keyboardManager.js":
+/*!************************************************************!*\
+  !*** ./app/assets/javascripts/services/keyboardManager.js ***!
+  \************************************************************/
 /*! exports provided: KeyboardManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -10079,10 +10127,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/migrationManager.js":
-/*!*****************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/migrationManager.js ***!
-  \*****************************************************************/
+/***/ "./app/assets/javascripts/services/migrationManager.js":
+/*!*************************************************************!*\
+  !*** ./app/assets/javascripts/services/migrationManager.js ***!
+  \*************************************************************/
 /*! exports provided: MigrationManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -10101,10 +10149,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
 /* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/app/utils.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/utils.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_7__);
-/* harmony import */ var _services_componentManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/services/componentManager */ "./app/assets/javascripts/app/services/componentManager.js");
+/* harmony import */ var _services_componentManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/services/componentManager */ "./app/assets/javascripts/services/componentManager.js");
 
 
 
@@ -10633,10 +10681,10 @@ function (_SFMigrationManager) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/modelManager.js":
-/*!*************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/modelManager.js ***!
-  \*************************************************************/
+/***/ "./app/assets/javascripts/services/modelManager.js":
+/*!*********************************************************!*\
+  !*** ./app/assets/javascripts/services/modelManager.js ***!
+  \*********************************************************/
 /*! exports provided: ModelManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -10940,10 +10988,10 @@ function (_SFModelManager) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/nativeExtManager.js":
-/*!*****************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/nativeExtManager.js ***!
-  \*****************************************************************/
+/***/ "./app/assets/javascripts/services/nativeExtManager.js":
+/*!*************************************************************!*\
+  !*** ./app/assets/javascripts/services/nativeExtManager.js ***!
+  \*************************************************************/
 /*! exports provided: NativeExtManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -10954,7 +11002,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/app/utils.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/utils.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_3__);
 
@@ -11154,10 +11202,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/passcodeManager.js":
-/*!****************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/passcodeManager.js ***!
-  \****************************************************************/
+/***/ "./app/assets/javascripts/services/passcodeManager.js":
+/*!************************************************************!*\
+  !*** ./app/assets/javascripts/services/passcodeManager.js ***!
+  \************************************************************/
 /*! exports provided: PasscodeManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -11172,8 +11220,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/app/utils.js");
-/* harmony import */ var _storageManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./storageManager */ "./app/assets/javascripts/app/services/storageManager.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/utils.js");
+/* harmony import */ var _storageManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./storageManager */ "./app/assets/javascripts/services/storageManager.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_6__);
 
@@ -11634,10 +11682,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/preferencesManager.js":
-/*!*******************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/preferencesManager.js ***!
-  \*******************************************************************/
+/***/ "./app/assets/javascripts/services/preferencesManager.js":
+/*!***************************************************************!*\
+  !*** ./app/assets/javascripts/services/preferencesManager.js ***!
+  \***************************************************************/
 /*! exports provided: PREF_TAGS_PANEL_WIDTH, PREF_NOTES_PANEL_WIDTH, PREF_SORT_NOTES_BY, PREF_SORT_NOTES_REVERSE, PREF_NOTES_SHOW_ARCHIVED, PREF_NOTES_HIDE_PINNED, PREF_NOTES_HIDE_NOTE_PREVIEW, PREF_NOTES_HIDE_DATE, PREF_NOTES_HIDE_TAGS, PreferencesManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -11754,10 +11802,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/privilegesManager.js":
-/*!******************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/privilegesManager.js ***!
-  \******************************************************************/
+/***/ "./app/assets/javascripts/services/privilegesManager.js":
+/*!**************************************************************!*\
+  !*** ./app/assets/javascripts/services/privilegesManager.js ***!
+  \**************************************************************/
 /*! exports provided: PrivilegesManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -11942,10 +11990,10 @@ function (_SFPrivilegesManager) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/sessionHistory.js":
-/*!***************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/sessionHistory.js ***!
-  \***************************************************************/
+/***/ "./app/assets/javascripts/services/sessionHistory.js":
+/*!***********************************************************!*\
+  !*** ./app/assets/javascripts/services/sessionHistory.js ***!
+  \***********************************************************/
 /*! exports provided: SessionHistory */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -11962,7 +12010,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
 /* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _models_noteHistoryEntry__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/models/noteHistoryEntry */ "./app/assets/javascripts/app/models/noteHistoryEntry.js");
+/* harmony import */ var _models_noteHistoryEntry__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/models/noteHistoryEntry */ "./app/assets/javascripts/models/noteHistoryEntry.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_6__);
 
@@ -12062,10 +12110,10 @@ function (_SFSessionHistoryMana) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/singletonManager.js":
-/*!*****************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/singletonManager.js ***!
-  \*****************************************************************/
+/***/ "./app/assets/javascripts/services/singletonManager.js":
+/*!*************************************************************!*\
+  !*** ./app/assets/javascripts/services/singletonManager.js ***!
+  \*************************************************************/
 /*! exports provided: SingletonManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -12109,10 +12157,10 @@ function (_SFSingletonManager) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/statusManager.js":
-/*!**************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/statusManager.js ***!
-  \**************************************************************/
+/***/ "./app/assets/javascripts/services/statusManager.js":
+/*!**********************************************************!*\
+  !*** ./app/assets/javascripts/services/statusManager.js ***!
+  \**********************************************************/
 /*! exports provided: StatusManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -12236,10 +12284,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/storageManager.js":
-/*!***************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/storageManager.js ***!
-  \***************************************************************/
+/***/ "./app/assets/javascripts/services/storageManager.js":
+/*!***********************************************************!*\
+  !*** ./app/assets/javascripts/services/storageManager.js ***!
+  \***********************************************************/
 /*! exports provided: MemoryStorage, StorageManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -12713,10 +12761,10 @@ StorageManager.Fixed = "Fixed"; // localStorage
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/syncManager.js":
-/*!************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/syncManager.js ***!
-  \************************************************************/
+/***/ "./app/assets/javascripts/services/syncManager.js":
+/*!********************************************************!*\
+  !*** ./app/assets/javascripts/services/syncManager.js ***!
+  \********************************************************/
 /*! exports provided: SyncManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -12781,10 +12829,10 @@ function (_SFSyncManager) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/services/themeManager.js":
-/*!*************************************************************!*\
-  !*** ./app/assets/javascripts/app/services/themeManager.js ***!
-  \*************************************************************/
+/***/ "./app/assets/javascripts/services/themeManager.js":
+/*!*********************************************************!*\
+  !*** ./app/assets/javascripts/services/themeManager.js ***!
+  \*********************************************************/
 /*! exports provided: ThemeManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -12803,8 +12851,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(angular__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _storageManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./storageManager */ "./app/assets/javascripts/app/services/storageManager.js");
-/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/app/state.js");
+/* harmony import */ var _storageManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./storageManager */ "./app/assets/javascripts/services/storageManager.js");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
 
 
 
@@ -13063,10 +13111,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/state.js":
-/*!*********************************************!*\
-  !*** ./app/assets/javascripts/app/state.js ***!
-  \*********************************************/
+/***/ "./app/assets/javascripts/state.js":
+/*!*****************************************!*\
+  !*** ./app/assets/javascripts/state.js ***!
+  \*****************************************/
 /*! exports provided: APP_STATE_EVENT_TAG_CHANGED, APP_STATE_EVENT_NOTE_CHANGED, APP_STATE_EVENT_PREFERENCES_CHANGED, APP_STATE_EVENT_PANEL_RESIZED, APP_STATE_EVENT_EDITOR_FOCUSED, APP_STATE_EVENT_BEGAN_BACKUP_DOWNLOAD, APP_STATE_EVENT_ENDED_BACKUP_DOWNLOAD, APP_STATE_EVENT_DESKTOP_EXTS_READY, AppState */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -13218,10 +13266,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/strings.js":
-/*!***********************************************!*\
-  !*** ./app/assets/javascripts/app/strings.js ***!
-  \***********************************************/
+/***/ "./app/assets/javascripts/strings.js":
+/*!*******************************************!*\
+  !*** ./app/assets/javascripts/strings.js ***!
+  \*******************************************/
 /*! exports provided: STRING_SESSION_EXPIRED, STRING_DEFAULT_FILE_ERROR, StringSyncException */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -13238,10 +13286,10 @@ function StringSyncException(data) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/app/utils.js":
-/*!*********************************************!*\
-  !*** ./app/assets/javascripts/app/utils.js ***!
-  \*********************************************/
+/***/ "./app/assets/javascripts/utils.js":
+/*!*****************************************!*\
+  !*** ./app/assets/javascripts/utils.js ***!
+  \*****************************************/
 /*! exports provided: getParameterByName, parametersFromURL, getPlatformString, isDesktopApplication */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -13353,58 +13401,10 @@ if (!Array.prototype.includes) {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/main.js":
-/*!****************************************!*\
-  !*** ./app/assets/javascripts/main.js ***!
-  \****************************************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var sn_stylekit_dist_stylekit_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sn-stylekit/dist/stylekit.css */ "./node_modules/sn-stylekit/dist/stylekit.css");
-/* harmony import */ var sn_stylekit_dist_stylekit_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sn_stylekit_dist_stylekit_css__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _stylesheets_main_css_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../stylesheets/main.css.scss */ "./app/assets/stylesheets/main.css.scss");
-/* harmony import */ var _stylesheets_main_css_scss__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_stylesheets_main_css_scss__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! angular */ "./node_modules/angular/index.js");
-/* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(angular__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _vendor_assets_javascripts_angular_sanitize__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../vendor/assets/javascripts/angular-sanitize */ "./vendor/assets/javascripts/angular-sanitize.js");
-/* harmony import */ var _vendor_assets_javascripts_angular_sanitize__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_vendor_assets_javascripts_angular_sanitize__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _vendor_assets_javascripts_zip_deflate__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../vendor/assets/javascripts/zip/deflate */ "./vendor/assets/javascripts/zip/deflate.js");
-/* harmony import */ var _vendor_assets_javascripts_zip_deflate__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_vendor_assets_javascripts_zip_deflate__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _vendor_assets_javascripts_zip_inflate__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../vendor/assets/javascripts/zip/inflate */ "./vendor/assets/javascripts/zip/inflate.js");
-/* harmony import */ var _vendor_assets_javascripts_zip_inflate__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_vendor_assets_javascripts_zip_inflate__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _vendor_assets_javascripts_zip_zip__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../vendor/assets/javascripts/zip/zip */ "./vendor/assets/javascripts/zip/zip.js");
-/* harmony import */ var _vendor_assets_javascripts_zip_zip__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_vendor_assets_javascripts_zip_zip__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var _vendor_assets_javascripts_zip_z_worker__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../vendor/assets/javascripts/zip/z-worker */ "./vendor/assets/javascripts/zip/z-worker.js");
-/* harmony import */ var _vendor_assets_javascripts_zip_z_worker__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_vendor_assets_javascripts_zip_z_worker__WEBPACK_IMPORTED_MODULE_7__);
-/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
-/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var _app_app__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./app/app */ "./app/assets/javascripts/app/app.js");
-//= require_tree ./app
-// css
-
- // Vendor
-
-
-
-
-
-
-
- // Set the app domain before starting the app
-
-snjs__WEBPACK_IMPORTED_MODULE_8__["SFItem"].AppDomain = 'org.standardnotes.sn'; // entry point
-// eslint-disable-next-line import/first
-
-
-
-/***/ }),
-
-/***/ "./app/assets/stylesheets/main.css.scss":
-/*!**********************************************!*\
-  !*** ./app/assets/stylesheets/main.css.scss ***!
-  \**********************************************/
+/***/ "./app/assets/stylesheets/index.css.scss":
+/*!***********************************************!*\
+  !*** ./app/assets/stylesheets/index.css.scss ***!
+  \***********************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
