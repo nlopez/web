@@ -1,44 +1,16 @@
 import template from '%/directives/component-view.pug';
-
 import { isDesktopApplication } from '../../utils';
+/**
+ * The maximum amount of time we'll wait for a component
+ * to load before displaying error
+ */
+const MAX_LOAD_THRESHOLD = 4000;
 
-export class ComponentView {
-  constructor(
-    $rootScope,
-    componentManager,
-    desktopManager,
-    $timeout,
-    themeManager
-  ) {
-    this.restrict = 'E';
-    this.template = template;
-    this.scope = {
-      component: '=',
-      onLoad: '=?',
-      manualDealloc: '=?'
-    };
+const VISIBILITY_CHANGE_LISTENER_KEY = 'visibilitychange';
 
-    this.desktopManager = desktopManager;
-  }
-
-  link($scope, el, attrs, ctrl) {
-    $scope.el = el;
-
-    $scope.componentValid = true;
-
-    $scope.updateObserver = this.desktopManager.registerUpdateObserver((component) => {
-      if(component == $scope.component && component.active) {
-        $scope.reloadComponent();
-      }
-    })
-
-    $scope.$watch('component', function(component, prevComponent){
-      ctrl.componentValueChanging(component, prevComponent);
-    });
-  }
-
+class ComponentViewCtrl {
   /* @ngInject */
-  controller(
+  constructor(
     $scope,
     $rootScope,
     $timeout,
@@ -46,224 +18,260 @@ export class ComponentView {
     desktopManager,
     themeManager
   ) {
-    $scope.onVisibilityChange = function() {
-      if(document.visibilityState == "hidden") {
-        return;
+    this.$rootScope = $rootScope;
+    this.$timeout = $timeout;
+    this.themeManager = themeManager;
+    this.desktopManager = desktopManager;
+    this.componentManager = componentManager;
+    this.componentValid = true;
+    
+    $scope.$watch('component', (component, prevComponent) => {
+      this.componentValueDidSet(component, prevComponent);
+    });
+    $scope.$on('ext-reload-complete', () => {
+      this.reloadStatus(false);
+    })
+    $scope.$on('$destroy', () => {
+      this.destroy();
+    });
+  }
+
+  $onInit() {
+    this.registerComponentHandlers();
+    this.registerPackageUpdateObserver();
+    this.componentValueDidSet(this.component);
+  };
+
+  registerPackageUpdateObserver() {
+    this.updateObserver = this.desktopManager
+    .registerUpdateObserver((component) => {
+      if(component === this.component && component.active) {
+        this.reloadComponent();
       }
+    })
+  }
 
-      if($scope.issueLoading) {
-        $scope.reloadComponent();
-      }
-    }
-
-    $scope.themeHandlerIdentifier = "component-view-" + Math.random();
-    componentManager.registerHandler({identifier: $scope.themeHandlerIdentifier, areas: ["themes"], activationHandler: (component) => {
-      $scope.reloadThemeStatus();
-    }});
-
-    $scope.identifier = "component-view-" + Math.random();
-
-    componentManager.registerHandler({
-      identifier: $scope.identifier,
-      areas: [$scope.component.area],
+  registerComponentHandlers() {
+    this.themeHandlerIdentifier = 'component-view-' + Math.random();
+    this.componentManager.registerHandler({
+      identifier: this.themeHandlerIdentifier,
+      areas: ['themes'],
       activationHandler: (component) => {
-        if(component !== $scope.component) {
+        this.reloadThemeStatus();
+      }
+    });
+
+    this.identifier = 'component-view-' + Math.random();
+    this.componentManager.registerHandler({
+      identifier: this.identifier,
+      areas: [this.component.area],
+      activationHandler: (component) => {
+        if(component !== this.component) {
           return;
         }
-
-        $timeout(() => {
-          $scope.handleActivation();
+        this.$timeout(() => {
+          this.handleActivation();
         })
       },
       actionHandler: (component, action, data) => {
-         if(action == "set-size") {
-           componentManager.handleSetSizeEvent(component, data);
-         }
-      }
-    });
-
-    $scope.handleActivation = function() {
-      // activationHandlers may be called multiple times, design below to be idempotent
-      let component = $scope.component;
-      if(!component.active) {
-        return;
-      }
-
-      let iframe = componentManager.iframeForComponent(component);
-      if(iframe) {
-        $scope.loading = true;
-        // begin loading error handler. If onload isn't called in x seconds, display an error
-        if($scope.loadTimeout) { $timeout.cancel($scope.loadTimeout);}
-        $scope.loadTimeout = $timeout(() => {
-          if($scope.loading) {
-            $scope.loading = false;
-            $scope.issueLoading = true;
-
-            if(!$scope.didAttemptReload) {
-              $scope.didAttemptReload = true;
-              $scope.reloadComponent();
-            } else {
-              // We'll attempt to reload when the tab gains focus
-              document.addEventListener("visibilitychange", $scope.onVisibilityChange);
-            }
-          }
-        }, 3500);
-        iframe.onload = (event) => {
-          let desktopError = false;
-          try {
-            // Accessing iframe.contentWindow.origin will throw an exception if we are in the web app, or if the iframe content
-            // is remote content. The only reason it works in this case is because we're accessing a local extension.
-            // In the future when the desktop app falls back to the web location if local fail loads, we won't be able to access this property anymore.
-            if(isDesktopApplication() && (iframe.contentWindow.origin == null || iframe.contentWindow.origin == 'null')) {
-              /*
-              Don't attempt reload in this case, as it results in infinite loop, since a reload will deactivate the extension and then reactivate.
-              This can cause this componentView to be dealloced and a new one to be instantiated. This happens in editor.js, which we'll need to look into.
-              Don't return from this clause either, since we don't want to cancel loadTimeout (that will trigger reload). Instead, handle custom fail logic here.
-              */
-              desktopError = true;
-            }
-          } catch (e) {
-
-          }
-
-          $timeout.cancel($scope.loadTimeout);
-          componentManager.registerComponentWindow(component, iframe.contentWindow).then(() => {
-            // Add small timeout to, as $scope.loading controls loading overlay,
-            // which is used to avoid flicker when enabling extensions while having an enabled theme
-            // we don't use ng-show because it causes problems with rendering iframes after timeout, for some reason.
-            $timeout(() => {
-              $scope.loading = false;
-              $scope.issueLoading = desktopError; /* Typically we'd just set this to false at this point, but we now account for desktopError */
-              $scope.onLoad && $scope.onLoad($scope.component);
-            }, 7)
-          })
-
-        };
-      }
-    }
-
-
-    /*
-    General note regarding activation/deactivation of components:
-    We pass `true` to componentManager.ac/detivateComponent for the `dontSync` parameter.
-    The activation we do in here is not global, but just local, so we don't need to sync the state.
-    For example, if we activate an editor, we just need to do that for display purposes, but dont
-    need to perform a sync to propagate that .active flag.
-    */
-
-    this.componentValueChanging = (component, prevComponent) => {
-      if(prevComponent && component !== prevComponent) {
-        componentManager.deactivateComponent(prevComponent, true);
-      }
-      if(component) {
-        componentManager.activateComponent(component, true);
-        $scope.reloadStatus();
-      }
-    }
-
-    $scope.$on("ext-reload-complete", () => {
-      $scope.reloadStatus(false);
-    })
-
-    $scope.reloadComponent = function() {
-      // force iFrame to deinit, allows new one to be created
-      $scope.componentValid = false;
-      componentManager.reloadComponent($scope.component).then(() => {
-        $scope.reloadStatus();
-      })
-    }
-
-    $scope.reloadStatus = function(doManualReload = true) {
-      let component = $scope.component;
-      $scope.reloading = true;
-      let previouslyValid = $scope.componentValid;
-      let offlineRestricted = component.offlineOnly && !isDesktopApplication();
-      let urlError =
-        (!isDesktopApplication() && !component.hasValidHostedUrl())
-        ||
-        (isDesktopApplication() && (!component.local_url && !component.hasValidHostedUrl()))
-
-      $scope.expired = component.valid_until && component.valid_until <= new Date();
-
-      // Here we choose our own readonly state based on custom logic. However, if a parent
-      // wants to implement their own readonly logic, they can lock it.
-      if(!component.lockReadonly) {
-        component.readonly = $scope.expired;
-      }
-
-      $scope.componentValid = !offlineRestricted && !urlError;
-
-      if(!$scope.componentValid) {
-        // required to disable overlay
-        $scope.loading = false;
-      }
-
-      if(offlineRestricted) $scope.error = 'offline-restricted';
-      else if(urlError) $scope.error = 'url-missing';
-      else $scope.error = null;
-
-      if($scope.componentValid !== previouslyValid) {
-        if($scope.componentValid) {
-          // We want to reload here, rather than `activateComponent`, because the component will already have attempted to been activated.
-          componentManager.reloadComponent(component, true);
+        if(action === 'set-size') {
+          this.componentManager.handleSetSizeEvent(component, data);
         }
       }
-
-      if($scope.expired && doManualReload) {
-        // Try reloading, handled by footer, which will open Extensions window momentarily to pull in latest data
-        // Upon completion, this method, reloadStatus, will be called, upon where doManualReload will be false to prevent recursion.
-        $rootScope.$broadcast("reload-ext-data");
-      }
-
-      $scope.reloadThemeStatus();
-
-      $timeout(() => {
-        $scope.reloading = false;
-      }, 500)
-    }
-
-    $scope.reloadThemeStatus = function() {
-      if(!$scope.component.acceptsThemes()) {
-        if(themeManager.hasActiveTheme()) {
-          if(!$scope.dismissedNoThemesMessage) {
-            $scope.showNoThemesMessage = true;
-          }
-        } else {
-          // Can be the case if we've just deactivated a theme
-          $scope.showNoThemesMessage = false;
-        }
-      }
-    }
-
-    $scope.noThemesMessageDismiss = function() {
-      $scope.showNoThemesMessage = false;
-      $scope.dismissedNoThemesMessage = true;
-    }
-
-    $scope.disableActiveTheme = function() {
-      themeManager.deactivateAllThemes();
-      $scope.noThemesMessageDismiss();
-    }
-
-    $scope.getUrl = function() {
-      var url = componentManager.urlForComponent($scope.component);
-      $scope.component.runningLocally = (url == $scope.component.local_url);
-      return url;
-    }
-
-    $scope.destroy = function() {
-      componentManager.deregisterHandler($scope.themeHandlerIdentifier);
-      componentManager.deregisterHandler($scope.identifier);
-      if($scope.component && !$scope.manualDealloc) {
-        componentManager.deactivateComponent($scope.component, true);
-      }
-
-      desktopManager.deregisterUpdateObserver($scope.updateObserver);
-      document.removeEventListener("visibilitychange", $scope.onVisibilityChange);
-    }
-
-    $scope.$on("$destroy", function() {
-      $scope.destroy();
     });
+  }
+
+  onVisibilityChange() {
+    if(document.visibilityState === 'hidden') {
+      return;
+    }
+    if(this.issueLoading) {
+      this.reloadComponent();
+    }
+  }
+
+  async reloadComponent() {
+    this.componentValid = false;
+    await this.componentManager.reloadComponent(this.component);
+    this.reloadStatus();
+  }
+
+  reloadStatus(doManualReload = true) {
+    this.reloading = true;
+    const component = this.component;
+    const previouslyValid = this.componentValid;
+    const offlineRestricted = component.offlineOnly && !isDesktopApplication();
+    const hasUrlError = function(){
+      if(isDesktopApplication()) {
+        return !component.local_url && !component.hasValidHostedUrl();
+      } else {
+        return !component.hasValidHostedUrl();
+      }
+    }();
+    this.expired = component.valid_until && component.valid_until <= new Date();
+    if(!component.lockReadonly) {
+      component.readonly = this.expired;
+    }
+    this.componentValid = !offlineRestricted && !hasUrlError;
+    if(!this.componentValid) {
+      this.loading = false;
+    }
+    if(offlineRestricted) {
+      this.error = 'offline-restricted'
+    } else if(hasUrlError) {
+      this.error = 'url-missing'
+    } else {
+      this.error = null;
+    }
+    if(this.componentValid !== previouslyValid) {
+      if(this.componentValid) {
+        this.componentManager.reloadComponent(component, true);
+      }
+    }
+    if(this.expired && doManualReload) {
+      this.$rootScope.$broadcast('reload-ext-dat');
+    }
+    this.reloadThemeStatus();
+    this.$timeout(() => {
+      this.reloading = false;
+    }, 500)
+  }
+
+  handleActivation() {
+    if(!this.component.active) {
+      return;
+    }
+    const iframe = this.componentManager.iframeForComponent(
+      this.component
+    );
+    if(!iframe) {
+      return;
+    }
+    this.loading = true;
+    if(this.loadTimeout) {
+      this.$timeout.cancel(this.loadTimeout);
+    }
+    this.loadTimeout = this.$timeout(() => {
+      this.handleIframeLoadTimeout();
+    }, MAX_LOAD_THRESHOLD);
+
+    iframe.onload = (event) => {
+      this.handleIframeLoad(iframe);
+    };
+  }
+
+  async handleIframeLoadTimeout() {
+    if(this.loading) {
+      this.loading = false;
+      this.issueLoading = true;
+      if(!this.didAttemptReload) {
+        this.didAttemptReload = true;
+        this.reloadComponent();
+      } else {
+        document.addEventListener(
+          VISIBILITY_CHANGE_LISTENER_KEY,
+          this.onVisibilityChange.bind(this)
+        );
+      }
+    }
+  }
+
+  async handleIframeLoad(iframe) {
+    let desktopError = false;
+    if(isDesktopApplication()) {
+      try {
+        /** Accessing iframe.contentWindow.origin only allowed in desktop app. */
+        if(!iframe.contentWindow.origin || iframe.contentWindow.origin === 'null') {
+          desktopError = true;
+        }
+      } catch (e) {}
+    }
+    this.$timeout.cancel(this.loadTimeout);
+    await this.componentManager.registerComponentWindow(
+      this.component,
+      iframe.contentWindow
+    );
+    const avoidFlickerTimeout = 7;
+    this.$timeout(() => {
+      this.loading = false;
+      this.issueLoading = desktopError ? true : false;
+      this.onLoad && this.onLoad(this.component);
+    }, avoidFlickerTimeout)
+  }
+
+  componentValueDidSet(component, prevComponent) {
+    const dontSync = true;
+    if(prevComponent && component !== prevComponent) {
+      this.componentManager.deactivateComponent(
+        prevComponent,
+        dontSync
+      );
+    }
+    if(component) {
+      this.componentManager.activateComponent(
+        component,
+        dontSync
+      );
+      this.reloadStatus();
+    }
+  }
+
+  reloadThemeStatus() {
+    if(this.component.acceptsThemes()) {
+      return;
+    }
+    if(this.themeManager.hasActiveTheme()) {
+      if(!this.dismissedNoThemesMessage) {
+        this.showNoThemesMessage = true;
+      }
+    } else {
+      this.showNoThemesMessage = false;
+    }
+  }
+
+  dismissNoThemesMessage() {
+    this.showNoThemesMessage = false;
+    this.dismissedNoThemesMessage = true;
+  }
+
+  disableActiveTheme() {
+    this.themeManager.deactivateAllThemes();
+    this.dismissNoThemesMessage();
+  }
+
+  getUrl() {
+    const url = this.componentManager.urlForComponent(this.component);
+    this.component.runningLocally = (url === this.component.local_url);
+    return url;
+  }
+
+  destroy() {
+    this.componentManager.deregisterHandler(this.themeHandlerIdentifier);
+    this.componentManager.deregisterHandler(this.identifier);
+    if(this.component && !this.manualDealloc) {
+      const dontSync = true;
+      this.componentManager.deactivateComponent(this.component, dontSync);
+    }
+
+    this.desktopManager.deregisterUpdateObserver(this.updateObserver);
+    document.removeEventListener(
+      VISIBILITY_CHANGE_LISTENER_KEY,
+      this.onVisibilityChange.bind(this)
+    );
+  }
+}
+
+export class ComponentView {
+  constructor() {
+    this.restrict = 'E';
+    this.template = template;
+    this.scope = {
+      component: '=',
+      onLoad: '=?',
+      manualDealloc: '=?'
+    };
+    this.controller = ComponentViewCtrl;
+    this.controllerAs = 'ctrl';
+    this.bindToController = true;
   }
 }

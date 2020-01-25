@@ -5696,278 +5696,369 @@ var ComponentModal = function ComponentModal() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ComponentView", function() { return ComponentView; });
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _directives_component_view_pug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! %/directives/component-view.pug */ "./app/assets/templates/directives/component-view.pug");
-/* harmony import */ var _directives_component_view_pug__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_directives_component_view_pug__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils */ "./app/assets/javascripts/utils.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _directives_component_view_pug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! %/directives/component-view.pug */ "./app/assets/templates/directives/component-view.pug");
+/* harmony import */ var _directives_component_view_pug__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_directives_component_view_pug__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../utils */ "./app/assets/javascripts/utils.js");
 
 
 
 
-var ComponentView =
+
+/**
+ * The maximum amount of time we'll wait for a component
+ * to load before displaying error
+ */
+
+var MAX_LOAD_THRESHOLD = 4000;
+var VISIBILITY_CHANGE_LISTENER_KEY = 'visibilitychange';
+
+var ComponentViewCtrl =
 /*#__PURE__*/
 function () {
-  function ComponentView($rootScope, componentManager, desktopManager, $timeout, themeManager) {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, ComponentView);
+  ComponentViewCtrl.$inject = ["$scope", "$rootScope", "$timeout", "componentManager", "desktopManager", "themeManager"];
 
-    this.restrict = 'E';
-    this.template = _directives_component_view_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
-    this.scope = {
-      component: '=',
-      onLoad: '=?',
-      manualDealloc: '=?'
-    };
+  /* @ngInject */
+  function ComponentViewCtrl($scope, $rootScope, $timeout, componentManager, desktopManager, themeManager) {
+    var _this = this;
+
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, ComponentViewCtrl);
+
+    this.$rootScope = $rootScope;
+    this.$timeout = $timeout;
+    this.themeManager = themeManager;
     this.desktopManager = desktopManager;
+    this.componentManager = componentManager;
+    this.componentValid = true;
+    $scope.$watch('component', function (component, prevComponent) {
+      _this.componentValueDidSet(component, prevComponent);
+    });
+    $scope.$on('ext-reload-complete', function () {
+      _this.reloadStatus(false);
+    });
+    $scope.$on('$destroy', function () {
+      _this.destroy();
+    });
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(ComponentView, [{
-    key: "link",
-    value: function link($scope, el, attrs, ctrl) {
-      $scope.el = el;
-      $scope.componentValid = true;
-      $scope.updateObserver = this.desktopManager.registerUpdateObserver(function (component) {
-        if (component == $scope.component && component.active) {
-          $scope.reloadComponent();
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(ComponentViewCtrl, [{
+    key: "$onInit",
+    value: function $onInit() {
+      this.registerComponentHandlers();
+      this.registerPackageUpdateObserver();
+      this.componentValueDidSet(this.component);
+    }
+  }, {
+    key: "registerPackageUpdateObserver",
+    value: function registerPackageUpdateObserver() {
+      var _this2 = this;
+
+      this.updateObserver = this.desktopManager.registerUpdateObserver(function (component) {
+        if (component === _this2.component && component.active) {
+          _this2.reloadComponent();
         }
-      });
-      $scope.$watch('component', function (component, prevComponent) {
-        ctrl.componentValueChanging(component, prevComponent);
       });
     }
-    /* @ngInject */
-
   }, {
-    key: "controller",
-    value: ["$scope", "$rootScope", "$timeout", "componentManager", "desktopManager", "themeManager", function controller($scope, $rootScope, $timeout, componentManager, desktopManager, themeManager) {
-      $scope.onVisibilityChange = function () {
-        if (document.visibilityState == "hidden") {
-          return;
-        }
+    key: "registerComponentHandlers",
+    value: function registerComponentHandlers() {
+      var _this3 = this;
 
-        if ($scope.issueLoading) {
-          $scope.reloadComponent();
-        }
-      };
-
-      $scope.themeHandlerIdentifier = "component-view-" + Math.random();
-      componentManager.registerHandler({
-        identifier: $scope.themeHandlerIdentifier,
-        areas: ["themes"],
+      this.themeHandlerIdentifier = 'component-view-' + Math.random();
+      this.componentManager.registerHandler({
+        identifier: this.themeHandlerIdentifier,
+        areas: ['themes'],
         activationHandler: function activationHandler(component) {
-          $scope.reloadThemeStatus();
+          _this3.reloadThemeStatus();
         }
       });
-      $scope.identifier = "component-view-" + Math.random();
-      componentManager.registerHandler({
-        identifier: $scope.identifier,
-        areas: [$scope.component.area],
+      this.identifier = 'component-view-' + Math.random();
+      this.componentManager.registerHandler({
+        identifier: this.identifier,
+        areas: [this.component.area],
         activationHandler: function activationHandler(component) {
-          if (component !== $scope.component) {
+          if (component !== _this3.component) {
             return;
           }
 
-          $timeout(function () {
-            $scope.handleActivation();
+          _this3.$timeout(function () {
+            _this3.handleActivation();
           });
         },
         actionHandler: function actionHandler(component, action, data) {
-          if (action == "set-size") {
-            componentManager.handleSetSizeEvent(component, data);
+          if (action === 'set-size') {
+            _this3.componentManager.handleSetSizeEvent(component, data);
           }
         }
       });
+    }
+  }, {
+    key: "onVisibilityChange",
+    value: function onVisibilityChange() {
+      if (document.visibilityState === 'hidden') {
+        return;
+      }
 
-      $scope.handleActivation = function () {
-        // activationHandlers may be called multiple times, design below to be idempotent
-        var component = $scope.component;
+      if (this.issueLoading) {
+        this.reloadComponent();
+      }
+    }
+  }, {
+    key: "reloadComponent",
+    value: function reloadComponent() {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function reloadComponent$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              this.componentValid = false;
+              _context.next = 3;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.componentManager.reloadComponent(this.component));
 
-        if (!component.active) {
-          return;
-        }
+            case 3:
+              this.reloadStatus();
 
-        var iframe = componentManager.iframeForComponent(component);
-
-        if (iframe) {
-          $scope.loading = true; // begin loading error handler. If onload isn't called in x seconds, display an error
-
-          if ($scope.loadTimeout) {
-            $timeout.cancel($scope.loadTimeout);
+            case 4:
+            case "end":
+              return _context.stop();
           }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "reloadStatus",
+    value: function reloadStatus() {
+      var _this4 = this;
 
-          $scope.loadTimeout = $timeout(function () {
-            if ($scope.loading) {
-              $scope.loading = false;
-              $scope.issueLoading = true;
+      var doManualReload = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      this.reloading = true;
+      var component = this.component;
+      var previouslyValid = this.componentValid;
+      var offlineRestricted = component.offlineOnly && !Object(_utils__WEBPACK_IMPORTED_MODULE_4__["isDesktopApplication"])();
 
-              if (!$scope.didAttemptReload) {
-                $scope.didAttemptReload = true;
-                $scope.reloadComponent();
-              } else {
-                // We'll attempt to reload when the tab gains focus
-                document.addEventListener("visibilitychange", $scope.onVisibilityChange);
+      var hasUrlError = function () {
+        if (Object(_utils__WEBPACK_IMPORTED_MODULE_4__["isDesktopApplication"])()) {
+          return !component.local_url && !component.hasValidHostedUrl();
+        } else {
+          return !component.hasValidHostedUrl();
+        }
+      }();
+
+      this.expired = component.valid_until && component.valid_until <= new Date();
+
+      if (!component.lockReadonly) {
+        component.readonly = this.expired;
+      }
+
+      this.componentValid = !offlineRestricted && !hasUrlError;
+
+      if (!this.componentValid) {
+        this.loading = false;
+      }
+
+      if (offlineRestricted) {
+        this.error = 'offline-restricted';
+      } else if (hasUrlError) {
+        this.error = 'url-missing';
+      } else {
+        this.error = null;
+      }
+
+      if (this.componentValid !== previouslyValid) {
+        if (this.componentValid) {
+          this.componentManager.reloadComponent(component, true);
+        }
+      }
+
+      if (this.expired && doManualReload) {
+        this.$rootScope.$broadcast('reload-ext-dat');
+      }
+
+      this.reloadThemeStatus();
+      this.$timeout(function () {
+        _this4.reloading = false;
+      }, 500);
+    }
+  }, {
+    key: "handleActivation",
+    value: function handleActivation() {
+      var _this5 = this;
+
+      if (!this.component.active) {
+        return;
+      }
+
+      var iframe = this.componentManager.iframeForComponent(this.component);
+
+      if (!iframe) {
+        return;
+      }
+
+      this.loading = true;
+
+      if (this.loadTimeout) {
+        this.$timeout.cancel(this.loadTimeout);
+      }
+
+      this.loadTimeout = this.$timeout(function () {
+        _this5.handleIframeLoadTimeout();
+      }, MAX_LOAD_THRESHOLD);
+
+      iframe.onload = function (event) {
+        _this5.handleIframeLoad(iframe);
+      };
+    }
+  }, {
+    key: "handleIframeLoadTimeout",
+    value: function handleIframeLoadTimeout() {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function handleIframeLoadTimeout$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              if (this.loading) {
+                this.loading = false;
+                this.issueLoading = true;
+
+                if (!this.didAttemptReload) {
+                  this.didAttemptReload = true;
+                  this.reloadComponent();
+                } else {
+                  document.addEventListener(VISIBILITY_CHANGE_LISTENER_KEY, this.onVisibilityChange.bind(this));
+                }
               }
-            }
-          }, 3500);
 
-          iframe.onload = function (event) {
-            var desktopError = false;
+            case 1:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "handleIframeLoad",
+    value: function handleIframeLoad(iframe) {
+      var _this6 = this;
 
-            try {
-              // Accessing iframe.contentWindow.origin will throw an exception if we are in the web app, or if the iframe content
-              // is remote content. The only reason it works in this case is because we're accessing a local extension.
-              // In the future when the desktop app falls back to the web location if local fail loads, we won't be able to access this property anymore.
-              if (Object(_utils__WEBPACK_IMPORTED_MODULE_3__["isDesktopApplication"])() && (iframe.contentWindow.origin == null || iframe.contentWindow.origin == 'null')) {
-                /*
-                Don't attempt reload in this case, as it results in infinite loop, since a reload will deactivate the extension and then reactivate.
-                This can cause this componentView to be dealloced and a new one to be instantiated. This happens in editor.js, which we'll need to look into.
-                Don't return from this clause either, since we don't want to cancel loadTimeout (that will trigger reload). Instead, handle custom fail logic here.
-                */
-                desktopError = true;
+      var desktopError, avoidFlickerTimeout;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function handleIframeLoad$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              desktopError = false;
+
+              if (Object(_utils__WEBPACK_IMPORTED_MODULE_4__["isDesktopApplication"])()) {
+                try {
+                  /** Accessing iframe.contentWindow.origin only allowed in desktop app. */
+                  if (!iframe.contentWindow.origin || iframe.contentWindow.origin === 'null') {
+                    desktopError = true;
+                  }
+                } catch (e) {}
               }
-            } catch (e) {}
 
-            $timeout.cancel($scope.loadTimeout);
-            componentManager.registerComponentWindow(component, iframe.contentWindow).then(function () {
-              // Add small timeout to, as $scope.loading controls loading overlay,
-              // which is used to avoid flicker when enabling extensions while having an enabled theme
-              // we don't use ng-show because it causes problems with rendering iframes after timeout, for some reason.
-              $timeout(function () {
-                $scope.loading = false;
-                $scope.issueLoading = desktopError;
-                /* Typically we'd just set this to false at this point, but we now account for desktopError */
+              this.$timeout.cancel(this.loadTimeout);
+              _context3.next = 5;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.componentManager.registerComponentWindow(this.component, iframe.contentWindow));
 
-                $scope.onLoad && $scope.onLoad($scope.component);
-              }, 7);
-            });
-          };
-        }
-      };
-      /*
-      General note regarding activation/deactivation of components:
-      We pass `true` to componentManager.ac/detivateComponent for the `dontSync` parameter.
-      The activation we do in here is not global, but just local, so we don't need to sync the state.
-      For example, if we activate an editor, we just need to do that for display purposes, but dont
-      need to perform a sync to propagate that .active flag.
-      */
+            case 5:
+              avoidFlickerTimeout = 7;
+              this.$timeout(function () {
+                _this6.loading = false;
+                _this6.issueLoading = desktopError ? true : false;
+                _this6.onLoad && _this6.onLoad(_this6.component);
+              }, avoidFlickerTimeout);
 
-
-      this.componentValueChanging = function (component, prevComponent) {
-        if (prevComponent && component !== prevComponent) {
-          componentManager.deactivateComponent(prevComponent, true);
-        }
-
-        if (component) {
-          componentManager.activateComponent(component, true);
-          $scope.reloadStatus();
-        }
-      };
-
-      $scope.$on("ext-reload-complete", function () {
-        $scope.reloadStatus(false);
-      });
-
-      $scope.reloadComponent = function () {
-        // force iFrame to deinit, allows new one to be created
-        $scope.componentValid = false;
-        componentManager.reloadComponent($scope.component).then(function () {
-          $scope.reloadStatus();
-        });
-      };
-
-      $scope.reloadStatus = function () {
-        var doManualReload = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-        var component = $scope.component;
-        $scope.reloading = true;
-        var previouslyValid = $scope.componentValid;
-        var offlineRestricted = component.offlineOnly && !Object(_utils__WEBPACK_IMPORTED_MODULE_3__["isDesktopApplication"])();
-        var urlError = !Object(_utils__WEBPACK_IMPORTED_MODULE_3__["isDesktopApplication"])() && !component.hasValidHostedUrl() || Object(_utils__WEBPACK_IMPORTED_MODULE_3__["isDesktopApplication"])() && !component.local_url && !component.hasValidHostedUrl();
-        $scope.expired = component.valid_until && component.valid_until <= new Date(); // Here we choose our own readonly state based on custom logic. However, if a parent
-        // wants to implement their own readonly logic, they can lock it.
-
-        if (!component.lockReadonly) {
-          component.readonly = $scope.expired;
-        }
-
-        $scope.componentValid = !offlineRestricted && !urlError;
-
-        if (!$scope.componentValid) {
-          // required to disable overlay
-          $scope.loading = false;
-        }
-
-        if (offlineRestricted) $scope.error = 'offline-restricted';else if (urlError) $scope.error = 'url-missing';else $scope.error = null;
-
-        if ($scope.componentValid !== previouslyValid) {
-          if ($scope.componentValid) {
-            // We want to reload here, rather than `activateComponent`, because the component will already have attempted to been activated.
-            componentManager.reloadComponent(component, true);
+            case 7:
+            case "end":
+              return _context3.stop();
           }
         }
+      }, null, this);
+    }
+  }, {
+    key: "componentValueDidSet",
+    value: function componentValueDidSet(component, prevComponent) {
+      var dontSync = true;
 
-        if ($scope.expired && doManualReload) {
-          // Try reloading, handled by footer, which will open Extensions window momentarily to pull in latest data
-          // Upon completion, this method, reloadStatus, will be called, upon where doManualReload will be false to prevent recursion.
-          $rootScope.$broadcast("reload-ext-data");
+      if (prevComponent && component !== prevComponent) {
+        this.componentManager.deactivateComponent(prevComponent, dontSync);
+      }
+
+      if (component) {
+        this.componentManager.activateComponent(component, dontSync);
+        this.reloadStatus();
+      }
+    }
+  }, {
+    key: "reloadThemeStatus",
+    value: function reloadThemeStatus() {
+      if (this.component.acceptsThemes()) {
+        return;
+      }
+
+      if (this.themeManager.hasActiveTheme()) {
+        if (!this.dismissedNoThemesMessage) {
+          this.showNoThemesMessage = true;
         }
+      } else {
+        this.showNoThemesMessage = false;
+      }
+    }
+  }, {
+    key: "dismissNoThemesMessage",
+    value: function dismissNoThemesMessage() {
+      this.showNoThemesMessage = false;
+      this.dismissedNoThemesMessage = true;
+    }
+  }, {
+    key: "disableActiveTheme",
+    value: function disableActiveTheme() {
+      this.themeManager.deactivateAllThemes();
+      this.dismissNoThemesMessage();
+    }
+  }, {
+    key: "getUrl",
+    value: function getUrl() {
+      var url = this.componentManager.urlForComponent(this.component);
+      this.component.runningLocally = url === this.component.local_url;
+      return url;
+    }
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      this.componentManager.deregisterHandler(this.themeHandlerIdentifier);
+      this.componentManager.deregisterHandler(this.identifier);
 
-        $scope.reloadThemeStatus();
-        $timeout(function () {
-          $scope.reloading = false;
-        }, 500);
-      };
+      if (this.component && !this.manualDealloc) {
+        var dontSync = true;
+        this.componentManager.deactivateComponent(this.component, dontSync);
+      }
 
-      $scope.reloadThemeStatus = function () {
-        if (!$scope.component.acceptsThemes()) {
-          if (themeManager.hasActiveTheme()) {
-            if (!$scope.dismissedNoThemesMessage) {
-              $scope.showNoThemesMessage = true;
-            }
-          } else {
-            // Can be the case if we've just deactivated a theme
-            $scope.showNoThemesMessage = false;
-          }
-        }
-      };
-
-      $scope.noThemesMessageDismiss = function () {
-        $scope.showNoThemesMessage = false;
-        $scope.dismissedNoThemesMessage = true;
-      };
-
-      $scope.disableActiveTheme = function () {
-        themeManager.deactivateAllThemes();
-        $scope.noThemesMessageDismiss();
-      };
-
-      $scope.getUrl = function () {
-        var url = componentManager.urlForComponent($scope.component);
-        $scope.component.runningLocally = url == $scope.component.local_url;
-        return url;
-      };
-
-      $scope.destroy = function () {
-        componentManager.deregisterHandler($scope.themeHandlerIdentifier);
-        componentManager.deregisterHandler($scope.identifier);
-
-        if ($scope.component && !$scope.manualDealloc) {
-          componentManager.deactivateComponent($scope.component, true);
-        }
-
-        desktopManager.deregisterUpdateObserver($scope.updateObserver);
-        document.removeEventListener("visibilitychange", $scope.onVisibilityChange);
-      };
-
-      $scope.$on("$destroy", function () {
-        $scope.destroy();
-      });
-    }]
+      this.desktopManager.deregisterUpdateObserver(this.updateObserver);
+      document.removeEventListener(VISIBILITY_CHANGE_LISTENER_KEY, this.onVisibilityChange.bind(this));
+    }
   }]);
 
-  return ComponentView;
+  return ComponentViewCtrl;
 }();
+
+var ComponentView = function ComponentView() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, ComponentView);
+
+  this.restrict = 'E';
+  this.template = _directives_component_view_pug__WEBPACK_IMPORTED_MODULE_3___default.a;
+  this.scope = {
+    component: '=',
+    onLoad: '=?',
+    manualDealloc: '=?'
+  };
+  this.controller = ComponentViewCtrl;
+  this.controllerAs = 'ctrl';
+  this.bindToController = true;
+};
 
 /***/ }),
 
@@ -68316,7 +68407,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\" ng-if=\"issueLoading\"\u003E\u003Cdiv class=\"sk-app-bar no-edges no-top-edge dynamic-height\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\"\u003E\u003Cdiv class=\"sk-label warning\"\u003EThere was an issue loading {{component.name}}.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"right\"\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-click=\"reloadComponent()\"\u003E\u003Cdiv class=\"sk-button info\"\u003E\u003Cdiv class=\"sk-label\"\u003EReload\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\" ng-if=\"showNoThemesMessage\"\u003E\u003Cdiv class=\"sk-app-bar no-edges no-top-edge dynamic-height\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\"\u003E\u003Cdiv class=\"sk-label warning\"\u003EThis extension does not support themes.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"right\"\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-click=\"noThemesMessageDismiss()\"\u003E\u003Cdiv class=\"sk-label\"\u003EDismiss\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-click=\"disableActiveTheme()\"\u003E\u003Cdiv class=\"sk-label\"\u003EDisable Active Theme\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\" ng-if=\"expired\"\u003E\u003Cdiv class=\"sk-app-bar no-edges no-top-edge dynamic-height\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\"\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-circle danger small\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv\u003E\u003Ca class=\"sk-label sk-base\" href=\"https:\u002F\u002Fdashboard.standardnotes.org\" rel=\"noopener\" target=\"_blank\"\u003EYour Extended subscription expired on {{component.dateToLocalizedString(component.valid_until)}}.\u003C\u002Fa\u003E\u003Cdiv class=\"sk-p\"\u003EExtensions are in a read-only state.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"right\"\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-click=\"reloadComponent()\"\u003E\u003Cdiv class=\"sk-button info\"\u003E\u003Cdiv class=\"sk-label\"\u003EReload\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item\"\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-button warning\"\u003E\u003Ca class=\"sk-label\" href=\"https:\u002F\u002Fstandardnotes.org\u002Fhelp\u002F41\u002Fexpired\" rel=\"noopener\" target=\"_blank\"\u003EHelp\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\" ng-if=\"error == 'offline-restricted'\"\u003E\u003Cdiv class=\"sk-panel static\"\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section stretch\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-h1 sk-bold\"\u003EYou have restricted this extension to be used offline only.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-subtitle\"\u003EOffline extensions are not available in the Web app.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003Cdiv class=\"sk-p\"\u003EYou can either:\u003C\u002Fdiv\u003E\u003Cul\u003E\u003Cli class=\"sk-p\"\u003E\u003Cstrong\u003EEnable the Hosted option\u003C\u002Fstrong\u003E for this extension by opening the 'Extensions' menu and toggling 'Use hosted when local is unavailable' under this extension's options. Then press Reload below.\u003C\u002Fli\u003E\u003Cli class=\"sk-p\"\u003E\u003Cstrong\u003EUse the Desktop application.\u003C\u002Fstrong\u003E\u003C\u002Fli\u003E\u003C\u002Ful\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"reloadStatus()\" ng-if=\"!reloading\"\u003E\u003Cdiv class=\"sk-label\"\u003EReload\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-spinner info small\" ng-if=\"reloading\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\" ng-if=\"error == 'url-missing'\"\u003E\u003Cdiv class=\"sk-panel static\"\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section stretch\"\u003E\u003Cdiv class=\"sk-panel-section-title\"\u003EThis extension is not installed correctly.\u003C\u002Fdiv\u003E\u003Cp\u003EPlease uninstall {{component.name}}, then re-install it.\u003C\u002Fp\u003E\u003Cp\u003EThis issue can occur if you access Standard Notes using an older version of the app.\nEnsure you are running at least version 2.1 on all platforms.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Ciframe data-component-id=\"{{component.uuid}}\" frameborder=\"0\" ng-attr-id=\"component-iframe-{{component.uuid}}\" ng-if=\"component &amp;&amp; componentValid\" ng-src=\"{{getUrl() | trusted}}\" sandbox=\"allow-scripts allow-top-navigation-by-user-activation allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-modals allow-forms\"\u003ELoading\u003C\u002Fiframe\u003E\u003Cdiv class=\"loading-overlay\" ng-if=\"loading\"\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\" ng-if=\"ctrl.issueLoading\"\u003E\u003Cdiv class=\"sk-app-bar no-edges no-top-edge dynamic-height\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\"\u003E\u003Cdiv class=\"sk-label warning\"\u003EThere was an issue loading {{ctrl.component.name}}.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"right\"\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-click=\"ctrl.reloadComponent()\"\u003E\u003Cdiv class=\"sk-button info\"\u003E\u003Cdiv class=\"sk-label\"\u003EReload\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\" ng-if=\"ctrl.showNoThemesMessage\"\u003E\u003Cdiv class=\"sk-app-bar no-edges no-top-edge dynamic-height\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\"\u003E\u003Cdiv class=\"sk-label warning\"\u003EThis extension does not support themes.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"right\"\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-click=\"ctrl.dismissNoThemesMessage()\"\u003E\u003Cdiv class=\"sk-label\"\u003EDismiss\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-click=\"ctrl.disableActiveTheme()\"\u003E\u003Cdiv class=\"sk-label\"\u003EDisable Active Theme\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\" ng-if=\"ctrl.expired\"\u003E\u003Cdiv class=\"sk-app-bar no-edges no-top-edge dynamic-height\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\"\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-circle danger small\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv\u003E\u003Ca class=\"sk-label sk-base\" href=\"https:\u002F\u002Fdashboard.standardnotes.org\" rel=\"noopener\" target=\"_blank\"\u003EYour Extended subscription expired on \n{{ctrl.component.dateToLocalizedString(ctrl.component.valid_until)}}.\u003C\u002Fa\u003E\u003Cdiv class=\"sk-p\"\u003EExtensions are in a read-only state.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"right\"\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-click=\"ctrl.reloadComponent()\"\u003E\u003Cdiv class=\"sk-button info\"\u003E\u003Cdiv class=\"sk-label\"\u003EReload\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item\"\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-button warning\"\u003E\u003Ca class=\"sk-label\" href=\"https:\u002F\u002Fstandardnotes.org\u002Fhelp\u002F41\u002Fexpired\" rel=\"noopener\" target=\"_blank\"\u003EHelp\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\" ng-if=\"ctrl.error == 'offline-restricted'\"\u003E\u003Cdiv class=\"sk-panel static\"\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section stretch\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-h1 sk-bold\"\u003EYou have restricted this extension to be used offline only.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-subtitle\"\u003EOffline extensions are not available in the Web app.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003Cdiv class=\"sk-p\"\u003EYou can either:\u003C\u002Fdiv\u003E\u003Cul\u003E\u003Cli class=\"sk-p\"\u003E\u003Cstrong\u003EEnable the Hosted option\u003C\u002Fstrong\u003E for this extension by opening the 'Extensions' menu and \ntoggling 'Use hosted when local is unavailable' under this \nextension's options. Then press Reload below.\u003C\u002Fli\u003E\u003Cli class=\"sk-p\"\u003E\u003Cstrong\u003EUse the Desktop application.\u003C\u002Fstrong\u003E\u003C\u002Fli\u003E\u003C\u002Ful\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"ctrl.reloadStatus()\" ng-if=\"!ctrl.reloading\"\u003E\u003Cdiv class=\"sk-label\"\u003EReload\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-spinner info small\" ng-if=\"ctrl.reloading\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\" ng-if=\"ctrl.error == 'url-missing'\"\u003E\u003Cdiv class=\"sk-panel static\"\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section stretch\"\u003E\u003Cdiv class=\"sk-panel-section-title\"\u003EThis extension is not installed correctly.\u003C\u002Fdiv\u003E\u003Cp\u003EPlease uninstall {{ctrl.component.name}}, then re-install it.\u003C\u002Fp\u003E\u003Cp\u003EThis issue can occur if you access Standard Notes using an older \nversion of the app.\nEnsure you are running at least version 2.1 on all platforms.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Ciframe data-component-id=\"{{ctrl.component.uuid}}\" frameborder=\"0\" ng-attr-id=\"component-iframe-{{ctrl.component.uuid}}\" ng-if=\"ctrl.component &amp;&amp; ctrl.componentValid\" ng-src=\"{{ctrl.getUrl() | trusted}}\" sandbox=\"allow-scripts allow-top-navigation-by-user-activation allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-modals allow-forms\"\u003ELoading\u003C\u002Fiframe\u003E\u003Cdiv class=\"loading-overlay\" ng-if=\"ctrl.loading\"\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),
