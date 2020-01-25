@@ -24,8 +24,8 @@ class ComponentViewCtrl {
     this.desktopManager = desktopManager;
     this.componentManager = componentManager;
     this.componentValid = true;
-    
-    $scope.$watch('component', (component, prevComponent) => {
+
+    $scope.$watch('ctrl.component', (component, prevComponent) => {
       this.componentValueDidSet(component, prevComponent);
     });
     $scope.$on('ext-reload-complete', () => {
@@ -39,7 +39,6 @@ class ComponentViewCtrl {
   $onInit() {
     this.registerComponentHandlers();
     this.registerPackageUpdateObserver();
-    this.componentValueDidSet(this.component);
   };
 
   registerPackageUpdateObserver() {

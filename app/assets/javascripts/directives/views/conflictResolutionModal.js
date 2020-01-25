@@ -1,74 +1,95 @@
-/*
-  The purpose of the conflict resoltion modal is to present two versions of a conflicted item,
-  and allow the user to choose which to keep (or to keep both.)
-*/
-
 import template from '%/directives/conflict-resolution-modal.pug';
+
+class ConflictResolutionCtrl {
+  /* @ngInject */
+  constructor(
+    $element,
+    alertManager,
+    archiveManager,
+    modelManager,
+    syncManager
+  ) {
+    this.$element = $element;
+    this.alertManager = alertManager;
+    this.archiveManager = archiveManager;
+    this.modelManager = modelManager;
+    this.syncManager = syncManager;
+  }
+
+  $onInit() {
+    this.contentType = this.item1.content_type;
+    this.item1Content = this.createContentString(this.item1);
+    this.item2Content = this.createContentString(this.item2);
+  };
+
+  createContentString(item) {
+    const data = Object.assign({
+      created_at: item.created_at,
+      updated_at: item.updated_at
+    }, item.content);
+    return JSON.stringify(data, null, 2);
+  }
+
+  keepItem1() {
+    this.alertManager.confirm({
+      text: `Are you sure you want to delete the item on the right?`,
+      destructive: true,
+      onConfirm: () => {
+        this.modelManager.setItemToBeDeleted(this.item2);
+        this.syncManager.sync().then(() => {
+          this.applyCallback();
+        })
+        this.dismiss();
+      }
+    });
+  }
+
+  keepItem2() {
+    this.alertManager.confirm({
+      text: `Are you sure you want to delete the item on the left?`,
+      destructive: true,
+      onConfirm: () => {
+        this.modelManager.setItemToBeDeleted(this.item1);
+        this.syncManager.sync().then(() => {
+          this.applyCallback();
+        })
+        this.dismiss();
+      }
+    });
+  }
+
+  keepBoth() {
+    this.applyCallback();
+    this.dismiss();
+  }
+
+  export() {
+    this.archiveManager.downloadBackupOfItems(
+      [this.item1, this.item2],
+      true
+    );
+  }
+
+  applyCallback() {
+    this.callback && this.callback();
+  }
+
+  dismiss() {
+    this.$element.remove();
+  }
+}
 
 export class ConflictResolutionModal {
   constructor() {
     this.restrict = 'E';
     this.template = template;
+    this.controller = ConflictResolutionCtrl;
+    this.controllerAs = 'ctrl';
+    this.bindToController = true;
     this.scope = {
       item1: '=',
       item2: '=',
       callback: '='
     };
-  }
-
-  link($scope, el, attrs) {
-
-    $scope.dismiss = function() {
-      el.remove();
-    }
-  }
-
-  /* @ngInject */
-  controller($scope, modelManager, syncManager, archiveManager, alertManager) {
-    $scope.createContentString = function(item) {
-      return JSON.stringify(
-        Object.assign({created_at: item.created_at, updated_at: item.updated_at}, item.content), null, 2
-      )
-    }
-
-    $scope.contentType = $scope.item1.content_type;
-
-    $scope.item1Content = $scope.createContentString($scope.item1);
-    $scope.item2Content = $scope.createContentString($scope.item2);
-
-    $scope.keepItem1 = function() {
-      alertManager.confirm({text: `Are you sure you want to delete the item on the right?`, destructive: true, onConfirm: () => {
-        modelManager.setItemToBeDeleted($scope.item2);
-        syncManager.sync().then(() => {
-          $scope.applyCallback();
-        })
-
-        $scope.dismiss();
-      }});
-    }
-
-    $scope.keepItem2 = function() {
-      alertManager.confirm({text: `Are you sure you want to delete the item on the left?`, destructive: true, onConfirm: () => {
-        modelManager.setItemToBeDeleted($scope.item1);
-        syncManager.sync().then(() => {
-          $scope.applyCallback();
-        })
-
-        $scope.dismiss();
-      }});
-    }
-
-    $scope.keepBoth = function() {
-      $scope.applyCallback();
-      $scope.dismiss();
-    }
-
-    $scope.export = function() {
-      archiveManager.downloadBackupOfItems([$scope.item1, $scope.item2], true);
-    }
-
-    $scope.applyCallback = function() {
-      $scope.callback && $scope.callback();
-    }
   }
 }

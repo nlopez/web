@@ -5735,7 +5735,7 @@ function () {
     this.desktopManager = desktopManager;
     this.componentManager = componentManager;
     this.componentValid = true;
-    $scope.$watch('component', function (component, prevComponent) {
+    $scope.$watch('ctrl.component', function (component, prevComponent) {
       _this.componentValueDidSet(component, prevComponent);
     });
     $scope.$on('ext-reload-complete', function () {
@@ -5751,7 +5751,6 @@ function () {
     value: function $onInit() {
       this.registerComponentHandlers();
       this.registerPackageUpdateObserver();
-      this.componentValueDidSet(this.component);
     }
   }, {
     key: "registerPackageUpdateObserver",
@@ -6081,94 +6080,117 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-/*
-  The purpose of the conflict resoltion modal is to present two versions of a conflicted item,
-  and allow the user to choose which to keep (or to keep both.)
-*/
 
-var ConflictResolutionModal =
+var ConflictResolutionCtrl =
 /*#__PURE__*/
 function () {
-  function ConflictResolutionModal() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, ConflictResolutionModal);
+  ConflictResolutionCtrl.$inject = ["$element", "alertManager", "archiveManager", "modelManager", "syncManager"];
 
-    this.restrict = 'E';
-    this.template = _directives_conflict_resolution_modal_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
-    this.scope = {
-      item1: '=',
-      item2: '=',
-      callback: '='
-    };
+  /* @ngInject */
+  function ConflictResolutionCtrl($element, alertManager, archiveManager, modelManager, syncManager) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, ConflictResolutionCtrl);
+
+    this.$element = $element;
+    this.alertManager = alertManager;
+    this.archiveManager = archiveManager;
+    this.modelManager = modelManager;
+    this.syncManager = syncManager;
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(ConflictResolutionModal, [{
-    key: "link",
-    value: function link($scope, el, attrs) {
-      $scope.dismiss = function () {
-        el.remove();
-      };
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(ConflictResolutionCtrl, [{
+    key: "$onInit",
+    value: function $onInit() {
+      this.contentType = this.item1.content_type;
+      this.item1Content = this.createContentString(this.item1);
+      this.item2Content = this.createContentString(this.item2);
     }
-    /* @ngInject */
-
   }, {
-    key: "controller",
-    value: ["$scope", "modelManager", "syncManager", "archiveManager", "alertManager", function controller($scope, modelManager, syncManager, archiveManager, alertManager) {
-      $scope.createContentString = function (item) {
-        return JSON.stringify(Object.assign({
-          created_at: item.created_at,
-          updated_at: item.updated_at
-        }, item.content), null, 2);
-      };
+    key: "createContentString",
+    value: function createContentString(item) {
+      var data = Object.assign({
+        created_at: item.created_at,
+        updated_at: item.updated_at
+      }, item.content);
+      return JSON.stringify(data, null, 2);
+    }
+  }, {
+    key: "keepItem1",
+    value: function keepItem1() {
+      var _this = this;
 
-      $scope.contentType = $scope.item1.content_type;
-      $scope.item1Content = $scope.createContentString($scope.item1);
-      $scope.item2Content = $scope.createContentString($scope.item2);
+      this.alertManager.confirm({
+        text: "Are you sure you want to delete the item on the right?",
+        destructive: true,
+        onConfirm: function onConfirm() {
+          _this.modelManager.setItemToBeDeleted(_this.item2);
 
-      $scope.keepItem1 = function () {
-        alertManager.confirm({
-          text: "Are you sure you want to delete the item on the right?",
-          destructive: true,
-          onConfirm: function onConfirm() {
-            modelManager.setItemToBeDeleted($scope.item2);
-            syncManager.sync().then(function () {
-              $scope.applyCallback();
-            });
-            $scope.dismiss();
-          }
-        });
-      };
+          _this.syncManager.sync().then(function () {
+            _this.applyCallback();
+          });
 
-      $scope.keepItem2 = function () {
-        alertManager.confirm({
-          text: "Are you sure you want to delete the item on the left?",
-          destructive: true,
-          onConfirm: function onConfirm() {
-            modelManager.setItemToBeDeleted($scope.item1);
-            syncManager.sync().then(function () {
-              $scope.applyCallback();
-            });
-            $scope.dismiss();
-          }
-        });
-      };
+          _this.dismiss();
+        }
+      });
+    }
+  }, {
+    key: "keepItem2",
+    value: function keepItem2() {
+      var _this2 = this;
 
-      $scope.keepBoth = function () {
-        $scope.applyCallback();
-        $scope.dismiss();
-      };
+      this.alertManager.confirm({
+        text: "Are you sure you want to delete the item on the left?",
+        destructive: true,
+        onConfirm: function onConfirm() {
+          _this2.modelManager.setItemToBeDeleted(_this2.item1);
 
-      $scope.export = function () {
-        archiveManager.downloadBackupOfItems([$scope.item1, $scope.item2], true);
-      };
+          _this2.syncManager.sync().then(function () {
+            _this2.applyCallback();
+          });
 
-      $scope.applyCallback = function () {
-        $scope.callback && $scope.callback();
-      };
-    }]
+          _this2.dismiss();
+        }
+      });
+    }
+  }, {
+    key: "keepBoth",
+    value: function keepBoth() {
+      this.applyCallback();
+      this.dismiss();
+    }
+  }, {
+    key: "export",
+    value: function _export() {
+      this.archiveManager.downloadBackupOfItems([this.item1, this.item2], true);
+    }
+  }, {
+    key: "applyCallback",
+    value: function applyCallback() {
+      this.callback && this.callback();
+    }
+  }, {
+    key: "dismiss",
+    value: function dismiss() {
+      this.$element.remove();
+    }
   }]);
 
-  return ConflictResolutionModal;
+  return ConflictResolutionCtrl;
 }();
+
+var ConflictResolutionModal = function ConflictResolutionModal() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, ConflictResolutionModal);
+
+  this.restrict = 'E';
+  this.template = _directives_conflict_resolution_modal_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
+  this.controller = ConflictResolutionCtrl;
+  this.controllerAs = 'ctrl';
+  this.bindToController = true;
+  this.scope = {
+    item1: '=',
+    item2: '=',
+    callback: '='
+  };
+};
 
 /***/ }),
 
@@ -6193,101 +6215,122 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var EditorMenu =
+
+var EditorMenuCtrl =
 /*#__PURE__*/
 function () {
-  function EditorMenu() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, EditorMenu);
+  EditorMenuCtrl.$inject = ["$timeout", "componentManager", "modelManager", "syncManager"];
 
-    this.restrict = 'E';
-    this.template = _directives_editor_menu_pug__WEBPACK_IMPORTED_MODULE_3___default.a;
-    this.scope = {
-      callback: '&',
-      selectedEditor: '=',
-      currentItem: '='
-    };
-  }
   /* @ngInject */
+  function EditorMenuCtrl($timeout, componentManager, modelManager, syncManager) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, EditorMenuCtrl);
 
+    this.$timeout = $timeout;
+    this.componentManager = componentManager;
+    this.modelManager = modelManager;
+    this.syncManager = syncManager;
+    this.formData = {};
+    this.isDesktop = Object(_utils__WEBPACK_IMPORTED_MODULE_2__["isDesktopApplication"])();
+  }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(EditorMenu, [{
-    key: "controller",
-    value: ["$scope", "componentManager", "syncManager", "modelManager", "$timeout", function controller($scope, componentManager, syncManager, modelManager, $timeout) {
-      $scope.formData = {};
-      $scope.editors = componentManager.componentsForArea("editor-editor").sort(function (a, b) {
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(EditorMenuCtrl, [{
+    key: "$onInit",
+    value: function $onInit() {
+      this.editors = this.componentManager.componentsForArea('editor-editor').sort(function (a, b) {
         return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
       });
-      $scope.isDesktop = Object(_utils__WEBPACK_IMPORTED_MODULE_2__["isDesktopApplication"])();
-      $scope.defaultEditor = $scope.editors.filter(function (e) {
+      this.defaultEditor = this.editors.filter(function (e) {
+        return e.isDefaultEditor();
+      })[0];
+    }
+  }, {
+    key: "selectComponent",
+    value: function selectComponent(component) {
+      var _this = this;
+
+      if (component) {
+        if (component.content.conflict_of) {
+          component.content.conflict_of = null;
+          this.modelManager.setItemDirty(component, true);
+          this.syncManager.sync();
+        }
+      }
+
+      this.$timeout(function () {
+        _this.callback()(component);
+      });
+    }
+  }, {
+    key: "toggleDefaultForEditor",
+    value: function toggleDefaultForEditor(editor) {
+      if (this.defaultEditor === editor) {
+        this.removeEditorDefault(editor);
+      } else {
+        this.makeEditorDefault(editor);
+      }
+    }
+  }, {
+    key: "offlineAvailableForComponent",
+    value: function offlineAvailableForComponent(component) {
+      return component.local_url && Object(_utils__WEBPACK_IMPORTED_MODULE_2__["isDesktopApplication"])();
+    }
+  }, {
+    key: "makeEditorDefault",
+    value: function makeEditorDefault(component) {
+      var currentDefault = this.componentManager.componentsForArea('editor-editor').filter(function (e) {
         return e.isDefaultEditor();
       })[0];
 
-      $scope.selectComponent = function (component) {
-        if (component) {
-          if (component.content.conflict_of) {
-            component.content.conflict_of = null; // clear conflict if applicable
+      if (currentDefault) {
+        currentDefault.setAppDataItem('defaultEditor', false);
+        this.modelManager.setItemDirty(currentDefault);
+      }
 
-            modelManager.setItemDirty(component, true);
-            syncManager.sync();
-          }
-        }
+      component.setAppDataItem('defaultEditor', true);
+      this.modelManager.setItemDirty(component);
+      this.syncManager.sync();
+      this.defaultEditor = component;
+    }
+  }, {
+    key: "removeEditorDefault",
+    value: function removeEditorDefault(component) {
+      component.setAppDataItem('defaultEditor', false);
+      this.modelManager.setItemDirty(component);
+      this.syncManager.sync();
+      this.defaultEditor = null;
+    }
+  }, {
+    key: "shouldDisplayRunningLocallyLabel",
+    value: function shouldDisplayRunningLocallyLabel(component) {
+      if (!component.runningLocally) {
+        return false;
+      }
 
-        $timeout(function () {
-          $scope.callback()(component);
-        });
-      };
-
-      $scope.toggleDefaultForEditor = function (editor) {
-        if ($scope.defaultEditor == editor) {
-          $scope.removeEditorDefault(editor);
-        } else {
-          $scope.makeEditorDefault(editor);
-        }
-      };
-
-      $scope.offlineAvailableForComponent = function (component) {
-        return component.local_url && Object(_utils__WEBPACK_IMPORTED_MODULE_2__["isDesktopApplication"])();
-      };
-
-      $scope.makeEditorDefault = function (component) {
-        var currentDefault = componentManager.componentsForArea("editor-editor").filter(function (e) {
-          return e.isDefaultEditor();
-        })[0];
-
-        if (currentDefault) {
-          currentDefault.setAppDataItem("defaultEditor", false);
-          modelManager.setItemDirty(currentDefault, true);
-        }
-
-        component.setAppDataItem("defaultEditor", true);
-        modelManager.setItemDirty(component, true);
-        syncManager.sync();
-        $scope.defaultEditor = component;
-      };
-
-      $scope.removeEditorDefault = function (component) {
-        component.setAppDataItem("defaultEditor", false);
-        modelManager.setItemDirty(component, true);
-        syncManager.sync();
-        $scope.defaultEditor = null;
-      };
-
-      $scope.shouldDisplayRunningLocallyLabel = function (component) {
-        if (!component.runningLocally) {
-          return false;
-        }
-
-        if (component == $scope.selectedEditor) {
-          return true;
-        } else {
-          return false;
-        }
-      };
-    }]
+      if (component === this.selectedEditor) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   }]);
 
-  return EditorMenu;
+  return EditorMenuCtrl;
 }();
+
+var EditorMenu = function EditorMenu() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, EditorMenu);
+
+  this.restrict = 'E';
+  this.template = _directives_editor_menu_pug__WEBPACK_IMPORTED_MODULE_3___default.a;
+  this.controller = EditorMenuCtrl;
+  this.controllerAs = 'ctrl';
+  this.bindToController = true;
+  this.scope = {
+    callback: '&',
+    selectedEditor: '=',
+    currentItem: '='
+  };
+};
 
 /***/ }),
 
@@ -68421,7 +68464,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-modal large\" id=\"conflict-resolution-modal\"\u003E\u003Cdiv class=\"sk-modal-background\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-modal-content\"\u003E\u003Cdiv class=\"sk-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Ch1 class=\"sk-panel-header-title\"\u003EConflicted items — choose which version to keep\u003C\u002Fh1\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"keepItem1()\"\u003EKeep left\u003C\u002Fa\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"keepItem2()\"\u003EKeep right\u003C\u002Fa\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"keepBoth()\"\u003EKeep both\u003C\u002Fa\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"export()\"\u003EExport\u003C\u002Fa\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"dismiss(); $event.stopPropagation()\"\u003EClose\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content selectable\"\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Ch3\u003E\u003Cstrong\u003EContent type:\u003C\u002Fstrong\u003E{{contentType}}\u003C\u002Fh3\u003E\u003Cp\u003EYou may wish to look at the \"created_at\" and \"updated_at\" fields of the items to gain better context in deciding which to keep.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv id=\"items\"\u003E\u003Cdiv class=\"sk-panel static item\" id=\"item1\"\u003E\u003Cp class=\"normal\" style=\"white-space: pre-wrap; font-size: 16px;\"\u003E{{item1Content}}\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"border\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel static item\" id=\"item2\"\u003E\u003Cp class=\"normal\" style=\"white-space: pre-wrap; font-size: 16px;\"\u003E{{item2Content}}\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-modal large\" id=\"conflict-resolution-modal\"\u003E\u003Cdiv class=\"sk-modal-background\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-modal-content\"\u003E\u003Cdiv class=\"sk-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Ch1 class=\"sk-panel-header-title\"\u003EConflicted items — choose which version to keep\u003C\u002Fh1\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"ctrl.keepItem1()\"\u003EKeep left\u003C\u002Fa\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"ctrl.keepItem2()\"\u003EKeep right\u003C\u002Fa\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"ctrl.keepBoth()\"\u003EKeep both\u003C\u002Fa\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"ctrl.export()\"\u003EExport\u003C\u002Fa\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"ctrl.dismiss(); $event.stopPropagation()\"\u003EClose\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content selectable\"\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Ch3\u003E\u003Cstrong\u003EContent type:\u003C\u002Fstrong\u003E{{ctrl.contentType}}\u003C\u002Fh3\u003E\u003Cp\u003EYou may wish to look at the \"created_at\" and \"updated_at\" fields\nof the items to gain better context in deciding which to keep.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv id=\"items\"\u003E\u003Cdiv class=\"sk-panel static item\" id=\"item1\"\u003E\u003Cp class=\"normal\" style=\"white-space: pre-wrap; font-size: 16px;\"\u003E {{ctrl.item1Content}}\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"border\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel static item\" id=\"item2\"\u003E\u003Cp class=\"normal\" style=\"white-space: pre-wrap; font-size: 16px;\"\u003E {{ctrl.item2Content}}\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),
@@ -68435,7 +68478,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-menu-panel dropdown-menu\"\u003E\u003Cdiv class=\"sk-menu-panel-section\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003ENote Editor\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"selectComponent(null)\" circle=\"selectedEditor == null &amp;&amp; 'success'\" label=\"'Plain Editor'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"selectComponent(editor)\" button-action=\"toggleDefaultForEditor(editor)\" button-class=\"defaultEditor == editor ? 'warning' : 'info'\" button-text=\"defaultEditor == editor ? 'Undefault' : 'Set Default'\" circle=\"selectedEditor === editor &amp;&amp; 'success'\" has-button=\"selectedEditor == editor || defaultEditor == editor\" label=\"editor.name\" ng-repeat=\"editor in editors\"\u003E\u003Cdiv class=\"sk-menu-panel-column\" ng-if=\"component.content.conflict_of || shouldDisplayRunningLocallyLabel(editor)\"\u003E\u003Cstrong class=\"danger medium-text\" ng-if=\"editor.content.conflict_of\"\u003EConflicted copy\u003C\u002Fstrong\u003E\u003Cdiv class=\"sk-sublabel\" ng-if=\"shouldDisplayRunningLocallyLabel(editor)\"\u003ERunning Locally\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fmenu-row\u003E\u003Ca class=\"no-decoration\" href=\"https:\u002F\u002Fstandardnotes.org\u002Fextensions\" ng-if=\"editors.length == 0\" rel=\"noopener\" target=\"blank\"\u003E\u003Cmenu-row label=\"'Download More Editors'\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-menu-panel dropdown-menu\"\u003E\u003Cdiv class=\"sk-menu-panel-section\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003ENote Editor\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"ctrl.selectComponent(null)\" circle=\"ctrl.selectedEditor == null &amp;&amp; 'success'\" label=\"'Plain Editor'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row ng-repeat=\"editor in ctrl.editors\" action=\"ctrl.selectComponent(editor)\" button-action=\"ctrl.toggleDefaultForEditor(editor)\" button-class=\"ctrl.defaultEditor == editor ? 'warning' : 'info'\" button-text=\"ctrl.defaultEditor == editor ? 'Undefault' : 'Set Default'\" circle=\"ctrl.selectedEditor === editor &amp;&amp; 'success'\" has-button=\"ctrl.selectedEditor == editor || ctrl.defaultEditor == editor\" label=\"editor.name\"\u003E\u003Cdiv class=\"sk-menu-panel-column\" ng-if=\"editor.content.conflict_of || ctrl.shouldDisplayRunningLocallyLabel(editor)\"\u003E\u003Cstrong class=\"danger medium-text\" ng-if=\"editor.content.conflict_of\"\u003EConflicted copy\u003C\u002Fstrong\u003E\u003Cdiv class=\"sk-sublabel\" ng-if=\"ctrl.shouldDisplayRunningLocallyLabel(editor)\"\u003ERunning Locally\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fmenu-row\u003E\u003Ca class=\"no-decoration\" href=\"https:\u002F\u002Fstandardnotes.org\u002Fextensions\" ng-if=\"ctrl.editors.length == 0\" rel=\"noopener\" target=\"blank\"\u003E\u003Cmenu-row label=\"'Download More Editors'\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),
