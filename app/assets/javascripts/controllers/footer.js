@@ -228,10 +228,6 @@ class FooterCtrl {
     this.error = this.syncManager.syncStatus.error;
   }
 
-  onAuthSuccess = () => {
-    this.showAccountMenu = false;
-  }
-
   accountMenuPressed() {
     this.showAccountMenu = !this.showAccountMenu;
     this.closeAllRooms();

@@ -1,4 +1,4 @@
-import { SFPredicate } from 'snjs';
+import { SFPredicate, SFItem } from 'snjs';
 
 export const PREF_TAGS_PANEL_WIDTH         = 'tagsPanelWidth';
 export const PREF_NOTES_PANEL_WIDTH        = 'notesPanelWidth';

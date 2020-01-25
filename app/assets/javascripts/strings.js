@@ -27,3 +27,22 @@ export function StringDeleteNote({title, permanently}) {
 export function StringEmptyTrash({count}) {
   return `Are you sure you want to permanently delete ${count} note(s)?`;
 }
+
+/** @account */
+export const STRING_ACCOUNT_MENU_UNCHECK_MERGE = "Unchecking this option means any of the notes you have written while you were signed out will be deleted. Are you sure you want to discard these notes?";
+export const STRING_SIGN_OUT_CONFIRMATION      = "Are you sure you want to end your session? This will delete all local items and extensions.";
+export const STRING_ERROR_DECRYPTING_IMPORT    = "There was an error decrypting your items. Make sure the password you entered is correct and try again.";
+export const STRING_E2E_ENABLED                = "End-to-end encryption is enabled. Your data is encrypted on your device first, then synced to your private cloud.";
+export const STRING_LOCAL_ENC_ENABLED          = "Encryption is enabled. Your data is encrypted using your passcode before it is saved to your device storage.";
+export const STRING_ENC_NOT_ENABLED            = "Encryption is not enabled. Sign in, register, or add a passcode lock to enable encryption.";
+export const STRING_IMPORT_SUCCESS             = "Your data has been successfully imported.";
+export const STRING_REMOVE_PASSCODE_CONFIRMATION = "Are you sure you want to remove your local passcode?";
+export const STRING_REMOVE_PASSCODE_OFFLINE_ADDENDUM = " This will remove encryption from your local data.";
+export const STRING_NON_MATCHING_PASSCODES = "The two passcodes you entered do not match. Please try again.";
+export const STRING_NON_MATCHING_PASSWORDS = "The two passwords you entered do not match. Please try again.";
+export const STRING_GENERATING_LOGIN_KEYS = "Generating Login Keys...";
+export const STRING_GENERATING_REGISTER_KEYS = "Generating Account Keys...";
+export const STRING_INVALID_IMPORT_FILE = "Unable to open file. Ensure it is a proper JSON file and try again.";
+export function StringImportError({errorCount}) {
+  return `Import complete. ${errorCount} items were not imported because there was an error decrypting them. Make sure the password is correct and try again.`;
+}

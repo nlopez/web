@@ -2,527 +2,542 @@ import { isDesktopApplication } from '@/utils';
 import { PrivilegesManager } from '@/services/privilegesManager';
 import template from '%/directives/account-menu.pug';
 import { protocolManager } from 'snjs';
+import {
+  STRING_ACCOUNT_MENU_UNCHECK_MERGE,
+  STRING_SIGN_OUT_CONFIRMATION,
+  STRING_ERROR_DECRYPTING_IMPORT,
+  STRING_E2E_ENABLED,
+  STRING_LOCAL_ENC_ENABLED,
+  STRING_ENC_NOT_ENABLED,
+  STRING_IMPORT_SUCCESS,
+  STRING_REMOVE_PASSCODE_CONFIRMATION,
+  STRING_REMOVE_PASSCODE_OFFLINE_ADDENDUM,
+  STRING_NON_MATCHING_PASSCODES,
+  STRING_NON_MATCHING_PASSWORDS,
+  STRING_INVALID_IMPORT_FILE,
+  STRING_GENERATING_LOGIN_KEYS,
+  STRING_GENERATING_REGISTER_KEYS,
+  StringImportError
+} from '@/strings';
+
+const ELEMENT_ID_IMPORT_PASSWORD_INPUT = 'import-password-request';
+
+class AccountMenuCtrl {
+  /* @ngInject */
+  constructor(
+    $scope,
+    $rootScope,
+    $timeout,
+    alertManager,
+    archiveManager,
+    appVersion,
+    authManager,
+    modelManager,
+    passcodeManager,
+    privilegesManager,
+    storageManager,
+    syncManager,
+  ) {
+    this.$scope = $scope;
+    this.$rootScope = $rootScope;
+    this.$timeout = $timeout;
+    this.alertManager = alertManager;
+    this.archiveManager = archiveManager;
+    this.authManager = authManager;
+    this.modelManager = modelManager;
+    this.passcodeManager = passcodeManager;
+    this.privilegesManager = privilegesManager;
+    this.storageManager = storageManager;
+    this.syncManager = syncManager;
+
+    this.appVersion = 'v' + (window.electronAppVersion || appVersion);
+    this.user = this.authManager.user;
+    this.canAddPasscode = !this.authManager.isEphemeralSession();
+    this.syncStatus = this.syncManager.syncStatus;
+    this.user = this.authManager.user;
+    this.passcodeAutoLockOptions = this.passcodeManager.getAutoLockIntervalOptions();
+    this.formData = {
+      mergeLocal: true,
+      ephemeral: false
+    };
+    this.archiveFormData = {
+      encrypted: this.encryptedBackupsAvailable() ? true : false
+    };
+    this.syncManager.getServerURL().then((url) => {
+      this.server = url;
+      this.formData.url = url;
+    })
+    this.authManager.checkForSecurityUpdate().then((available) => {
+      this.securityUpdateAvailable = available;
+    })
+    this.reloadAutoLockInterval();
+  }
+
+  close() {
+    this.$timeout(() => {
+      this.closeFunction()();
+    })
+  }
+
+  encryptedBackupsAvailable() {
+    return this.authManager.user || this.passcodeManager.hasPasscode();
+  }
+
+  submitMfaForm() {
+    const params = {
+      [this.formData.mfa.payload.mfa_key]: this.formData.userMfaCode
+    };
+    this.login(params);
+  }
+
+  submitAuthForm() {
+    if(!this.formData.email || !this.formData.user_password) {
+      return;
+    }
+    if(this.formData.showLogin) {
+      this.login();
+    } else {
+      this.register();
+    }
+  }
+
+  async login(extraParams) {
+    /** Prevent a timed sync from occuring while signing in. */
+    this.syncManager.lockSyncing();
+    this.formData.status = STRING_GENERATING_LOGIN_KEYS;
+    this.formData.authenticating = true;
+    const response = await this.authManager.login(
+      this.formData.url,
+      this.formData.email,
+      this.formData.user_password,
+      this.formData.ephemeral,
+      this.formData.strictSignin,
+      extraParams
+    );
+    const hasError = !response || response.error;
+    if(!hasError) {
+      await this.onAuthSuccess();
+      this.syncManager.unlockSyncing();
+      this.syncManager.sync({performIntegrityCheck: true});
+      return;
+    }
+    this.syncManager.unlockSyncing();
+    this.formData.status = null;
+    const error = response
+      ? response.error
+      : {message: "An unknown error occured."}
+
+    if(error.tag === 'mfa-required' || error.tag === 'mfa-invalid') {
+      this.formData.showLogin = false;
+      this.formData.mfa = error;
+    } else {
+      this.formData.showLogin = true;
+      this.formData.mfa = null;
+      if(error.message) {
+        this.alertManager.alert({
+          text: error.message
+        });
+      }
+    }
+    this.formData.authenticating = false;
+  }
+
+  async register() {
+    const confirmation = this.formData.password_conf;
+    if(confirmation !== this.formData.user_password) {
+      this.alertManager.alert({
+        text: STRING_NON_MATCHING_PASSWORDS
+      });
+      return;
+    }
+    this.formData.confirmPassword = false;
+    this.formData.status = STRING_GENERATING_REGISTER_KEYS;
+    this.formData.authenticating = true;
+    const response = await this.authManager.register(
+      this.formData.url,
+      this.formData.email,
+      this.formData.user_password,
+      this.formData.ephemeral
+    )
+    if(!response || response.error) {
+      this.formData.status = null;
+      const error = response
+        ? response.error
+        : {message: "An unknown error occured."};
+      this.formData.authenticating = false;
+      this.alertManager.alert({
+        text: error.message
+      });
+    } else {
+      await this.onAuthSuccess();
+      this.syncManager.sync();
+    }
+  }
+
+  mergeLocalChanged() {
+    if(!this.formData.mergeLocal) {
+      this.alertManager.confirm({
+        text: STRING_ACCOUNT_MENU_UNCHECK_MERGE,
+        destructive: true,
+        onCancel: () => {
+          this.formData.mergeLocal = true;
+        }
+      })
+    }
+  }
+
+  async onAuthSuccess() {
+    if(this.formData.mergeLocal) {
+      this.$rootScope.$broadcast('major-data-change');
+      await this.clearDatabaseAndRewriteAllItems({alternateUuids: true});
+    } else {
+      this.modelManager.removeAllItemsFromMemory();
+      await this.storageManager.clearAllModels();
+    }
+    this.formData.authenticating = false;
+    this.syncManager.refreshErroredItems();
+    this.close();
+  }
+
+  openPasswordWizard(type) {
+    this.close();
+    this.authManager.presentPasswordWizard(type);
+  }
+
+  async openPrivilegesModal() {
+    this.close();
+    const run = () => {
+      this.$timeout(() => {
+        this.privilegesManager.presentPrivilegesManagementModal();
+      })
+    }
+    const needsPrivilege = await this.privilegesManager.actionRequiresPrivilege(
+      PrivilegesManager.ActionManagePrivileges
+    );
+    if(needsPrivilege) {
+      this.privilegesManager.presentPrivilegesModal(
+        PrivilegesManager.ActionManagePrivileges,
+        () => {
+          run();
+        }
+      );
+    } else {
+      run();
+    }
+  }
+
+  /**
+   * Allows IndexedDB unencrypted logs to be deleted
+   * `clearAllModels` will remove data from backing store,
+   * but not from working memory See:
+   * https://github.com/standardnotes/desktop/issues/131
+   */
+  async clearDatabaseAndRewriteAllItems({alternateUuids} = {}) {
+    await this.storageManager.clearAllModels();
+    await this.syncManager.markAllItemsDirtyAndSaveOffline(alternateUuids)
+  }
+
+  destroyLocalData() {
+    this.alertManager.confirm({
+      text: STRING_SIGN_OUT_CONFIRMATION,
+      destructive: true,
+      onConfirm: async () => {
+        await this.authManager.signout(true);
+        window.location.reload();
+      }
+    })
+  }
+
+  async submitImportPassword() {
+    await this.performImport(
+      this.importData.data,
+      this.importData.password
+    );
+  }
+
+  async readFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          resolve(data);
+        } catch (e) {
+          this.alertManager.alert({
+            text: STRING_INVALID_IMPORT_FILE
+          });
+        }
+      }
+
+      reader.readAsText(file);
+    })
+  }
+
+  /** Called by template. */
+  async importFileSelected(files) {
+    const run = async () => {
+      this.importData = {};
+      const file = files[0];
+      const data = await this.readFile(file);
+      if(!data) {
+        return;
+      }
+      if(data.auth_params) {
+        this.importData.requestPassword = true;
+        this.importData.data = data;
+        const element = document.getElementById(
+          ELEMENT_ID_IMPORT_PASSWORD_INPUT
+        );
+        if(element) {
+          element.scrollIntoView(false);
+        }
+      } else {
+        await this.performImport(data, null);
+      }
+    }
+
+    const needsPrivilege = await this.privilegesManager.actionRequiresPrivilege(
+      PrivilegesManager.ActionManageBackups
+    );
+    if(needsPrivilege) {
+      this.privilegesManager.presentPrivilegesModal(
+        PrivilegesManager.ActionManageBackups,
+        () => {
+          this.$timeout(run);
+        }
+      );
+    } else {
+      this.$timeout(run);
+    }
+  }
+
+  async performImport(data, password) {
+    this.importData.loading = true;
+    const errorCount = await this.importJSONData(data, password);
+    this.importData.loading = false;
+    this.importData = null;
+    if(errorCount > 0) {
+      const message = StringImportError({errorCount: errorCount})
+      this.alertManager.alert({
+        text: message
+      });
+    } else {
+      this.alertManager.alert({
+        text: STRING_IMPORT_SUCCESS
+      })
+    }
+  }
+
+  async importJSONData(data, password) {
+    let errorCount = 0;
+    if(data.auth_params) {
+      const keys = await protocolManager.computeEncryptionKeysForUser(
+        password,
+        data.auth_params
+      );
+      try {
+        const throws = false;
+        await protocolManager.decryptMultipleItems(data.items, keys, throws);
+        const items = [];
+        for(const item of data.items) {
+          item.enc_item_key = null;
+          item.auth_hash = null;
+          if(item.errorDecrypting) {
+            errorCount++;
+          } else {
+            items.push(item);
+          }
+        }
+        data.items = items;
+      } catch (e) {
+        this.alertManager.alert({
+          text: STRING_ERROR_DECRYPTING_IMPORT
+        });
+        return;
+      }
+    }
+
+    const items = await this.modelManager.importItems(data.items);
+    for(const item of items) {
+      /**
+       * Don't want to activate any components during import process in
+       * case of exceptions breaking up the import proccess
+       */
+      if(item.content_type === 'SN|Component') {
+        item.active = false;
+      }
+    }
+
+    this.syncManager.sync();
+    return errorCount;
+  }
+
+  async downloadDataArchive() {
+    this.archiveManager.downloadBackup(this.archiveFormData.encrypted);
+  }
+
+  notesAndTagsCount() {
+    return this.modelManager.allItemsMatchingTypes([
+      'Note',
+      'Tag'
+    ]).length;
+  }
+
+  encryptionStatusForNotes() {
+    const length = this.notesAndTagsCount();
+    return length + "/" + length + " notes and tags encrypted";
+  }
+
+  encryptionEnabled() {
+    return this.passcodeManager.hasPasscode() || !this.authManager.offline();
+  }
+
+  encryptionSource() {
+    if(!this.authManager.offline()) {
+      return "Account keys";
+    } else if(this.passcodeManager.hasPasscode()) {
+      return "Local Passcode";
+    } else {
+      return null;
+    }
+  }
+
+  encryptionStatusString() {
+    if(!this.authManager.offline()) {
+      return STRING_E2E_ENABLED;
+    } else if(this.passcodeManager.hasPasscode()) {
+      return STRING_LOCAL_ENC_ENABLED;
+    } else {
+      return STRING_ENC_NOT_ENABLED;
+    }
+  }
+
+  async reloadAutoLockInterval() {
+    const interval = await this.passcodeManager.getAutoLockInterval();
+    this.selectedAutoLockInterval = interval;
+  }
+
+  async selectAutoLockInterval(interval) {
+    const run = async () => {
+      await this.passcodeManager.setAutoLockInterval(interval);
+      this.$timeout(() => {
+        this.reloadAutoLockInterval();
+      });
+    }
+    const needsPrivilege = await this.privilegesManager.actionRequiresPrivilege(
+      PrivilegesManager.ActionManagePasscode
+    );
+    if(needsPrivilege) {
+      this.privilegesManager.presentPrivilegesModal(
+        PrivilegesManager.ActionManagePasscode,
+        () => {
+          run();
+        }
+      );
+    } else {
+      run();
+    }
+  }
+
+  hasPasscode() {
+    return this.passcodeManager.hasPasscode();
+  }
+
+  addPasscodeClicked() {
+    this.formData.showPasscodeForm = true;
+  }
+
+  submitPasscodeForm() {
+    const passcode = this.formData.passcode;
+    if(passcode !== this.formData.confirmPasscode) {
+      this.alertManager.alert({
+        text: STRING_NON_MATCHING_PASSCODES
+      });
+      return;
+    }
+    const func = this.formData.changingPasscode
+      ? this.passcodeManager.changePasscode.bind(this.passcodeManager)
+      : this.passcodeManager.setPasscode.bind(this.passcodeManager);
+    func(passcode, () => {
+      this.$timeout(async () => {
+        this.formData.passcode = null;
+        this.formData.confirmPasscode = null;
+        this.formData.showPasscodeForm = false;
+        if(await this.authManager.offline()) {
+          this.$rootScope.$broadcast('major-data-change');
+          this.clearDatabaseAndRewriteAllItems();
+        }
+      })
+    })
+  }
+
+  async changePasscodePressed() {
+    const run = () => {
+      this.formData.changingPasscode = true;
+      this.addPasscodeClicked();
+    }
+    const needsPrivilege = await this.privilegesManager.actionRequiresPrivilege(
+      PrivilegesManager.ActionManagePasscode
+    );
+    if(needsPrivilege) {
+      this.privilegesManager.presentPrivilegesModal(
+        PrivilegesManager.ActionManagePasscode,
+        () => {
+          this.$timeout(run);
+        }
+      );
+    } else {
+      this.$timeout(run);
+    }
+  }
+
+  async removePasscodePressed() {
+    const run = () => {
+      const signedIn = !this.authManager.offline();
+      const message = STRING_REMOVE_PASSCODE_CONFIRMATION;
+      if(!signedIn) {
+        message += STRING_REMOVE_PASSCODE_OFFLINE_ADDENDUM;
+      }
+      this.alertManager.confirm({
+        text: message,
+        destructive: true,
+        onConfirm: () => {
+          this.passcodeManager.clearPasscode();
+          if(this.authManager.offline()) {
+            this.syncManager.markAllItemsDirtyAndSaveOffline();
+          }
+        }
+      })
+    }
+    const needsPrivilege = await this.privilegesManager.actionRequiresPrivilege(
+      PrivilegesManager.ActionManagePasscode
+    );
+    if(needsPrivilege) {
+      this.privilegesManager.presentPrivilegesModal(
+        PrivilegesManager.ActionManagePasscode,
+        () => {
+          this.$timeout(run);
+        }
+      );
+    } else {
+      this.$timeout(run);
+    }
+  }
+
+  isDesktopApplication() {
+    return isDesktopApplication();
+  }
+}
 
 export class AccountMenu {
   constructor() {
     this.restrict = 'E';
     this.template = template;
+    this.controller = AccountMenuCtrl;
+    this.controllerAs = 'ctrl';
+    this.bindToController = true;
     this.scope = {
-      onSuccessfulAuth: '&',
       closeFunction: '&'
     };
-  }
-
-  /* @ngInject */
-  controller(
-    $scope,
-    $rootScope,
-    authManager,
-    modelManager,
-    syncManager,
-    storageManager,
-    dbManager,
-    passcodeManager,
-    $timeout,
-    $compile,
-    archiveManager,
-    privilegesManager,
-    appVersion,
-    alertManager) {
-    'ngInject';
-
-    $scope.appVersion = "v" + (window.electronAppVersion || appVersion);
-    $scope.formData = {mergeLocal: true, ephemeral: false};
-
-    $scope.user = authManager.user;
-
-    syncManager.getServerURL().then((url) => {
-      $timeout(() => {
-        $scope.server = url;
-        $scope.formData.url = url;
-      })
-    })
-
-    authManager.checkForSecurityUpdate().then((available) => {
-        $scope.securityUpdateAvailable = available;
-    })
-
-    $scope.close = function() {
-      $timeout(() => {
-        $scope.closeFunction()();
-      })
-    }
-
-    $scope.encryptedBackupsAvailable = function() {
-      return authManager.user || passcodeManager.hasPasscode();
-    }
-
-    $scope.canAddPasscode = !authManager.isEphemeralSession();
-    $scope.syncStatus = syncManager.syncStatus;
-
-    $scope.submitMfaForm = function() {
-      var params = {};
-      params[$scope.formData.mfa.payload.mfa_key] = $scope.formData.userMfaCode;
-      $scope.login(params);
-    }
-
-    $scope.submitAuthForm = function() {
-      if(!$scope.formData.email || !$scope.formData.user_password) {
-        return;
-      }
-      if($scope.formData.showLogin) {
-        $scope.login();
-      } else {
-        $scope.register();
-      }
-    }
-
-    $scope.login = function(extraParams) {
-      // Prevent a timed sync from occuring while signing in. There may be a race condition where when
-      // calling `markAllItemsDirtyAndSaveOffline` during sign in, if an authenticated sync happens to occur
-      // right before that's called, items retreived from that sync will be marked as dirty, then resynced, causing mass duplication.
-      // Unlock sync after all sign in processes are complete.
-      syncManager.lockSyncing();
-
-      $scope.formData.status = "Generating Login Keys...";
-      $scope.formData.authenticating = true;
-      $timeout(function(){
-        authManager.login($scope.formData.url, $scope.formData.email, $scope.formData.user_password,
-          $scope.formData.ephemeral, $scope.formData.strictSignin, extraParams).then((response) => {
-            $timeout(() => {
-              if(!response || response.error) {
-
-                syncManager.unlockSyncing();
-
-                $scope.formData.status = null;
-                var error = response ? response.error : {message: "An unknown error occured."}
-
-                // MFA Error
-                if(error.tag == "mfa-required" || error.tag == "mfa-invalid") {
-                  $scope.formData.showLogin = false;
-                  $scope.formData.mfa = error;
-                }
-                // General Error
-                else {
-                  $scope.formData.showLogin = true;
-                  $scope.formData.mfa = null;
-                  if(error.message) {
-                    alertManager.alert({text: error.message});
-                  }
-                }
-
-                $scope.formData.authenticating = false;
-              }
-              // Success
-              else {
-                $scope.onAuthSuccess(() => {
-                  syncManager.unlockSyncing();
-                  syncManager.sync({performIntegrityCheck: true});
-                });
-              }
-            })
-        });
-      })
-    }
-
-    $scope.register = function() {
-      let confirmation = $scope.formData.password_conf;
-      if(confirmation !== $scope.formData.user_password) {
-        alertManager.alert({text: "The two passwords you entered do not match. Please try again."});
-        return;
-      }
-
-      $scope.formData.confirmPassword = false;
-      $scope.formData.status = "Generating Account Keys...";
-      $scope.formData.authenticating = true;
-
-      $timeout(function(){
-        authManager.register($scope.formData.url, $scope.formData.email, $scope.formData.user_password, $scope.formData.ephemeral).then((response) => {
-          $timeout(() => {
-            if(!response || response.error) {
-              $scope.formData.status = null;
-              var error = response ? response.error : {message: "An unknown error occured."}
-              $scope.formData.authenticating = false;
-              alertManager.alert({text: error.message});
-            } else {
-              $scope.onAuthSuccess(() => {
-                syncManager.sync();
-              });
-            }
-          })
-        });
-      })
-    }
-
-    $scope.mergeLocalChanged = function() {
-      if(!$scope.formData.mergeLocal) {
-        alertManager.confirm({text: "Unchecking this option means any of the notes you have written while you were signed out will be deleted. Are you sure you want to discard these notes?", destructive: true, onCancel: () => {
-          $scope.formData.mergeLocal = true;
-        }})
-      }
-    }
-
-    $scope.onAuthSuccess = function(callback) {
-      var block = function() {
-        $timeout(function(){
-          $scope.formData.authenticating = false;
-          $scope.onSuccessfulAuth()();
-          syncManager.refreshErroredItems();
-          callback && callback();
-        })
-      }
-
-      if($scope.formData.mergeLocal) {
-        // Allows desktop to make backup file
-        $rootScope.$broadcast("major-data-change");
-        $scope.clearDatabaseAndRewriteAllItems(true, block);
-      }
-      else {
-        modelManager.removeAllItemsFromMemory();
-        storageManager.clearAllModels().then(() => {
-          block();
-        })
-      }
-    }
-
-    $scope.openPasswordWizard = function(type) {
-      // Close the account menu
-      $scope.close();
-      authManager.presentPasswordWizard(type);
-    }
-
-    $scope.openPrivilegesModal = async function() {
-      $scope.close();
-
-      let run = () => {
-        $timeout(() => {
-          privilegesManager.presentPrivilegesManagementModal();
-        })
-      }
-
-      if(await privilegesManager.actionRequiresPrivilege(PrivilegesManager.ActionManagePrivileges)) {
-        privilegesManager.presentPrivilegesModal(PrivilegesManager.ActionManagePrivileges, () => {
-          run();
-        });
-      } else {
-        run();
-      }
-    }
-
-    // Allows indexeddb unencrypted logs to be deleted
-    // clearAllModels will remove data from backing store, but not from working memory
-    // See: https://github.com/standardnotes/desktop/issues/131
-    $scope.clearDatabaseAndRewriteAllItems = function(alternateUuids, callback) {
-      storageManager.clearAllModels().then(() => {
-        syncManager.markAllItemsDirtyAndSaveOffline(alternateUuids).then(() => {
-          callback && callback();
-        })
-      });
-    }
-
-    $scope.destroyLocalData = function() {
-      alertManager.confirm({text: "Are you sure you want to end your session? This will delete all local items and extensions.", destructive: true, onConfirm: () => {
-        authManager.signout(true).then(() => {
-          window.location.reload();
-        })
-      }})
-    }
-
-    /* Import/Export */
-
-    $scope.archiveFormData = {encrypted: $scope.encryptedBackupsAvailable() ? true : false};
-    $scope.user = authManager.user;
-
-    $scope.submitImportPassword = function() {
-      $scope.performImport($scope.importData.data, $scope.importData.password);
-    }
-
-    $scope.performImport = function(data, password) {
-      $scope.importData.loading = true;
-      // allow loading indicator to come up with timeout
-      $timeout(function(){
-        $scope.importJSONData(data, password, function(response, errorCount){
-          $timeout(function(){
-            $scope.importData.loading = false;
-            $scope.importData = null;
-
-            // Update UI before showing alert
-            setTimeout(function () {
-              // Response can be null if syncing offline
-              if(response && response.error) {
-                alertManager.alert({text: "There was an error importing your data. Please try again."});
-              } else {
-                if(errorCount > 0) {
-                  var message = `Import complete. ${errorCount} items were not imported because there was an error decrypting them. Make sure the password is correct and try again.`;
-                  alertManager.alert({text: message});
-                } else {
-                  alertManager.alert({text: "Your data has been successfully imported."})
-                }
-              }
-            }, 10);
-          })
-        })
-      })
-    }
-
-    $scope.importFileSelected = async function(files) {
-
-      let run = () => {
-        $timeout(() => {
-          $scope.importData = {};
-
-          var file = files[0];
-          var reader = new FileReader();
-          reader.onload = function(e) {
-            try {
-              var data = JSON.parse(e.target.result);
-              $timeout(function(){
-                if(data.auth_params) {
-                  // request password
-                  $scope.importData.requestPassword = true;
-                  $scope.importData.data = data;
-
-                  $timeout(() => {
-                    var element = document.getElementById("import-password-request");
-                    if(element) {
-                      element.scrollIntoView(false);
-                    }
-                  })
-                } else {
-                  $scope.performImport(data, null);
-                }
-              })
-            } catch (e) {
-                alertManager.alert({text: "Unable to open file. Ensure it is a proper JSON file and try again."});
-            }
-          }
-
-          reader.readAsText(file);
-        })
-      }
-
-      if(await privilegesManager.actionRequiresPrivilege(PrivilegesManager.ActionManageBackups)) {
-        privilegesManager.presentPrivilegesModal(PrivilegesManager.ActionManageBackups, () => {
-          run();
-        });
-      } else {
-        run();
-      }
-    }
-
-    $scope.importJSONData = function(data, password, callback) {
-      var onDataReady = async (errorCount) => {
-        var items = await modelManager.importItems(data.items);
-        for(var item of items) {
-          // We don't want to activate any components during import process in case of exceptions
-          // breaking up the import proccess
-          if(item.content_type == "SN|Component") { item.active = false; }
-        }
-
-        syncManager.sync().then((response) => {
-          // Response can be null if syncing offline
-          callback(response, errorCount);
-        });
-      }
-
-      if(data.auth_params) {
-        protocolManager.computeEncryptionKeysForUser(password, data.auth_params).then((keys) => {
-          try {
-            protocolManager.decryptMultipleItems(data.items, keys, false) /* throws = false as we don't want to interrupt all decryption if just one fails */
-            .then(() => {
-              // delete items enc_item_key since the user's actually key will do the encrypting once its passed off
-              data.items.forEach(function(item){
-                item.enc_item_key = null;
-                item.auth_hash = null;
-              });
-
-              var errorCount = 0;
-              // Don't import items that didn't decrypt properly
-              data.items = data.items.filter(function(item){
-                if(item.errorDecrypting) {
-                  errorCount++;
-                  return false;
-                }
-                return true;
-              })
-
-              onDataReady(errorCount);
-            })
-          }
-          catch (e) {
-            console.error("Error decrypting", e);
-            alertManager.alert({text: "There was an error decrypting your items. Make sure the password you entered is correct and try again."});
-            callback(null);
-            return;
-          }
-        });
-      } else {
-        onDataReady();
-      }
-    }
-
-    /*
-    Export
-    */
-
-    $scope.downloadDataArchive = async function() {
-      archiveManager.downloadBackup($scope.archiveFormData.encrypted);
-    }
-
-    /*
-    Encryption Status
-    */
-
-    $scope.notesAndTagsCount = function() {
-      var items = modelManager.allItemsMatchingTypes(["Note", "Tag"]);
-      return items.length;
-    }
-
-    $scope.encryptionStatusForNotes = function() {
-      var length = $scope.notesAndTagsCount();
-      return length + "/" + length + " notes and tags encrypted";
-    }
-
-    $scope.encryptionEnabled = function() {
-      return passcodeManager.hasPasscode() || !authManager.offline();
-    }
-
-    $scope.encryptionSource = function() {
-      if(!authManager.offline()) {
-        return "Account keys";
-      } else if(passcodeManager.hasPasscode()) {
-        return "Local Passcode";
-      } else {
-        return null;
-      }
-    }
-
-    $scope.encryptionStatusString = function() {
-      if(!authManager.offline()) {
-        return "End-to-end encryption is enabled. Your data is encrypted on your device first, then synced to your private cloud.";
-      } else if(passcodeManager.hasPasscode()) {
-        return "Encryption is enabled. Your data is encrypted using your passcode before it is saved to your device storage.";
-      } else {
-        return "Encryption is not enabled. Sign in, register, or add a passcode lock to enable encryption.";
-      }
-    }
-
-    /*
-    Passcode Lock
-    */
-
-    $scope.passcodeAutoLockOptions = passcodeManager.getAutoLockIntervalOptions();
-
-    $scope.reloadAutoLockInterval = function() {
-       passcodeManager.getAutoLockInterval().then((interval) => {
-         $timeout(() => {
-           $scope.selectedAutoLockInterval = interval;
-         })
-       })
-    }
-
-    $scope.reloadAutoLockInterval();
-
-    $scope.selectAutoLockInterval = async function(interval) {
-      let run = async () => {
-        await passcodeManager.setAutoLockInterval(interval);
-        $timeout(() => {
-          $scope.reloadAutoLockInterval();
-        });
-      }
-
-      if(await privilegesManager.actionRequiresPrivilege(PrivilegesManager.ActionManagePasscode)) {
-        privilegesManager.presentPrivilegesModal(PrivilegesManager.ActionManagePasscode, () => {
-          run();
-        });
-      } else {
-        run();
-      }
-    }
-
-    $scope.hasPasscode = function() {
-      return passcodeManager.hasPasscode();
-    }
-
-    $scope.addPasscodeClicked = function() {
-      $scope.formData.showPasscodeForm = true;
-    }
-
-    $scope.submitPasscodeForm = function() {
-      var passcode = $scope.formData.passcode;
-      if(passcode !== $scope.formData.confirmPasscode) {
-        alertManager.alert({text: "The two passcodes you entered do not match. Please try again."});
-        return;
-      }
-
-      let fn = $scope.formData.changingPasscode ? passcodeManager.changePasscode.bind(passcodeManager) : passcodeManager.setPasscode.bind(passcodeManager);
-
-      fn(passcode, () => {
-        $timeout(() => {
-          $scope.formData.passcode = null;
-          $scope.formData.confirmPasscode = null;
-          $scope.formData.showPasscodeForm = false;
-          var offline = authManager.offline();
-
-          if(offline) {
-            // Allows desktop to make backup file
-            $rootScope.$broadcast("major-data-change");
-            $scope.clearDatabaseAndRewriteAllItems(false);
-          }
-        })
-      })
-    }
-
-    $scope.changePasscodePressed = async function() {
-      let run = () => {
-        $timeout(() => {
-          $scope.formData.changingPasscode = true;
-          $scope.addPasscodeClicked();
-        })
-      }
-
-      if(await privilegesManager.actionRequiresPrivilege(PrivilegesManager.ActionManagePasscode)) {
-        privilegesManager.presentPrivilegesModal(PrivilegesManager.ActionManagePasscode, () => {
-          run();
-        });
-      } else {
-        run();
-      }
-    }
-
-    $scope.removePasscodePressed = async function() {
-      let run = () => {
-        $timeout(() => {
-          var signedIn = !authManager.offline();
-          var message = "Are you sure you want to remove your local passcode?";
-          if(!signedIn) {
-            message += " This will remove encryption from your local data.";
-          }
-
-          alertManager.confirm({text: message, destructive: true, onConfirm: () => {
-            passcodeManager.clearPasscode();
-
-            if(authManager.offline()) {
-              syncManager.markAllItemsDirtyAndSaveOffline();
-              // Don't create backup here, as if the user is temporarily removing the passcode to change it,
-              // we don't want to write unencrypted data to disk.
-              // $rootScope.$broadcast("major-data-change");
-            }
-          }})
-        })
-      }
-
-      if(await privilegesManager.actionRequiresPrivilege(PrivilegesManager.ActionManagePasscode)) {
-        privilegesManager.presentPrivilegesModal(PrivilegesManager.ActionManagePasscode, () => {
-          run();
-        });
-      } else {
-        run();
-      }
-    }
-
-    $scope.isDesktopApplication = function() {
-      return isDesktopApplication();
-    }
   }
 }

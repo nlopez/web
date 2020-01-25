@@ -1,6 +1,6 @@
 import angular from 'angular';
 import { StorageManager } from './storageManager';
-import { protocolManager, SFItem, SFPredicate, SFAuthManager } from 'snjs';
+import { protocolManager, SFAuthManager } from 'snjs';
 
 export class AuthManager extends SFAuthManager {
   /* @ngInject */
