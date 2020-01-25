@@ -5623,11 +5623,12 @@ var ActionsMenu = function ActionsMenu() {
 /*!*******************************************************************!*\
   !*** ./app/assets/javascripts/directives/views/componentModal.js ***!
   \*******************************************************************/
-/*! exports provided: ComponentModal */
+/*! exports provided: ComponentModalCtrl, ComponentModal */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ComponentModalCtrl", function() { return ComponentModalCtrl; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ComponentModal", function() { return ComponentModal; });
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
@@ -5638,43 +5639,50 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var ComponentModal =
+var ComponentModalCtrl =
 /*#__PURE__*/
 function () {
-  function ComponentModal() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, ComponentModal);
+  ComponentModalCtrl.$inject = ["$scope", "$element"];
 
-    this.restrict = 'E';
-    this.template = _directives_component_modal_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
-    this.scope = {
-      show: '=',
-      component: '=',
-      callback: '=',
-      onDismiss: '&'
-    };
+  /* @ngInject */
+  function ComponentModalCtrl($scope, $element) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, ComponentModalCtrl);
+
+    this.$element = $element;
+    this.$scope = $scope;
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(ComponentModal, [{
-    key: "link",
-    value: function link($scope, el, attrs) {
-      $scope.el = el;
-    }
-    /* @ngInject */
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(ComponentModalCtrl, [{
+    key: "dismiss",
+    value: function dismiss(callback) {
+      this.$element.remove();
+      this.$scope.$destroy();
 
-  }, {
-    key: "controller",
-    value: ["$scope", "$timeout", "componentManager", function controller($scope, $timeout, componentManager) {
-      $scope.dismiss = function (callback) {
-        $scope.el.remove();
-        $scope.$destroy();
-        $scope.onDismiss && $scope.onDismiss() && $scope.onDismiss()($scope.component);
-        callback && callback();
-      };
-    }]
+      if (this.onDismiss && this.onDismiss()) {
+        this.onDismiss()(this.component);
+      }
+
+      callback && callback();
+    }
   }]);
 
-  return ComponentModal;
+  return ComponentModalCtrl;
 }();
+var ComponentModal = function ComponentModal() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, ComponentModal);
+
+  this.restrict = 'E';
+  this.template = _directives_component_modal_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
+  this.controller = ComponentModalCtrl;
+  this.controllerAs = 'ctrl';
+  this.bindToController = true;
+  this.scope = {
+    show: '=',
+    component: '=',
+    callback: '=',
+    onDismiss: '&'
+  };
+};
 
 /***/ }),
 
@@ -68294,7 +68302,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sk-modal-background\" ng-click=\"dismiss()\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-modal-content\" ng-attr-id=\"component-content-outer-{{component.uuid}}\"\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel\" ng-attr-id=\"component-content-inner-{{component.uuid}}\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003E{{component.name}}\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"dismiss()\"\u003EClose\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Ccomponent-view class=\"component-view\" component=\"component\"\u003E\u003C\u002Fcomponent-view\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sk-modal-background\" ng-click=\"ctrl.dismiss()\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-modal-content\" ng-attr-id=\"component-content-outer-{{ctrl.component.uuid}}\"\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel\" ng-attr-id=\"component-content-inner-{{ctrl.component.uuid}}\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003E{{ctrl.component.name}}\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"ctrl.dismiss()\"\u003EClose\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Ccomponent-view class=\"component-view\" component=\"ctrl.component\"\u003E\u003C\u002Fcomponent-view\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),
