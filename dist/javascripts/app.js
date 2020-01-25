@@ -5481,25 +5481,30 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var ActionsMenu =
+
+var ActionsMenuCtrl =
 /*#__PURE__*/
 function () {
-  function ActionsMenu() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, ActionsMenu);
+  ActionsMenuCtrl.$inject = ["actionsManager"];
 
-    this.restrict = 'E';
-    this.template = _directives_actions_menu_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
-    this.scope = {
-      item: '='
-    };
-  }
   /* @ngInject */
+  function ActionsMenuCtrl(actionsManager) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, ActionsMenuCtrl);
 
+    this.actionsManager = actionsManager;
+  }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(ActionsMenu, [{
-    key: "controller",
-    value: ["$scope", "modelManager", "actionsManager", function controller($scope, modelManager, actionsManager) {
-      $scope.extensions = actionsManager.extensions.sort(function (a, b) {
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(ActionsMenuCtrl, [{
+    key: "$onInit",
+    value: function $onInit() {
+      this.loadExtensions();
+    }
+  }, {
+    key: "loadExtensions",
+    value: function loadExtensions() {
+      var _this = this;
+
+      this.extensions = this.actionsManager.extensions.sort(function (a, b) {
         return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
       });
       var _iteratorNormalCompletion = true;
@@ -5508,14 +5513,15 @@ function () {
 
       try {
         var _loop = function _loop() {
-          var ext = _step.value;
-          ext.loading = true;
-          actionsManager.loadExtensionInContextOfItem(ext, $scope.item, function (scopedExtension) {
-            ext.loading = false;
+          var extension = _step.value;
+          extension.loading = true;
+
+          _this.actionsManager.loadExtensionInContextOfItem(extension, _this.item, function (scopedExtension) {
+            extension.loading = false;
           });
         };
 
-        for (var _iterator = $scope.extensions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        for (var _iterator = this.extensions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
           _loop();
         }
       } catch (err) {
@@ -5532,72 +5538,84 @@ function () {
           }
         }
       }
+    }
+  }, {
+    key: "executeAction",
+    value: function executeAction(action, extension, parentAction) {
+      var _this2 = this;
 
-      $scope.executeAction = function (action, extension, parentAction) {
-        if (action.verb == "nested") {
-          if (!action.subrows) {
-            action.subrows = $scope.subRowsForAction(action, extension);
-          } else {
-            action.subrows = null;
-          }
+      if (action.verb === 'nested') {
+        if (!action.subrows) {
+          action.subrows = this.subRowsForAction(action, extension);
+        } else {
+          action.subrows = null;
+        }
 
+        return;
+      }
+
+      action.running = true;
+      this.actionsManager.executeAction(action, extension, this.item, function (response, error) {
+        if (error) {
           return;
         }
 
-        action.running = true;
-        actionsManager.executeAction(action, extension, $scope.item, function (response, error) {
-          if (error) {
-            return;
+        action.running = false;
+
+        _this2.handleActionResponse(action, response);
+
+        _this2.actionsManager.loadExtensionInContextOfItem(extension, _this2.item);
+      });
+    }
+  }, {
+    key: "handleActionResponse",
+    value: function handleActionResponse(action, response) {
+      switch (action.verb) {
+        case 'render':
+          {
+            var item = response.item;
+            this.actionsManager.presentRevisionPreviewModal(item.uuid, item.content);
           }
+      }
+    }
+  }, {
+    key: "subRowsForAction",
+    value: function subRowsForAction(parentAction, extension) {
+      var _this3 = this;
 
-          action.running = false;
-          $scope.handleActionResponse(action, response); // reload extension actions
+      if (!parentAction.subactions) {
+        return null;
+      }
 
-          actionsManager.loadExtensionInContextOfItem(extension, $scope.item, function (ext) {// keep nested state
-            // 4/1/2019: We're not going to do this anymore because we're no longer using nested actions for version history,
-            // and also because finding the parentAction based on only label is not good enough. Two actions can have same label.
-            // We'd need a way to track actions after they are reloaded, but there's no good way to do this.
-            // if(parentAction) {
-            //   var matchingAction = _.find(ext.actions, {label: parentAction.label});
-            //   matchingAction.subrows = $scope.subRowsForAction(parentAction, extension);
-            // }
-          });
-        });
-      };
-
-      $scope.handleActionResponse = function (action, response) {
-        switch (action.verb) {
-          case "render":
-            {
-              var item = response.item;
-              actionsManager.presentRevisionPreviewModal(item.uuid, item.content);
-            }
-        }
-      };
-
-      $scope.subRowsForAction = function (parentAction, extension) {
-        var _this = this;
-
-        if (!parentAction.subactions) {
-          return null;
-        }
-
-        return parentAction.subactions.map(function (subaction) {
-          return {
-            onClick: function onClick() {
-              _this.executeAction(subaction, extension, parentAction);
-            },
-            label: subaction.label,
-            subtitle: subaction.desc,
-            spinnerClass: subaction.running ? 'info' : null
-          };
-        });
-      };
-    }]
+      return parentAction.subactions.map(function (subaction) {
+        return {
+          onClick: function onClick() {
+            _this3.executeAction(subaction, extension, parentAction);
+          },
+          label: subaction.label,
+          subtitle: subaction.desc,
+          spinnerClass: subaction.running ? 'info' : null
+        };
+      });
+    }
   }]);
 
-  return ActionsMenu;
+  return ActionsMenuCtrl;
 }();
+
+var ActionsMenu = function ActionsMenu() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, ActionsMenu);
+
+  this.restrict = 'E';
+  this.scope = {
+    item: '='
+  };
+  this.template = _directives_actions_menu_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
+  this.replace = true;
+  this.controller = ActionsMenuCtrl;
+  this.controllerAs = 'ctrl';
+  this.bindToController = true;
+};
 
 /***/ }),
 
@@ -8182,18 +8200,16 @@ function () {
   }, {
     key: "loadExtensionInContextOfItem",
     value: function loadExtensionInContextOfItem(extension, item, callback) {
-      this.httpManager.getAbsolute(extension.url, {
+      var params = {
         content_type: item.content_type,
         item_uuid: item.uuid
-      }, function (response) {
+      };
+      this.httpManager.getAbsolute(extension.url, params, function (response) {
         this.updateExtensionFromRemoteResponse(extension, response);
         callback && callback(extension);
       }.bind(this), function (response) {
         console.error("Error loading extension", response);
-
-        if (callback) {
-          callback(null);
-        }
+        callback && callback(null);
       }.bind(this));
     }
   }, {
@@ -68264,7 +68280,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-menu-panel dropdown-menu\"\u003E\u003Ca class=\"no-decoration\" href=\"https:\u002F\u002Fstandardnotes.org\u002Fextensions\" ng-if=\"extensions.length == 0\" rel=\"noopener\" target=\"blank\"\u003E\u003Cmenu-row label=\"'Download Actions'\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fa\u003E\u003Cdiv ng-repeat=\"extension in extensions\"\u003E\u003Cdiv class=\"sk-menu-panel-header\" ng-click=\"extension.hide = !extension.hide; $event.stopPropagation();\"\u003E\u003Cdiv class=\"sk-menu-panel-column\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003E{{extension.name}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-spinner small loading\" ng-if=\"extension.loading\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"extension.hide\"\u003E…\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"executeAction(action, extension);\" label=\"action.label\" ng-if=\"!extension.hide\" ng-repeat=\"action in extension.actionsWithContextForItem(item)\" spinner-class=\"action.running ? 'info' : null\" sub-rows=\"action.subrows\" subtitle=\"action.desc\"\u003E\u003Cdiv class=\"sk-sublabel\" ng-if=\"action.access_type\"\u003EUses \u003Cstrong\u003E{{action.access_type}}\u003C\u002Fstrong\u003E access to this note.\u003C\u002Fdiv\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row faded=\"true\" label=\"'No Actions Available'\" ng-if=\"extension.actionsWithContextForItem(item).length == 0\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-menu-panel dropdown-menu\"\u003E\u003Ca class=\"no-decoration\" href=\"https:\u002F\u002Fstandardnotes.org\u002Fextensions\" ng-if=\"ctrl.extensions.length == 0\" rel=\"noopener\" target=\"blank\"\u003E\u003Cmenu-row label=\"'Download Actions'\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fa\u003E\u003Cdiv ng-repeat=\"extension in ctrl.extensions\"\u003E\u003Cdiv class=\"sk-menu-panel-header\" ng-click=\"extension.hide = !extension.hide; $event.stopPropagation();\"\u003E\u003Cdiv class=\"sk-menu-panel-column\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003E{{extension.name}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-spinner small loading\" ng-if=\"extension.loading\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"extension.hide\"\u003E…\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"ctrl.executeAction(action, extension);\" label=\"action.label\" ng-if=\"!extension.hide\" ng-repeat=\"action in extension.actionsWithContextForItem(ctrl.item)\" spinner-class=\"action.running ? 'info' : null\" sub-rows=\"action.subrows\" subtitle=\"action.desc\"\u003E\u003Cdiv class=\"sk-sublabel\" ng-if=\"action.access_type\"\u003EUses \u003Cstrong\u003E{{action.access_type}}\u003C\u002Fstrong\u003E access to this note.\u003C\u002Fdiv\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row faded=\"true\" label=\"'No Actions Available'\" ng-if=\"extension.actionsWithContextForItem(ctrl.item).length == 0\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),

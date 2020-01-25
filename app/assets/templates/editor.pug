@@ -170,7 +170,10 @@
           ng-click="ctrl.toggleMenu('showExtensions')"
           )
           .sk-label Actions
-          actions-menu(item='ctrl.note', ng-if='ctrl.showExtensions')
+          actions-menu(
+            item='ctrl.note', 
+            ng-if='ctrl.showExtensions'
+            )
         .sk-app-bar-item(
           click-outside='ctrl.showSessionHistory = false;', 
           is-open='ctrl.showSessionHistory', 

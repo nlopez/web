@@ -43,23 +43,29 @@ export class ActionsManager {
   relevant just to this item. The response extension is not saved, just displayed as a one-time thing.
   */
   loadExtensionInContextOfItem(extension, item, callback) {
-    this.httpManager.getAbsolute(extension.url, {content_type: item.content_type, item_uuid: item.uuid}, function(response){
+    const params = {
+      content_type: item.content_type,
+      item_uuid: item.uuid
+    };
+    this.httpManager.getAbsolute(extension.url, params, function(response){
       this.updateExtensionFromRemoteResponse(extension, response);
       callback && callback(extension);
     }.bind(this), function(response){
       console.error("Error loading extension", response);
-      if(callback) {
-        callback(null);
-      }
+      callback && callback(null);
     }.bind(this))
   }
 
   updateExtensionFromRemoteResponse(extension, response) {
-    if(response.description) { extension.description = response.description; }
-    if(response.supported_types) { extension.supported_types = response.supported_types; }
+    if(response.description) {
+      extension.description = response.description;
+    }
+    if(response.supported_types) {
+      extension.supported_types = response.supported_types;
+    }
 
     if(response.actions) {
-      extension.actions = response.actions.map(function(action){
+      extension.actions = response.actions.map((action) => {
         return new Action(action);
       })
     } else {
