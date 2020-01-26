@@ -1,306 +1,339 @@
 import angular from 'angular';
 import template from '%/directives/panel-resizer.pug';
+import { debounce } from '@/utils';
+
+const PANEL_SIDE_RIGHT = 'right';
+const PANEL_SIDE_LEFT  = 'left';
+
+const MOUSE_EVENT_MOVE    = 'mousemove';
+const MOUSE_EVENT_DOWN    = 'mousedown';
+const MOUSE_EVENT_UP      = 'mouseup';
+
+const WINDOW_EVENT_RESIZE = 'resize';
+
+const PANEL_CSS_CLASS_HOVERABLE       = 'hoverable';
+const PANEL_CSS_CLASS_ALWAYS_VISIBLE  = 'always-visible';
+const PANEL_CSS_CLASS_DRAGGING        = 'dragging';
+const PANEL_CSS_CLASS_NO_SELECTION    = 'no-selection';
+const PANEL_CSS_CLASS_COLLAPSED       = 'collapsed';
+const PANEL_CSS_CLASS_ANIMATE_OPACITY = 'animate-opacity';
+
+class PanelResizerCtrl {
+  /* @ngInject */
+  constructor(
+    $compile,
+    $element,
+    $scope,
+    $timeout,
+  ) {
+    this.$compile = $compile;
+    this.$element = $element;
+    this.$scope = $scope;
+    this.$timeout = $timeout;
+  }
+
+  $onInit() {
+    this.configureControl();
+    this.configureDefaults();
+    this.addDoubleClickHandler();
+    this.reloadDefaultValues();
+    this.addMouseDownListener();
+    this.addMouseMoveListener();
+    this.addMouseUpListener();
+  }
+
+  configureControl() {
+    this.control.setWidth = (value) => {
+      this.setWidth(value, true);
+    };
+
+    this.control.setLeft = (value) => {
+      this.setLeft(value);
+    };
+
+    this.control.flash = () => {
+      this.flash();
+    };
+
+    this.control.isCollapsed = () => {
+      return this.isCollapsed();
+    };
+  }
+
+  configureDefaults() {
+    this.panel = document.getElementById(this.panelId);
+    if (!this.panel) {
+      console.error('Panel not found for', this.panelId);
+    }
+
+    this.resizerColumn = this.$element[0];
+    this.currentMinWidth = this.minWidth || this.resizerColumn.offsetWidth;
+    this.pressed = false;
+    this.startWidth = this.panel.scrollWidth;
+    this.lastDownX = 0;
+    this.collapsed = false;
+    this.lastWidth = this.startWidth;
+    this.startLeft = this.panel.offsetLeft;
+    this.lastLeft = this.startLeft;
+    this.appFrame = null;
+    this.widthBeforeLastDblClick = 0;
+
+    if (this.property === PANEL_SIDE_RIGHT) {
+      this.configureRightPanel();
+    }
+    if (this.alwaysVisible) {
+      this.resizerColumn.classList.add(PANEL_CSS_CLASS_ALWAYS_VISIBLE);
+    }
+    if (this.hoverable) {
+      this.resizerColumn.classList.add(PANEL_CSS_CLASS_HOVERABLE);
+    }
+  }
+
+  configureRightPanel() {
+    const handleResize = debounce(event => {
+      this.reloadDefaultValues();
+      this.handleWidthEvent();
+      this.$timeout(() => {
+        this.finishSettingWidth();
+      });
+    }, 250);
+    window.addEventListener(WINDOW_EVENT_RESIZE, handleResize);
+    this.$scope.$on('$destroy', () => {
+      window.removeEventListener(WINDOW_EVENT_RESIZE, handleResize);
+    });
+  }
+
+  getParentRect() {
+    return this.panel.parentNode.getBoundingClientRect();
+  }
+
+  reloadDefaultValues() {
+    this.startWidth = this.isAtMaxWidth()
+      ? this.getParentRect().width
+      : this.panel.scrollWidth;
+    this.lastWidth = this.startWidth;
+    this.appFrame = document.getElementById('app').getBoundingClientRect();
+  }
+
+  addDoubleClickHandler() {
+    this.resizerColumn.ondblclick = () => {
+      this.$timeout(() => {
+        const preClickCollapseState = this.isCollapsed();
+        if (preClickCollapseState) {
+          this.setWidth(this.widthBeforeLastDblClick || this.defaultWidth);
+        } else {
+          this.widthBeforeLastDblClick = this.lastWidth;
+          this.setWidth(this.currentMinWidth);
+        }
+
+        this.finishSettingWidth();
+
+        const newCollapseState = !preClickCollapseState;
+        this.onResizeFinish()(
+          this.lastWidth,
+          this.lastLeft,
+          this.isAtMaxWidth(),
+          newCollapseState
+        );
+      });
+    };
+  }
+
+  addMouseDownListener() {
+    this.resizerColumn.addEventListener(MOUSE_EVENT_DOWN, (event) => {
+      this.addInvisibleOverlay();
+      this.pressed = true;
+      this.lastDownX = event.clientX;
+      this.startWidth = this.panel.scrollWidth;
+      this.startLeft = this.panel.offsetLeft;
+      this.panel.classList.add(PANEL_CSS_CLASS_NO_SELECTION);
+      if (this.hoverable) {
+        this.resizerColumn.classList.add(PANEL_CSS_CLASS_DRAGGING);
+      }
+    });
+  }
+
+  addMouseMoveListener() {
+    document.addEventListener(MOUSE_EVENT_MOVE, (event) => {
+      if (!this.pressed) {
+        return;
+      }
+      event.preventDefault();
+      if (this.property && this.property === PANEL_SIDE_LEFT) {
+        this.handleLeftEvent(event);
+      } else {
+        this.handleWidthEvent(event);
+      }
+    });
+  }
+
+  handleWidthEvent(event) {
+    let x;
+    if (event) {
+      x = event.clientX;
+    } else {
+      /** Coming from resize event */
+      x = 0;
+      this.lastDownX = 0;
+    }
+
+    const deltaX = x - this.lastDownX;
+    const newWidth = this.startWidth + deltaX;
+    this.setWidth(newWidth, false);
+    if (this.onResize()) {
+      this.onResize()(this.lastWidth, this.panel);
+    }
+  }
+
+  handleLeftEvent(event) {
+    const panelRect = this.panel.getBoundingClientRect();
+    const x = event.clientX || panelRect.x;
+    let deltaX = x - this.lastDownX;
+    let newLeft = this.startLeft + deltaX;
+    if (newLeft < 0) {
+      newLeft = 0;
+      deltaX = -this.startLeft;
+    }
+    const parentRect = this.getParentRect();
+    let newWidth = this.startWidth - deltaX;
+    if (newWidth < this.currentMinWidth) {
+      newWidth = this.currentMinWidth;
+    }
+    if (newWidth > parentRect.width) {
+      newWidth = parentRect.width;
+    }
+    if (newLeft + newWidth > parentRect.width) {
+      newLeft = parentRect.width - newWidth;
+    }
+    this.setLeft(newLeft, false);
+    this.setWidth(newWidth, false);
+  }
+
+  addMouseUpListener() {
+    document.addEventListener(MOUSE_EVENT_UP, event => {
+      this.removeInvisibleOverlay();
+      if (this.pressed) {
+        this.pressed = false;
+        this.resizerColumn.classList.remove(PANEL_CSS_CLASS_DRAGGING);
+        this.panel.classList.remove(PANEL_CSS_CLASS_NO_SELECTION);
+        const isMaxWidth = this.isAtMaxWidth();
+        if (this.onResizeFinish) {
+          this.onResizeFinish()(
+            this.lastWidth,
+            this.lastLeft,
+            isMaxWidth,
+            this.isCollapsed()
+          );
+        }
+        this.finishSettingWidth();
+      }
+    });
+  }
+
+  isAtMaxWidth() {
+    return (
+      Math.round(this.lastWidth + this.lastLeft) === 
+      Math.round(this.getParentRect().width)
+    );
+  }
+
+  isCollapsed() {
+    return this.lastWidth <= this.currentMinWidth;
+  }
+
+  setWidth(width, finish) {
+    if (width < this.currentMinWidth) {
+      width = this.currentMinWidth;
+    }
+    const parentRect = this.getParentRect();
+    if (width > parentRect.width) {
+      width = parentRect.width;
+    }
+
+    const maxWidth = this.appFrame.width - this.panel.getBoundingClientRect().x;
+    if (width > maxWidth) {
+      width = maxWidth;
+    }
+    if (Math.round(width + this.lastLeft) === Math.round(parentRect.width)) {
+      this.panel.style.width = `calc(100% - ${this.lastLeft}px)`;
+      this.panel.style.flexBasis = `calc(100% - ${this.lastLeft}px)`;
+    } else {
+      this.panel.style.flexBasis = width + 'px';
+      this.panel.style.width = width + 'px';
+    }
+    this.lastWidth = width;
+    if (finish) {
+      this.finishSettingWidth();
+    }
+  }
+
+  setLeft(left) {
+    this.panel.style.left = left + 'px';
+    this.lastLeft = left;
+  }
+
+  finishSettingWidth() {
+    if (!this.collapsable) {
+      return;
+    }
+
+    this.collapsed = this.isCollapsed();
+    if (this.collapsed) {
+      this.resizerColumn.classList.add(PANEL_CSS_CLASS_COLLAPSED);
+    } else {
+      this.resizerColumn.classList.remove(PANEL_CSS_CLASS_COLLAPSED);
+    }
+  }
+
+  /**
+   * If an iframe is displayed adjacent to our panel, and the mouse exits over the iframe,
+   * document[onmouseup] is not triggered because the document is no longer the same over 
+   * the iframe. We add an invisible overlay while resizing so that the mouse context 
+   * remains in our main document.
+   */
+  addInvisibleOverlay() {
+    if (this.overlay) {
+      return;
+    }
+    this.overlay = this.$compile(`<div id='resizer-overlay'></div>`)(this.$scope);
+    angular.element(document.body).prepend(this.overlay);
+  }
+
+  removeInvisibleOverlay() {
+    if (this.overlay) {
+      this.overlay.remove();
+      this.overlay = null;
+    }
+  }
+
+  flash() {
+    const FLASH_DURATION = 3000;
+    this.resizerColumn.classList.add(PANEL_CSS_CLASS_ANIMATE_OPACITY);
+    this.$timeout(() => {
+      this.resizerColumn.classList.remove(PANEL_CSS_CLASS_ANIMATE_OPACITY);
+    }, FLASH_DURATION);
+  }
+}
 
 export class PanelResizer {
   constructor() {
     this.restrict = 'E';
     this.template = template;
+    this.controller = PanelResizerCtrl;
+    this.controllerAs = 'ctrl';
+    this.bindToController = true;
     this.scope = {
-      index: '=',
-      panelId: '=',
-      onResize: '&',
-      defaultWidth: '=',
-      onResizeFinish: '&',
-      control: '=',
       alwaysVisible: '=',
-      minWidth: '=',
-      property: '=',
+      collapsable: '=',
+      control: '=',
+      defaultWidth: '=',
       hoverable: '=',
-      collapsable: '='
+      index: '=',
+      minWidth: '=',
+      onResize: '&',
+      onResizeFinish: '&',
+      panelId: '=',
+      property: '='
     };
   }
-
-  link(scope, elem, attrs, ctrl) {
-    scope.elem = elem;
-
-    scope.control.setWidth = function(value) {
-      scope.setWidth(value, true);
-    }
-
-    scope.control.setLeft = function(value) {
-      scope.setLeft(value);
-    }
-
-    scope.control.flash = function() {
-      scope.flash();
-    }
-
-    scope.control.isCollapsed = function() {
-      return scope.isCollapsed();
-    }
-  }
-
-  /* @ngInject */
-  controller($scope, $element, modelManager, actionsManager, $timeout, $compile) {
-    let panel = document.getElementById($scope.panelId);
-    if(!panel) {
-      console.error("Panel not found for", $scope.panelId);
-    }
-
-    let resizerColumn = $element[0];
-    let resizerWidth = resizerColumn.offsetWidth;
-    let minWidth = $scope.minWidth || resizerWidth;
-    var pressed = false;
-    var startWidth = panel.scrollWidth, startX = 0, lastDownX = 0, collapsed, lastWidth = startWidth, startLeft = panel.offsetLeft, lastLeft = startLeft;
-    var appFrame;
-
-    $scope.isAtMaxWidth = function() {
-      return Math.round((lastWidth + lastLeft)) == Math.round(getParentRect().width);
-    }
-
-    $scope.isCollapsed = function() {
-      return lastWidth <= minWidth;
-    }
-
-    // Handle Double Click Event
-    var widthBeforeLastDblClick = 0;
-    resizerColumn.ondblclick = () => {
-      $timeout(() => {
-        var preClickCollapseState = $scope.isCollapsed();
-        if(preClickCollapseState) {
-          $scope.setWidth(widthBeforeLastDblClick || $scope.defaultWidth);
-        } else {
-          widthBeforeLastDblClick = lastWidth;
-          $scope.setWidth(minWidth);
-        }
-
-        $scope.finishSettingWidth();
-
-        var newCollapseState = !preClickCollapseState;
-        $scope.onResizeFinish()(lastWidth, lastLeft, $scope.isAtMaxWidth(), newCollapseState);
-      })
-    }
-
-    function getParentRect() {
-      return panel.parentNode.getBoundingClientRect();
-    }
-
-    if($scope.property == "right") {
-      let handleReize = debounce((event) => {
-        reloadDefaultValues();
-        handleWidthEvent();
-        $timeout(() => { $scope.finishSettingWidth(); })
-      }, 250);
-
-      window.addEventListener('resize', handleReize);
-
-      $scope.$on("$destroy", function() {
-        window.removeEventListener('resize', handleReize);
-      });
-    }
-
-    function reloadDefaultValues() {
-      startWidth = $scope.isAtMaxWidth() ? getParentRect().width : panel.scrollWidth;
-      lastWidth = startWidth;
-      appFrame = document.getElementById("app").getBoundingClientRect();
-    }
-    reloadDefaultValues();
-
-    if($scope.alwaysVisible) {
-      resizerColumn.classList.add("always-visible");
-    }
-
-    if($scope.hoverable) {
-      resizerColumn.classList.add("hoverable");
-    }
-
-    $scope.setWidth = function(width, finish) {
-      if(width < minWidth) {
-        width = minWidth;
-      }
-
-      let parentRect = getParentRect();
-
-      if(width > parentRect.width) {
-        width = parentRect.width;
-      }
-
-      let maxWidth = appFrame.width - panel.getBoundingClientRect().x;
-      if(width > maxWidth) {
-        width = maxWidth;
-      }
-
-      if((Math.round(width + lastLeft)) == Math.round(parentRect.width)) {
-        panel.style.width = `calc(100% - ${lastLeft}px)`;
-        panel.style.flexBasis = `calc(100% - ${lastLeft}px)`;
-      } else {
-        panel.style.flexBasis = width + "px";
-        panel.style.width = width + "px";
-      }
-
-      lastWidth = width;
-
-      if(finish) {
-        $scope.finishSettingWidth();
-      }
-    }
-
-    $scope.setLeft = function(left) {
-      panel.style.left = left + "px";
-      lastLeft = left;
-    }
-
-    $scope.finishSettingWidth = function() {
-      if(!$scope.collapsable) {
-        return;
-      }
-
-      collapsed = $scope.isCollapsed();
-      if(collapsed) {
-        resizerColumn.classList.add("collapsed");
-      } else {
-        resizerColumn.classList.remove("collapsed");
-      }
-    }
-
-    /*
-      If an iframe is displayed adjacent to our panel, and your mouse exits over the iframe,
-      document[onmouseup] is not triggered because the document is no longer the same over the iframe.
-      We add an invisible overlay while resizing so that the mouse context remains in our main document.
-     */
-    $scope.addInvisibleOverlay = function() {
-      if($scope.overlay) {
-        return;
-      }
-
-      $scope.overlay = $compile("<div id='resizer-overlay'></div>")($scope);
-      angular.element(document.body).prepend($scope.overlay);
-    }
-
-    $scope.removeInvisibleOverlay = function() {
-      if($scope.overlay) {
-        $scope.overlay.remove();
-        $scope.overlay = null;
-      }
-    }
-
-    $scope.flash = function() {
-      resizerColumn.classList.add("animate-opacity");
-      $timeout(() => {
-        resizerColumn.classList.remove("animate-opacity");
-      }, 3000)
-    }
-
-    resizerColumn.addEventListener("mousedown", function(event){
-      $scope.addInvisibleOverlay();
-
-      pressed = true;
-      lastDownX = event.clientX;
-      startWidth = panel.scrollWidth;
-      startLeft = panel.offsetLeft;
-      panel.classList.add("no-selection");
-
-      if($scope.hoverable) {
-        resizerColumn.classList.add("dragging");
-      }
-    })
-
-    document.addEventListener("mousemove", function(event){
-      if(!pressed) {
-        return;
-      }
-
-      event.preventDefault();
-
-      if($scope.property && $scope.property == 'left') {
-        handleLeftEvent(event);
-      } else {
-        handleWidthEvent(event);
-      }
-    })
-
-    function handleWidthEvent(event) {
-      let x;
-      if(event) {
-        x = event.clientX;
-      } else {
-        // coming from resize event
-        x = 0;
-        lastDownX = 0;
-      }
-
-      let deltaX = x - lastDownX;
-      var newWidth = startWidth + deltaX;
-
-      $scope.setWidth(newWidth, false);
-
-      if($scope.onResize()) {
-        $scope.onResize()(lastWidth, panel);
-      }
-    }
-
-    function handleLeftEvent(event) {
-      var panelRect = panel.getBoundingClientRect();
-      var x = event.clientX || panelRect.x;
-      let deltaX = x - lastDownX;
-      var newLeft = startLeft + deltaX;
-      if(newLeft < 0) {
-        newLeft = 0;
-        deltaX = -startLeft;
-      }
-
-      let parentRect = getParentRect();
-
-      var newWidth = startWidth - deltaX;
-      if(newWidth < minWidth) {
-        newWidth = minWidth;
-      }
-
-      if(newWidth > parentRect.width) {
-        newWidth = parentRect.width;
-      }
-
-
-      if(newLeft + newWidth > parentRect.width) {
-        newLeft = parentRect.width - newWidth;
-      }
-
-      $scope.setLeft(newLeft, false);
-      $scope.setWidth(newWidth, false);
-    }
-
-    document.addEventListener("mouseup", (event) => {
-      $scope.removeInvisibleOverlay();
-
-      if(pressed) {
-        pressed = false;
-        resizerColumn.classList.remove("dragging");
-        panel.classList.remove("no-selection");
-
-        let isMaxWidth = $scope.isAtMaxWidth();
-
-        if($scope.onResizeFinish) {
-          $scope.onResizeFinish()(lastWidth, lastLeft, isMaxWidth, $scope.isCollapsed());
-        }
-
-        $scope.finishSettingWidth();
-      }
-    })
-  }
 }
-
-/* via https://davidwalsh.name/javascript-debounce-function */
-function debounce(func, wait, immediate) {
-	var timeout;
-	return function() {
-		var context = this, args = arguments;
-		var later = function() {
-			timeout = null;
-			if (!immediate) func.apply(context, args);
-		};
-		var callNow = immediate && !timeout;
-		clearTimeout(timeout);
-		timeout = setTimeout(later, wait);
-		if (callNow) func.apply(context, args);
-	};
-};
