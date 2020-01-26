@@ -64,8 +64,10 @@ class AccountMenuCtrl {
       encrypted: this.encryptedBackupsAvailable() ? true : false
     };
     this.syncManager.getServerURL().then((url) => {
-      this.server = url;
-      this.formData.url = url;
+      this.$timeout(() => {
+        this.server = url;
+        this.formData.url = url;
+      })
     })
     this.authManager.checkForSecurityUpdate().then((available) => {
       this.securityUpdateAvailable = available;

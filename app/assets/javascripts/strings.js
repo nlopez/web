@@ -46,3 +46,6 @@ export const STRING_INVALID_IMPORT_FILE               = "Unable to open file. En
 export function StringImportError({errorCount}) {
   return `Import complete. ${errorCount} items were not imported because there was an error decrypting them. Make sure the password is correct and try again.`;
 }
+
+/** @password_change */
+export const STRING_FAILED_PASSWORD_CHANGE = "There was an error re-encrypting your items. Your password was changed, but not all your items were properly re-encrypted and synced. You should try syncing again. If all else fails, you should restore your notes from backup.";

@@ -1,260 +1,284 @@
 import { protocolManager } from 'snjs';
 import template from '%/directives/password-wizard.pug';
+import { STRING_FAILED_PASSWORD_CHANGE } from '@/strings';
+
+const DEFAULT_CONTINUE_TITLE = "Continue";
+const Steps = {
+  IntroStep:    0,
+  BackupStep:   1,
+  SignoutStep:  2,
+  PasswordStep: 3,
+  SyncStep:     4,
+  FinishStep:   5
+}
+
+class PasswordWizardCtrl { 
+  /* @ngInject */
+  constructor(
+    $element,
+    $scope,
+    $timeout,
+    alertManager,
+    archiveManager,
+    authManager,
+    modelManager,
+    syncManager,
+  ) {
+    this.$element = $element;
+    this.$timeout = $timeout;
+    this.$scope = $scope;
+    this.alertManager = alertManager;
+    this.archiveManager = archiveManager;
+    this.authManager = authManager;
+    this.modelManager = modelManager;
+    this.syncManager = syncManager;
+    this.registerWindowUnloadStopper();
+  }
+  
+  $onInit() {
+    this.syncStatus = this.syncManager.syncStatus;
+    this.formData = {};
+    this.configureDefaults();
+  }
+
+  configureDefaults() {
+    if (this.type === 'change-pw') {
+      this.title = "Change Password";
+      this.changePassword = true;
+    } else if (this.type === 'upgrade-security') {
+      this.title = "Security Update";
+      this.securityUpdate = true;
+    }
+    this.continueTitle = DEFAULT_CONTINUE_TITLE;
+    this.step = Steps.IntroStep;
+  }
+  
+  /** Confirms with user before closing tab */
+  registerWindowUnloadStopper() {
+    window.onbeforeunload = (e) => {
+      return true;
+    };
+    this.$scope.$on("$destroy", () => {
+      window.onbeforeunload = null;
+    });
+  }
+
+  titleForStep(step) {
+    switch (step) {
+      case Steps.BackupStep:
+        return "Download a backup of your data";
+      case Steps.SignoutStep:
+        return "Sign out of all your devices";
+      case Steps.PasswordStep:
+        return this.changePassword 
+          ? "Password information" 
+          : "Enter your current password";
+      case Steps.SyncStep:
+        return "Encrypt and sync data with new keys";
+      case Steps.FinishStep:
+        return "Sign back in to your devices";
+      default:
+        return null;
+    }
+  }
+
+  async nextStep() {
+    if (this.lockContinue || this.isContinuing) {
+      return;
+    }
+    this.isContinuing = true;
+    if (this.step === Steps.FinishStep) {
+      this.dismiss();
+      return;
+    }
+    const next = () => {
+      this.step++;
+      this.initializeStep(this.step);
+      this.isContinuing = false;
+    }
+    const preprocessor = this.preprocessorForStep(this.step);
+    if (preprocessor) {
+      await preprocessor().then(next).catch(() => {
+        this.isContinuing = false;
+      })
+    } else {
+      next();
+    }
+  }
+
+  preprocessorForStep(step) {
+    if (step === Steps.PasswordStep) {
+      return async () => {
+        this.showSpinner = true;
+        this.continueTitle = "Generating Keys...";
+        const success = await this.validateCurrentPassword();
+        this.showSpinner = false;
+        this.continueTitle = DEFAULT_CONTINUE_TITLE;
+        return success;
+      }
+    }
+  }
+
+  async initializeStep(step) {
+    if (step === Steps.SyncStep) {
+      await this.initializeSyncingStep();
+    } else if (step === Steps.FinishStep) {
+      this.continueTitle = "Finish";
+    }
+  }
+
+  async initializeSyncingStep() {
+    this.lockContinue = true;
+    this.formData.status = "Processing encryption keys...";
+    this.formData.processing = true;
+    
+    const passwordSuccess = await this.processPasswordChange();
+    this.formData.statusError = !passwordSuccess;
+    this.formData.processing = passwordSuccess;
+    if(!passwordSuccess) {
+      this.formData.status = "Unable to process your password. Please try again.";
+      return;
+    }
+    this.formData.status = "Encrypting and syncing data with new keys...";
+    
+    const syncSuccess = await this.resyncData();
+    this.formData.statusError = !syncSuccess;
+    this.formData.processing = !syncSuccess;
+    if (syncSuccess) {
+      this.lockContinue = false;
+      if (this.changePassword) {
+        this.formData.status = "Successfully changed password and synced all items.";
+      } else if (this.securityUpdate) {
+        this.formData.status = "Successfully performed security update and synced all items.";
+      }
+    } else {
+      this.formData.status = STRING_FAILED_PASSWORD_CHANGE;
+    }
+  }
+
+  async validateCurrentPassword() {
+    const currentPassword = this.formData.currentPassword;
+    const newPass = this.securityUpdate ? currentPassword : this.formData.newPassword;
+    if (!currentPassword || currentPassword.length === 0) {
+      this.alertManager.alert({ 
+        text: "Please enter your current password." 
+      });
+      return false;
+    }
+    if (this.changePassword) {
+      if (!newPass || newPass.length === 0) {
+        this.alertManager.alert({ 
+          text: "Please enter a new password." 
+        });
+        return false;
+      }
+      if (newPass !== this.formData.newPasswordConfirmation) {
+        this.alertManager.alert({ 
+          text: "Your new password does not match its confirmation." 
+        });
+        this.formData.status = null;
+        return false;
+      }
+    }
+    if (!this.authManager.user.email) {
+      this.alertManager.alert({ 
+        text: "We don't have your email stored. Please log out then log back in to fix this issue." 
+      });
+      this.formData.status = null;
+      return false;
+    }
+
+    /** Validate current password */
+    const authParams = await this.authManager.getAuthParams();
+    const password = this.formData.currentPassword;
+    const keys = await protocolManager.computeEncryptionKeysForUser(
+      password, 
+      authParams
+    );
+    const success = keys.mk === (await this.authManager.keys()).mk;
+    if (success) {
+      this.currentServerPw = keys.pw;
+    } else {
+      this.alertManager.alert({ 
+        text: "The current password you entered is not correct. Please try again." 
+      });
+    }
+    return success;
+  }
+
+  async resyncData() {
+    await this.modelManager.setAllItemsDirty();
+    const response = await this.syncManager.sync();
+    if (!response || response.error) {
+      this.alertManager.alert({ 
+        text: STRING_FAILED_PASSWORD_CHANGE 
+      })
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  async processPasswordChange() {
+    const newUserPassword = this.securityUpdate 
+      ? this.formData.currentPassword 
+      : this.formData.newPassword;
+    const currentServerPw = this.currentServerPw;
+    const results = await protocolManager.generateInitialKeysAndAuthParamsForUser(
+      this.authManager.user.email, 
+      newUserPassword
+    );
+    const newKeys = results.keys;
+    const newAuthParams = results.authParams;
+    /** 
+     * Perform a sync beforehand to pull in any last minutes changes before we change 
+     * the encryption key (and thus cant decrypt new changes).
+     */ 
+    await this.syncManager.sync();
+    const response = await this.authManager.changePassword(
+      await this.syncManager.getServerURL(), 
+      this.authManager.user.email, 
+      currentServerPw, 
+      newKeys, 
+      newAuthParams
+    );
+    if (response.error) {
+      this.alertManager.alert({ 
+        text: response.error.message 
+          ? response.error.message 
+          : "There was an error changing your password. Please try again." 
+        });
+        return false;
+    } else {
+      return true;
+    }
+  }
+
+  downloadBackup(encrypted) {
+    this.archiveManager.downloadBackup(encrypted);
+  }
+
+  dismiss() {
+    if (this.lockContinue) {
+      this.alertManager.alert({
+        text: "Cannot close window until pending tasks are complete."
+      });
+    } else {
+      this.$element.remove();
+      this.$scope.$destroy();
+    }
+  }
+}
 
 export class PasswordWizard {
   constructor() {
     this.restrict = 'E';
     this.template = template;
+    this.controller = PasswordWizardCtrl;
+    this.controllerAs = 'ctrl';
+    this.bindToController = true;
     this.scope = {
       type: '='
     };
-  }
-
-  link($scope, el, attrs) {
-    $scope.el = el;
-  }
-
-  /* @ngInject */
-  controller($scope, modelManager, archiveManager, authManager, syncManager, $timeout, alertManager) {
-
-    window.onbeforeunload = (e) => {
-      // Confirms with user to close tab before closing
-      return true;
-    };
-
-    $scope.$on("$destroy", function() {
-      window.onbeforeunload = null;
-    });
-
-    $scope.dismiss = function() {
-      if($scope.lockContinue) {
-        alertManager.alert({text: "Cannot close window until pending tasks are complete."});
-        return;
-      }
-      $scope.el.remove();
-      $scope.$destroy();
-    }
-
-    $scope.syncStatus = syncManager.syncStatus;
-    $scope.formData = {};
-
-    const IntroStep = 0;
-    const BackupStep = 1;
-    const SignoutStep = 2;
-    const PasswordStep = 3;
-    const SyncStep = 4;
-    const FinishStep = 5;
-
-    let DefaultContinueTitle = "Continue";
-    $scope.continueTitle = DefaultContinueTitle;
-
-    $scope.step = IntroStep;
-
-    $scope.titleForStep = function(step) {
-      switch (step) {
-        case BackupStep:
-          return "Download a backup of your data";
-        case SignoutStep:
-          return "Sign out of all your devices";
-        case PasswordStep:
-          return $scope.changePassword ? "Password information" : "Enter your current password";
-        case SyncStep:
-          return "Encrypt and sync data with new keys";
-        case FinishStep:
-          return "Sign back in to your devices";
-        default:
-          return null;
-      }
-    }
-
-    $scope.configure = function() {
-      if($scope.type == "change-pw") {
-        $scope.title = "Change Password";
-        $scope.changePassword = true;
-      } else if($scope.type == "upgrade-security") {
-        $scope.title = "Security Update";
-        $scope.securityUpdate = true;
-      }
-    }();
-
-    $scope.continue = function() {
-
-      if($scope.lockContinue || $scope.isContinuing) {
-        return;
-      }
-
-      // isContinuing is a way to lock the continue function separate from lockContinue
-      // lockContinue can be locked by other places, but isContinuing is only lockable from within this function.
-
-      $scope.isContinuing = true;
-
-      if($scope.step == FinishStep) {
-        $scope.dismiss();
-        return;
-      }
-
-      let next = () => {
-        $scope.step += 1;
-        $scope.initializeStep($scope.step);
-
-        $scope.isContinuing = false;
-      }
-
-      var preprocessor = $scope.preprocessorForStep($scope.step);
-      if(preprocessor) {
-        preprocessor(() => {
-          next();
-        }, () => {
-          // on fail
-          $scope.isContinuing = false;
-        })
-      } else {
-        next();
-      }
-    }
-
-    $scope.downloadBackup = function(encrypted) {
-      archiveManager.downloadBackup(encrypted);
-    }
-
-    $scope.preprocessorForStep = function(step) {
-      if(step == PasswordStep) {
-        return (onSuccess, onFail) => {
-          $scope.showSpinner = true;
-          $scope.continueTitle = "Generating Keys...";
-          $timeout(() => {
-            $scope.validateCurrentPassword((success) => {
-              $scope.showSpinner = false;
-              $scope.continueTitle = DefaultContinueTitle;
-              if(success) {
-                onSuccess();
-              } else {
-                onFail && onFail();
-              }
-            });
-          })
-        }
-      }
-    }
-
-    let FailedSyncMessage = "There was an error re-encrypting your items. Your password was changed, but not all your items were properly re-encrypted and synced. You should try syncing again. If all else fails, you should restore your notes from backup.";
-
-    $scope.initializeStep = function(step) {
-      if(step == SyncStep) {
-        $scope.lockContinue = true;
-        $scope.formData.status = "Processing encryption keys...";
-        $scope.formData.processing = true;
-
-        $scope.processPasswordChange((passwordSuccess) => {
-          $scope.formData.statusError = !passwordSuccess;
-          $scope.formData.processing = passwordSuccess;
-
-          if(passwordSuccess) {
-            $scope.formData.status = "Encrypting and syncing data with new keys...";
-
-            $scope.resyncData((syncSuccess) => {
-              $scope.formData.statusError = !syncSuccess;
-              $scope.formData.processing = !syncSuccess;
-              if(syncSuccess) {
-                $scope.lockContinue = false;
-
-                if($scope.changePassword) {
-                  $scope.formData.status = "Successfully changed password and synced all items.";
-                } else if($scope.securityUpdate) {
-                  $scope.formData.status = "Successfully performed security update and synced all items.";
-                }
-              } else {
-                $scope.formData.status = FailedSyncMessage;
-              }
-            })
-          } else {
-            $scope.formData.status = "Unable to process your password. Please try again.";
-          }
-        })
-      }
-
-      else if(step == FinishStep) {
-        $scope.continueTitle = "Finish";
-      }
-    }
-
-    $scope.validateCurrentPassword = async function(callback) {
-      let currentPassword = $scope.formData.currentPassword;
-      let newPass = $scope.securityUpdate ? currentPassword : $scope.formData.newPassword;
-
-      if(!currentPassword || currentPassword.length == 0) {
-        alertManager.alert({text: "Please enter your current password."});
-        callback(false);
-        return;
-      }
-
-      if($scope.changePassword) {
-        if(!newPass || newPass.length == 0) {
-          alertManager.alert({text: "Please enter a new password."});
-          callback(false);
-          return;
-        }
-
-        if(newPass != $scope.formData.newPasswordConfirmation) {
-          alertManager.alert({text: "Your new password does not match its confirmation."});
-          $scope.formData.status = null;
-          callback(false);
-          return;
-        }
-      }
-
-      if(!authManager.user.email) {
-        alertManager.alert({text: "We don't have your email stored. Please log out then log back in to fix this issue."});
-        $scope.formData.status = null;
-        callback(false);
-        return;
-      }
-
-      // Ensure value for current password matches what's saved
-      let authParams = await authManager.getAuthParams();
-      let password = $scope.formData.currentPassword;
-      protocolManager.computeEncryptionKeysForUser(password, authParams).then(async (keys) => {
-        let success = keys.mk === (await authManager.keys()).mk;
-        if(success) {
-          this.currentServerPw = keys.pw;
-        } else {
-          alertManager.alert({text: "The current password you entered is not correct. Please try again."});
-        }
-        $timeout(() => callback(success));
-      });
-    }
-
-    $scope.resyncData = function(callback) {
-      modelManager.setAllItemsDirty();
-      syncManager.sync().then((response) => {
-        if(!response || response.error) {
-          alertManager.alert({text: FailedSyncMessage})
-          $timeout(() => callback(false));
-        } else {
-          $timeout(() => callback(true));
-        }
-      });
-    }
-
-    $scope.processPasswordChange = async function(callback) {
-      let newUserPassword = $scope.securityUpdate ? $scope.formData.currentPassword : $scope.formData.newPassword;
-
-      let currentServerPw = this.currentServerPw;
-
-      let results = await protocolManager.generateInitialKeysAndAuthParamsForUser(authManager.user.email, newUserPassword);
-      let newKeys = results.keys;
-      let newAuthParams = results.authParams;
-
-      // perform a sync beforehand to pull in any last minutes changes before we change the encryption key (and thus cant decrypt new changes)
-      let syncResponse = await syncManager.sync();
-      authManager.changePassword(await syncManager.getServerURL(), authManager.user.email, currentServerPw, newKeys, newAuthParams).then((response) => {
-        if(response.error) {
-          alertManager.alert({text: response.error.message ? response.error.message : "There was an error changing your password. Please try again."});
-          $timeout(() => callback(false));
-        } else {
-          $timeout(() => callback(true));
-        }
-      })
-    }
   }
 }

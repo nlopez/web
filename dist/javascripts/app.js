@@ -4511,8 +4511,10 @@ function () {
       encrypted: this.encryptedBackupsAvailable() ? true : false
     };
     this.syncManager.getServerURL().then(function (url) {
-      _this.server = url;
-      _this.formData.url = url;
+      _this.$timeout(function () {
+        _this.server = url;
+        _this.formData.url = url;
+      });
     });
     this.authManager.checkForSecurityUpdate().then(function (available) {
       _this.securityUpdateAvailable = available;
@@ -7000,389 +7002,516 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _directives_password_wizard_pug__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! %/directives/password-wizard.pug */ "./app/assets/templates/directives/password-wizard.pug");
 /* harmony import */ var _directives_password_wizard_pug__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_directives_password_wizard_pug__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _strings__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/strings */ "./app/assets/javascripts/strings.js");
 
 
 
 
 
-var PasswordWizard =
+
+var DEFAULT_CONTINUE_TITLE = "Continue";
+var Steps = {
+  IntroStep: 0,
+  BackupStep: 1,
+  SignoutStep: 2,
+  PasswordStep: 3,
+  SyncStep: 4,
+  FinishStep: 5
+};
+
+var PasswordWizardCtrl =
 /*#__PURE__*/
 function () {
-  function PasswordWizard() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, PasswordWizard);
+  PasswordWizardCtrl.$inject = ["$element", "$scope", "$timeout", "alertManager", "archiveManager", "authManager", "modelManager", "syncManager"];
 
-    this.restrict = 'E';
-    this.template = _directives_password_wizard_pug__WEBPACK_IMPORTED_MODULE_4___default.a;
-    this.scope = {
-      type: '='
-    };
+  /* @ngInject */
+  function PasswordWizardCtrl($element, $scope, $timeout, alertManager, archiveManager, authManager, modelManager, syncManager) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, PasswordWizardCtrl);
+
+    this.$element = $element;
+    this.$timeout = $timeout;
+    this.$scope = $scope;
+    this.alertManager = alertManager;
+    this.archiveManager = archiveManager;
+    this.authManager = authManager;
+    this.modelManager = modelManager;
+    this.syncManager = syncManager;
+    this.registerWindowUnloadStopper();
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(PasswordWizard, [{
-    key: "link",
-    value: function link($scope, el, attrs) {
-      $scope.el = el;
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(PasswordWizardCtrl, [{
+    key: "$onInit",
+    value: function $onInit() {
+      this.syncStatus = this.syncManager.syncStatus;
+      this.formData = {};
+      this.configureDefaults();
     }
-    /* @ngInject */
+  }, {
+    key: "configureDefaults",
+    value: function configureDefaults() {
+      if (this.type === 'change-pw') {
+        this.title = "Change Password";
+        this.changePassword = true;
+      } else if (this.type === 'upgrade-security') {
+        this.title = "Security Update";
+        this.securityUpdate = true;
+      }
+
+      this.continueTitle = DEFAULT_CONTINUE_TITLE;
+      this.step = Steps.IntroStep;
+    }
+    /** Confirms with user before closing tab */
 
   }, {
-    key: "controller",
-    value: ["$scope", "modelManager", "archiveManager", "authManager", "syncManager", "$timeout", "alertManager", function controller($scope, modelManager, archiveManager, authManager, syncManager, $timeout, alertManager) {
+    key: "registerWindowUnloadStopper",
+    value: function registerWindowUnloadStopper() {
       window.onbeforeunload = function (e) {
-        // Confirms with user to close tab before closing
         return true;
       };
 
-      $scope.$on("$destroy", function () {
+      this.$scope.$on("$destroy", function () {
         window.onbeforeunload = null;
       });
+    }
+  }, {
+    key: "titleForStep",
+    value: function titleForStep(step) {
+      switch (step) {
+        case Steps.BackupStep:
+          return "Download a backup of your data";
 
-      $scope.dismiss = function () {
-        if ($scope.lockContinue) {
-          alertManager.alert({
-            text: "Cannot close window until pending tasks are complete."
+        case Steps.SignoutStep:
+          return "Sign out of all your devices";
+
+        case Steps.PasswordStep:
+          return this.changePassword ? "Password information" : "Enter your current password";
+
+        case Steps.SyncStep:
+          return "Encrypt and sync data with new keys";
+
+        case Steps.FinishStep:
+          return "Sign back in to your devices";
+
+        default:
+          return null;
+      }
+    }
+  }, {
+    key: "nextStep",
+    value: function nextStep() {
+      var _this = this;
+
+      var next, preprocessor;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function nextStep$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              if (!(this.lockContinue || this.isContinuing)) {
+                _context.next = 2;
+                break;
+              }
+
+              return _context.abrupt("return");
+
+            case 2:
+              this.isContinuing = true;
+
+              if (!(this.step === Steps.FinishStep)) {
+                _context.next = 6;
+                break;
+              }
+
+              this.dismiss();
+              return _context.abrupt("return");
+
+            case 6:
+              next = function next() {
+                _this.step++;
+
+                _this.initializeStep(_this.step);
+
+                _this.isContinuing = false;
+              };
+
+              preprocessor = this.preprocessorForStep(this.step);
+
+              if (!preprocessor) {
+                _context.next = 13;
+                break;
+              }
+
+              _context.next = 11;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(preprocessor().then(next).catch(function () {
+                _this.isContinuing = false;
+              }));
+
+            case 11:
+              _context.next = 14;
+              break;
+
+            case 13:
+              next();
+
+            case 14:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "preprocessorForStep",
+    value: function preprocessorForStep(step) {
+      var _this2 = this;
+
+      if (step === Steps.PasswordStep) {
+        return function _callee() {
+          var success;
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function _callee$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  _this2.showSpinner = true;
+                  _this2.continueTitle = "Generating Keys...";
+                  _context2.next = 4;
+                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this2.validateCurrentPassword());
+
+                case 4:
+                  success = _context2.sent;
+                  _this2.showSpinner = false;
+                  _this2.continueTitle = DEFAULT_CONTINUE_TITLE;
+                  return _context2.abrupt("return", success);
+
+                case 8:
+                case "end":
+                  return _context2.stop();
+              }
+            }
           });
-          return;
-        }
-
-        $scope.el.remove();
-        $scope.$destroy();
-      };
-
-      $scope.syncStatus = syncManager.syncStatus;
-      $scope.formData = {};
-      var IntroStep = 0;
-      var BackupStep = 1;
-      var SignoutStep = 2;
-      var PasswordStep = 3;
-      var SyncStep = 4;
-      var FinishStep = 5;
-      var DefaultContinueTitle = "Continue";
-      $scope.continueTitle = DefaultContinueTitle;
-      $scope.step = IntroStep;
-
-      $scope.titleForStep = function (step) {
-        switch (step) {
-          case BackupStep:
-            return "Download a backup of your data";
-
-          case SignoutStep:
-            return "Sign out of all your devices";
-
-          case PasswordStep:
-            return $scope.changePassword ? "Password information" : "Enter your current password";
-
-          case SyncStep:
-            return "Encrypt and sync data with new keys";
-
-          case FinishStep:
-            return "Sign back in to your devices";
-
-          default:
-            return null;
-        }
-      };
-
-      $scope.configure = function () {
-        if ($scope.type == "change-pw") {
-          $scope.title = "Change Password";
-          $scope.changePassword = true;
-        } else if ($scope.type == "upgrade-security") {
-          $scope.title = "Security Update";
-          $scope.securityUpdate = true;
-        }
-      }();
-
-      $scope.continue = function () {
-        if ($scope.lockContinue || $scope.isContinuing) {
-          return;
-        } // isContinuing is a way to lock the continue function separate from lockContinue
-        // lockContinue can be locked by other places, but isContinuing is only lockable from within this function.
-
-
-        $scope.isContinuing = true;
-
-        if ($scope.step == FinishStep) {
-          $scope.dismiss();
-          return;
-        }
-
-        var next = function next() {
-          $scope.step += 1;
-          $scope.initializeStep($scope.step);
-          $scope.isContinuing = false;
         };
+      }
+    }
+  }, {
+    key: "initializeStep",
+    value: function initializeStep(step) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function initializeStep$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              if (!(step === Steps.SyncStep)) {
+                _context3.next = 5;
+                break;
+              }
 
-        var preprocessor = $scope.preprocessorForStep($scope.step);
+              _context3.next = 3;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.initializeSyncingStep());
 
-        if (preprocessor) {
-          preprocessor(function () {
-            next();
-          }, function () {
-            // on fail
-            $scope.isContinuing = false;
-          });
-        } else {
-          next();
+            case 3:
+              _context3.next = 6;
+              break;
+
+            case 5:
+              if (step === Steps.FinishStep) {
+                this.continueTitle = "Finish";
+              }
+
+            case 6:
+            case "end":
+              return _context3.stop();
+          }
         }
-      };
+      }, null, this);
+    }
+  }, {
+    key: "initializeSyncingStep",
+    value: function initializeSyncingStep() {
+      var passwordSuccess, syncSuccess;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function initializeSyncingStep$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              this.lockContinue = true;
+              this.formData.status = "Processing encryption keys...";
+              this.formData.processing = true;
+              _context4.next = 5;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.processPasswordChange());
 
-      $scope.downloadBackup = function (encrypted) {
-        archiveManager.downloadBackup(encrypted);
-      };
+            case 5:
+              passwordSuccess = _context4.sent;
+              this.formData.statusError = !passwordSuccess;
+              this.formData.processing = passwordSuccess;
 
-      $scope.preprocessorForStep = function (step) {
-        if (step == PasswordStep) {
-          return function (onSuccess, onFail) {
-            $scope.showSpinner = true;
-            $scope.continueTitle = "Generating Keys...";
-            $timeout(function () {
-              $scope.validateCurrentPassword(function (success) {
-                $scope.showSpinner = false;
-                $scope.continueTitle = DefaultContinueTitle;
+              if (passwordSuccess) {
+                _context4.next = 11;
+                break;
+              }
 
-                if (success) {
-                  onSuccess();
-                } else {
-                  onFail && onFail();
+              this.formData.status = "Unable to process your password. Please try again.";
+              return _context4.abrupt("return");
+
+            case 11:
+              this.formData.status = "Encrypting and syncing data with new keys...";
+              _context4.next = 14;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.resyncData());
+
+            case 14:
+              syncSuccess = _context4.sent;
+              this.formData.statusError = !syncSuccess;
+              this.formData.processing = !syncSuccess;
+
+              if (syncSuccess) {
+                this.lockContinue = false;
+
+                if (this.changePassword) {
+                  this.formData.status = "Successfully changed password and synced all items.";
+                } else if (this.securityUpdate) {
+                  this.formData.status = "Successfully performed security update and synced all items.";
                 }
+              } else {
+                this.formData.status = _strings__WEBPACK_IMPORTED_MODULE_5__["STRING_FAILED_PASSWORD_CHANGE"];
+              }
+
+            case 18:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "validateCurrentPassword",
+    value: function validateCurrentPassword() {
+      var currentPassword, newPass, authParams, password, keys, success;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function validateCurrentPassword$(_context5) {
+        while (1) {
+          switch (_context5.prev = _context5.next) {
+            case 0:
+              currentPassword = this.formData.currentPassword;
+              newPass = this.securityUpdate ? currentPassword : this.formData.newPassword;
+
+              if (!(!currentPassword || currentPassword.length === 0)) {
+                _context5.next = 5;
+                break;
+              }
+
+              this.alertManager.alert({
+                text: "Please enter your current password."
               });
-            });
-          };
-        }
-      };
+              return _context5.abrupt("return", false);
 
-      var FailedSyncMessage = "There was an error re-encrypting your items. Your password was changed, but not all your items were properly re-encrypted and synced. You should try syncing again. If all else fails, you should restore your notes from backup.";
+            case 5:
+              if (!this.changePassword) {
+                _context5.next = 13;
+                break;
+              }
 
-      $scope.initializeStep = function (step) {
-        if (step == SyncStep) {
-          $scope.lockContinue = true;
-          $scope.formData.status = "Processing encryption keys...";
-          $scope.formData.processing = true;
-          $scope.processPasswordChange(function (passwordSuccess) {
-            $scope.formData.statusError = !passwordSuccess;
-            $scope.formData.processing = passwordSuccess;
+              if (!(!newPass || newPass.length === 0)) {
+                _context5.next = 9;
+                break;
+              }
 
-            if (passwordSuccess) {
-              $scope.formData.status = "Encrypting and syncing data with new keys...";
-              $scope.resyncData(function (syncSuccess) {
-                $scope.formData.statusError = !syncSuccess;
-                $scope.formData.processing = !syncSuccess;
-
-                if (syncSuccess) {
-                  $scope.lockContinue = false;
-
-                  if ($scope.changePassword) {
-                    $scope.formData.status = "Successfully changed password and synced all items.";
-                  } else if ($scope.securityUpdate) {
-                    $scope.formData.status = "Successfully performed security update and synced all items.";
-                  }
-                } else {
-                  $scope.formData.status = FailedSyncMessage;
-                }
+              this.alertManager.alert({
+                text: "Please enter a new password."
               });
-            } else {
-              $scope.formData.status = "Unable to process your password. Please try again.";
-            }
-          });
-        } else if (step == FinishStep) {
-          $scope.continueTitle = "Finish";
+              return _context5.abrupt("return", false);
+
+            case 9:
+              if (!(newPass !== this.formData.newPasswordConfirmation)) {
+                _context5.next = 13;
+                break;
+              }
+
+              this.alertManager.alert({
+                text: "Your new password does not match its confirmation."
+              });
+              this.formData.status = null;
+              return _context5.abrupt("return", false);
+
+            case 13:
+              if (this.authManager.user.email) {
+                _context5.next = 17;
+                break;
+              }
+
+              this.alertManager.alert({
+                text: "We don't have your email stored. Please log out then log back in to fix this issue."
+              });
+              this.formData.status = null;
+              return _context5.abrupt("return", false);
+
+            case 17:
+              _context5.next = 19;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.authManager.getAuthParams());
+
+            case 19:
+              authParams = _context5.sent;
+              password = this.formData.currentPassword;
+              _context5.next = 23;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(snjs__WEBPACK_IMPORTED_MODULE_3__["protocolManager"].computeEncryptionKeysForUser(password, authParams));
+
+            case 23:
+              keys = _context5.sent;
+              _context5.t0 = keys.mk;
+              _context5.next = 27;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.authManager.keys());
+
+            case 27:
+              _context5.t1 = _context5.sent.mk;
+              success = _context5.t0 === _context5.t1;
+
+              if (success) {
+                this.currentServerPw = keys.pw;
+              } else {
+                this.alertManager.alert({
+                  text: "The current password you entered is not correct. Please try again."
+                });
+              }
+
+              return _context5.abrupt("return", success);
+
+            case 31:
+            case "end":
+              return _context5.stop();
+          }
         }
-      };
+      }, null, this);
+    }
+  }, {
+    key: "resyncData",
+    value: function resyncData() {
+      var response;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function resyncData$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
+              _context6.next = 2;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.modelManager.setAllItemsDirty());
 
-      $scope.validateCurrentPassword = function _callee2(callback) {
-        var _this = this;
+            case 2:
+              _context6.next = 4;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.syncManager.sync());
 
-        var currentPassword, newPass, authParams, password;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                currentPassword = $scope.formData.currentPassword;
-                newPass = $scope.securityUpdate ? currentPassword : $scope.formData.newPassword;
+            case 4:
+              response = _context6.sent;
 
-                if (!(!currentPassword || currentPassword.length == 0)) {
-                  _context2.next = 6;
-                  break;
-                }
+              if (!(!response || response.error)) {
+                _context6.next = 10;
+                break;
+              }
 
-                alertManager.alert({
-                  text: "Please enter your current password."
-                });
-                callback(false);
-                return _context2.abrupt("return");
+              this.alertManager.alert({
+                text: _strings__WEBPACK_IMPORTED_MODULE_5__["STRING_FAILED_PASSWORD_CHANGE"]
+              });
+              return _context6.abrupt("return", false);
 
-              case 6:
-                if (!$scope.changePassword) {
-                  _context2.next = 16;
-                  break;
-                }
+            case 10:
+              return _context6.abrupt("return", true);
 
-                if (!(!newPass || newPass.length == 0)) {
-                  _context2.next = 11;
-                  break;
-                }
-
-                alertManager.alert({
-                  text: "Please enter a new password."
-                });
-                callback(false);
-                return _context2.abrupt("return");
-
-              case 11:
-                if (!(newPass != $scope.formData.newPasswordConfirmation)) {
-                  _context2.next = 16;
-                  break;
-                }
-
-                alertManager.alert({
-                  text: "Your new password does not match its confirmation."
-                });
-                $scope.formData.status = null;
-                callback(false);
-                return _context2.abrupt("return");
-
-              case 16:
-                if (authManager.user.email) {
-                  _context2.next = 21;
-                  break;
-                }
-
-                alertManager.alert({
-                  text: "We don't have your email stored. Please log out then log back in to fix this issue."
-                });
-                $scope.formData.status = null;
-                callback(false);
-                return _context2.abrupt("return");
-
-              case 21:
-                _context2.next = 23;
-                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(authManager.getAuthParams());
-
-              case 23:
-                authParams = _context2.sent;
-                password = $scope.formData.currentPassword;
-                snjs__WEBPACK_IMPORTED_MODULE_3__["protocolManager"].computeEncryptionKeysForUser(password, authParams).then(function _callee(keys) {
-                  var success;
-                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function _callee$(_context) {
-                    while (1) {
-                      switch (_context.prev = _context.next) {
-                        case 0:
-                          _context.t0 = keys.mk;
-                          _context.next = 3;
-                          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(authManager.keys());
-
-                        case 3:
-                          _context.t1 = _context.sent.mk;
-                          success = _context.t0 === _context.t1;
-
-                          if (success) {
-                            _this.currentServerPw = keys.pw;
-                          } else {
-                            alertManager.alert({
-                              text: "The current password you entered is not correct. Please try again."
-                            });
-                          }
-
-                          $timeout(function () {
-                            return callback(success);
-                          });
-
-                        case 7:
-                        case "end":
-                          return _context.stop();
-                      }
-                    }
-                  });
-                });
-
-              case 26:
-              case "end":
-                return _context2.stop();
-            }
+            case 11:
+            case "end":
+              return _context6.stop();
           }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "processPasswordChange",
+    value: function processPasswordChange() {
+      var newUserPassword, currentServerPw, results, newKeys, newAuthParams, response;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function processPasswordChange$(_context7) {
+        while (1) {
+          switch (_context7.prev = _context7.next) {
+            case 0:
+              newUserPassword = this.securityUpdate ? this.formData.currentPassword : this.formData.newPassword;
+              currentServerPw = this.currentServerPw;
+              _context7.next = 4;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(snjs__WEBPACK_IMPORTED_MODULE_3__["protocolManager"].generateInitialKeysAndAuthParamsForUser(this.authManager.user.email, newUserPassword));
+
+            case 4:
+              results = _context7.sent;
+              newKeys = results.keys;
+              newAuthParams = results.authParams;
+              /** 
+               * Perform a sync beforehand to pull in any last minutes changes before we change 
+               * the encryption key (and thus cant decrypt new changes).
+               */
+
+              _context7.next = 9;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.syncManager.sync());
+
+            case 9:
+              _context7.t0 = _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a;
+              _context7.t1 = this.authManager;
+              _context7.next = 13;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.syncManager.getServerURL());
+
+            case 13:
+              _context7.t2 = _context7.sent;
+              _context7.t3 = this.authManager.user.email;
+              _context7.t4 = currentServerPw;
+              _context7.t5 = newKeys;
+              _context7.t6 = newAuthParams;
+              _context7.t7 = _context7.t1.changePassword.call(_context7.t1, _context7.t2, _context7.t3, _context7.t4, _context7.t5, _context7.t6);
+              _context7.next = 21;
+              return _context7.t0.awrap.call(_context7.t0, _context7.t7);
+
+            case 21:
+              response = _context7.sent;
+
+              if (!response.error) {
+                _context7.next = 27;
+                break;
+              }
+
+              this.alertManager.alert({
+                text: response.error.message ? response.error.message : "There was an error changing your password. Please try again."
+              });
+              return _context7.abrupt("return", false);
+
+            case 27:
+              return _context7.abrupt("return", true);
+
+            case 28:
+            case "end":
+              return _context7.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "downloadBackup",
+    value: function downloadBackup(encrypted) {
+      this.archiveManager.downloadBackup(encrypted);
+    }
+  }, {
+    key: "dismiss",
+    value: function dismiss() {
+      if (this.lockContinue) {
+        this.alertManager.alert({
+          text: "Cannot close window until pending tasks are complete."
         });
-      };
-
-      $scope.resyncData = function (callback) {
-        modelManager.setAllItemsDirty();
-        syncManager.sync().then(function (response) {
-          if (!response || response.error) {
-            alertManager.alert({
-              text: FailedSyncMessage
-            });
-            $timeout(function () {
-              return callback(false);
-            });
-          } else {
-            $timeout(function () {
-              return callback(true);
-            });
-          }
-        });
-      };
-
-      $scope.processPasswordChange = function _callee3(callback) {
-        var newUserPassword, currentServerPw, results, newKeys, newAuthParams, syncResponse;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                newUserPassword = $scope.securityUpdate ? $scope.formData.currentPassword : $scope.formData.newPassword;
-                currentServerPw = this.currentServerPw;
-                _context3.next = 4;
-                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(snjs__WEBPACK_IMPORTED_MODULE_3__["protocolManager"].generateInitialKeysAndAuthParamsForUser(authManager.user.email, newUserPassword));
-
-              case 4:
-                results = _context3.sent;
-                newKeys = results.keys;
-                newAuthParams = results.authParams; // perform a sync beforehand to pull in any last minutes changes before we change the encryption key (and thus cant decrypt new changes)
-
-                _context3.next = 9;
-                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(syncManager.sync());
-
-              case 9:
-                syncResponse = _context3.sent;
-                _context3.t0 = authManager;
-                _context3.next = 13;
-                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(syncManager.getServerURL());
-
-              case 13:
-                _context3.t1 = _context3.sent;
-                _context3.t2 = authManager.user.email;
-                _context3.t3 = currentServerPw;
-                _context3.t4 = newKeys;
-                _context3.t5 = newAuthParams;
-
-                _context3.t6 = function (response) {
-                  if (response.error) {
-                    alertManager.alert({
-                      text: response.error.message ? response.error.message : "There was an error changing your password. Please try again."
-                    });
-                    $timeout(function () {
-                      return callback(false);
-                    });
-                  } else {
-                    $timeout(function () {
-                      return callback(true);
-                    });
-                  }
-                };
-
-                _context3.t0.changePassword.call(_context3.t0, _context3.t1, _context3.t2, _context3.t3, _context3.t4, _context3.t5).then(_context3.t6);
-
-              case 20:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, null, this);
-      };
-    }]
+      } else {
+        this.$element.remove();
+        this.$scope.$destroy();
+      }
+    }
   }]);
 
-  return PasswordWizard;
+  return PasswordWizardCtrl;
 }();
+
+var PasswordWizard = function PasswordWizard() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, PasswordWizard);
+
+  this.restrict = 'E';
+  this.template = _directives_password_wizard_pug__WEBPACK_IMPORTED_MODULE_4___default.a;
+  this.controller = PasswordWizardCtrl;
+  this.controllerAs = 'ctrl';
+  this.bindToController = true;
+  this.scope = {
+    type: '='
+  };
+};
 
 /***/ }),
 
@@ -14141,7 +14270,7 @@ function () {
 /*!*******************************************!*\
   !*** ./app/assets/javascripts/strings.js ***!
   \*******************************************/
-/*! exports provided: STRING_SESSION_EXPIRED, STRING_DEFAULT_FILE_ERROR, STRING_GENERIC_SYNC_ERROR, StringSyncException, STRING_NEW_UPDATE_READY, STRING_DELETE_TAG, STRING_DELETED_NOTE, STRING_INVALID_NOTE, STRING_ELLIPSES, STRING_GENERIC_SAVE_ERROR, STRING_DELETE_PLACEHOLDER_ATTEMPT, STRING_DELETE_LOCKED_ATTEMPT, StringDeleteNote, StringEmptyTrash, STRING_ACCOUNT_MENU_UNCHECK_MERGE, STRING_SIGN_OUT_CONFIRMATION, STRING_ERROR_DECRYPTING_IMPORT, STRING_E2E_ENABLED, STRING_LOCAL_ENC_ENABLED, STRING_ENC_NOT_ENABLED, STRING_IMPORT_SUCCESS, STRING_REMOVE_PASSCODE_CONFIRMATION, STRING_REMOVE_PASSCODE_OFFLINE_ADDENDUM, STRING_NON_MATCHING_PASSCODES, STRING_NON_MATCHING_PASSWORDS, STRING_GENERATING_LOGIN_KEYS, STRING_GENERATING_REGISTER_KEYS, STRING_INVALID_IMPORT_FILE, StringImportError */
+/*! exports provided: STRING_SESSION_EXPIRED, STRING_DEFAULT_FILE_ERROR, STRING_GENERIC_SYNC_ERROR, StringSyncException, STRING_NEW_UPDATE_READY, STRING_DELETE_TAG, STRING_DELETED_NOTE, STRING_INVALID_NOTE, STRING_ELLIPSES, STRING_GENERIC_SAVE_ERROR, STRING_DELETE_PLACEHOLDER_ATTEMPT, STRING_DELETE_LOCKED_ATTEMPT, StringDeleteNote, StringEmptyTrash, STRING_ACCOUNT_MENU_UNCHECK_MERGE, STRING_SIGN_OUT_CONFIRMATION, STRING_ERROR_DECRYPTING_IMPORT, STRING_E2E_ENABLED, STRING_LOCAL_ENC_ENABLED, STRING_ENC_NOT_ENABLED, STRING_IMPORT_SUCCESS, STRING_REMOVE_PASSCODE_CONFIRMATION, STRING_REMOVE_PASSCODE_OFFLINE_ADDENDUM, STRING_NON_MATCHING_PASSCODES, STRING_NON_MATCHING_PASSWORDS, STRING_GENERATING_LOGIN_KEYS, STRING_GENERATING_REGISTER_KEYS, STRING_INVALID_IMPORT_FILE, StringImportError, STRING_FAILED_PASSWORD_CHANGE */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14175,6 +14304,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STRING_GENERATING_REGISTER_KEYS", function() { return STRING_GENERATING_REGISTER_KEYS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STRING_INVALID_IMPORT_FILE", function() { return STRING_INVALID_IMPORT_FILE; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StringImportError", function() { return StringImportError; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STRING_FAILED_PASSWORD_CHANGE", function() { return STRING_FAILED_PASSWORD_CHANGE; });
 /** @generic */
 var STRING_SESSION_EXPIRED = "Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.";
 var STRING_DEFAULT_FILE_ERROR = "Please use FileSafe or the Bold Editor to attach images and files. Learn more at standardnotes.org/filesafe.";
@@ -14225,6 +14355,9 @@ function StringImportError(_ref3) {
   var errorCount = _ref3.errorCount;
   return "Import complete. ".concat(errorCount, " items were not imported because there was an error decrypting them. Make sure the password is correct and try again.");
 }
+/** @password_change */
+
+var STRING_FAILED_PASSWORD_CHANGE = "There was an error re-encrypting your items. Your password was changed, but not all your items were properly re-encrypted and synced. You should try syncing again. If all else fails, you should restore your notes from backup.";
 
 /***/ }),
 
@@ -68629,7 +68762,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-modal small auto-height\" id=\"password-wizard\"\u003E\u003Cdiv class=\"sk-modal-background\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-modal-content\"\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003E{{title}}\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"dismiss()\"\u003EClose\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv ng-if=\"step == 0\"\u003E\u003Cdiv ng-if=\"changePassword\"\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003EChanging your password involves changing your encryption key, which requires your data to be re-encrypted and synced.\nIf you have many items, syncing your data can take several minutes.\u003C\u002Fp\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003EYou must keep the application window open during this process.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"securityUpdate\"\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003EA new update is available for your account. Updates address improvements and enhancements to our security specification.\nThis process will guide you through the update, and perform the steps necessary with your supervision.\u003C\u002Fp\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003Cp class=\"sk-p\"\u003EFor more information about security updates, please visit\u003C\u002Fp\u003E\u003Ca class=\"sk-a info\" href=\"https:\u002F\u002Fstandardnotes.org\u002Fhelp\u002Fsecurity\" rel=\"noopener\" target=\"_blank\"\u003Estandardnotes.org\u002Fhelp\u002Fsecurity.\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cp class=\"sk-panel-row sk-p\"\u003E\u003C\u002Fp\u003E\u003Cdiv class=\"info\"\u003EPress Continue to proceed.\u003C\u002Fdiv\u003E\u003Cp\u003E\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section\" ng-if=\"step &gt; 0\"\u003E\u003Cdiv class=\"sk-panel-section-title\"\u003EStep {{step}} — {{titleForStep(step)}}\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"step == 1\"\u003E\u003Cp class=\"sk-panel-row sk-p\"\u003EAs a result of this process, the entirety of your data will be re-encrypted and synced to your account. This is a generally safe process,\nbut unforeseen factors like poor network connectivity or a sudden shutdown of your computer may cause this process to fail.\nIt's best to be on the safe side before large operations such as this one.\u003C\u002Fp\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-button-group\"\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"downloadBackup(true)\"\u003E\u003Cdiv class=\"sk-label\"\u003EDownload Encrypted Backup\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"downloadBackup(false)\"\u003E\u003Cdiv class=\"sk-label\"\u003EDownload Decrypted Backup\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"step == 2\"\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003EAs a result of this process, your encryption keys will change.\nAny device on which you use Standard Notes will need to end its session. After this process completes, you will be asked to sign back in.\u003C\u002Fp\u003E\u003Cp class=\"sk-p bold sk-panel-row info-i\"\u003EPlease sign out of all applications (excluding this one), including:\u003C\u002Fp\u003E\u003Cul\u003E\u003Cli class=\"sk-p\"\u003EDesktop\u003C\u002Fli\u003E\u003Cli class=\"sk-p\"\u003EWeb (Chrome, Firefox, Safari)\u003C\u002Fli\u003E\u003Cli class=\"sk-p\"\u003EMobile (iOS and Android)\u003C\u002Fli\u003E\u003C\u002Ful\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003EIf you do not currently have access to a device you're signed in on, you may proceed,\nbut must make signing out and back in the first step upon gaining access to that device.\u003C\u002Fp\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003EPress Continue only when you have completed signing out of all your devices.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"step == 3\"\u003E\u003Cdiv ng-if=\"changePassword\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"securityUpdate\"\u003E\u003Cp class=\"sk-panel-row\"\u003EEnter your current password. We'll run this through our encryption scheme to generate strong new encryption keys.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column stretch\"\u003E\u003Cform class=\"sk-panel-form\"\u003E\u003Cinput class=\"sk-input contrast\" ng-model=\"formData.currentPassword\" placeholder=\"Current Password\" should-focus=\"true\" sn-autofocus=\"true\" type=\"password\"\u003E\u003Cinput class=\"sk-input contrast\" ng-if=\"changePassword\" ng-model=\"formData.newPassword\" placeholder=\"New Password\" type=\"password\"\u003E\u003Cinput class=\"sk-input contrast\" ng-if=\"changePassword\" ng-model=\"formData.newPasswordConfirmation\" placeholder=\"Confirm New Password\" type=\"password\"\u003E\u003C\u002Fform\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"step == 4\"\u003E\u003Cp class=\"sk-panel-row\"\u003EYour data is being re-encrypted with your new keys and synced to your account.\u003C\u002Fp\u003E\u003Cp class=\"sk-panel-row danger\" ng-if=\"lockContinue\"\u003EDo not close this window until this process completes.\u003C\u002Fp\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003Cdiv class=\"sk-spinner small inline info mr-5\" ng-if=\"formData.processing\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"inline bold\" ng-class=\"{'info' : !formData.statusError, 'error' : formData.statusError}\"\u003E{{formData.status}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-column\" delay=\"1000\" delay-hide=\"true\" show=\"syncStatus.syncOpInProgress || syncStatus.needsMoreSync\"\u003E\u003Cp class=\"info\"\u003ESyncing {{syncStatus.current}}\u002F{{syncStatus.total}}\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"step == 5\"\u003E\u003Cdiv ng-if=\"changePassword\"\u003E\u003Cp class=\"sk-p sk-panel-row info-i\"\u003EYour password has been successfully changed.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"securityUpdate\"\u003E\u003Cp class=\"sk-p sk-panel-row info-i\"\u003EThe security update has been successfully applied to your account.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003EPlease ensure you are running the latest version of Standard Notes on all platforms to ensure maximum compatibility.\u003C\u002Fp\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003EYou may now sign back in on all your devices and close this window.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-footer\"\u003E\u003Cdiv class=\"empty\"\u003E\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info right\" ng-class=\"{'disabled' : lockContinue}\" ng-click=\"continue()\" ng-disabled=\"lockContinue\"\u003E\u003Cdiv class=\"sk-spinner small inline info mr-5\" ng-if=\"showSpinner\"\u003E\u003C\u002Fdiv\u003E{{continueTitle}}\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-modal small auto-height\" id=\"password-wizard\"\u003E\u003Cdiv class=\"sk-modal-background\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-modal-content\"\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003E{{ctrl.title}}\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"ctrl.dismiss()\"\u003EClose\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv ng-if=\"ctrl.step == 0\"\u003E\u003Cdiv ng-if=\"ctrl.changePassword\"\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003EChanging your password involves changing your encryption key, \nwhich requires your data to be re-encrypted and synced.\nIf you have many items, syncing your data can take several minutes.\u003C\u002Fp\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003E You must keep the application window open during this process.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"ctrl.securityUpdate\"\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003EA new update is available for your account. Updates address \nimprovements and enhancements to our security specification.\nThis process will guide you through the update, and perform the \nsteps necessary with your supervision.\u003C\u002Fp\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003Cp class=\"sk-p\"\u003EFor more information about security updates, please visit\u003C\u002Fp\u003E\u003Ca class=\"sk-a info\" href=\"https:\u002F\u002Fstandardnotes.org\u002Fhelp\u002Fsecurity\" rel=\"noopener\" target=\"_blank\"\u003Estandardnotes.org\u002Fhelp\u002Fsecurity.\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cp class=\"sk-panel-row sk-p\"\u003E\u003C\u002Fp\u003E\u003Cdiv class=\"info\"\u003EPress Continue to proceed.\u003C\u002Fdiv\u003E\u003Cp\u003E\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section\" ng-if=\"ctrl.step &gt; 0\"\u003E\u003Cdiv class=\"sk-panel-section-title\"\u003EStep {{ctrl.step}} — {{ctrl.titleForStep(ctrl.step)}}\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"ctrl.step == 1\"\u003E\u003Cp class=\"sk-panel-row sk-p\"\u003EAs a result of this process, the entirety of your data will be \nre-encrypted and synced to your account. This is a generally safe \nprocess, but unforeseen factors like poor network connectivity or a \nsudden shutdown of your computer may cause this process to fail. It's \nbest to be on the safe side before large operations such as this one.\u003C\u002Fp\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-button-group\"\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"ctrl.downloadBackup(true)\"\u003E\u003Cdiv class=\"sk-label\"\u003EDownload Encrypted Backup\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"ctrl.downloadBackup(false)\"\u003E\u003Cdiv class=\"sk-label\"\u003EDownload Decrypted Backup\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"ctrl.step == 2\"\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003EAs a result of this process, your encryption keys will change. Any \ndevice on which you use Standard Notes will need to end its  session. \nAfter this process completes, you will be asked to sign back in.\u003C\u002Fp\u003E\u003Cp class=\"sk-p bold sk-panel-row info-i\"\u003E Please sign out of all applications (excluding this one), including:\u003C\u002Fp\u003E\u003Cul\u003E\u003Cli class=\"sk-p\"\u003EDesktop\u003C\u002Fli\u003E\u003Cli class=\"sk-p\"\u003EWeb (Chrome, Firefox, Safari)\u003C\u002Fli\u003E\u003Cli class=\"sk-p\"\u003EMobile (iOS and Android)\u003C\u002Fli\u003E\u003C\u002Ful\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003EIf you do not currently have access to a device you're signed in on, \nyou may proceed, but must make signing out and back in the first step \nupon gaining access to that device.\u003C\u002Fp\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003E Press Continue only when you have \ncompleted signing out of all your devices.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"ctrl.step == 3\"\u003E\u003Cdiv ng-if=\"ctrl.changePassword\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"ctrl.securityUpdate\"\u003E\u003Cp class=\"sk-panel-row\"\u003EEnter your current password. We'll run this through our encryption \nscheme to generate strong new encryption keys.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column stretch\"\u003E\u003Cform class=\"sk-panel-form\"\u003E\u003Cinput class=\"sk-input contrast\" ng-model=\"ctrl.formData.currentPassword\" placeholder=\"Current Password\" should-focus=\"true\" sn-autofocus=\"true\" type=\"password\"\u003E\u003Cinput class=\"sk-input contrast\" ng-if=\"ctrl.changePassword\" ng-model=\"ctrl.formData.newPassword\" placeholder=\"New Password\" type=\"password\"\u003E\u003Cinput class=\"sk-input contrast\" ng-if=\"ctrl.changePassword\" ng-model=\"ctrl.formData.newPasswordConfirmation\" placeholder=\"Confirm New Password\" type=\"password\"\u003E\u003C\u002Fform\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"ctrl.step == 4\"\u003E\u003Cp class=\"sk-panel-row\"\u003EYour data is being re-encrypted with your new \nkeys and synced to your account.\u003C\u002Fp\u003E\u003Cp class=\"sk-panel-row danger\" ng-if=\"ctrl.lockContinue\"\u003EDo not close this window until this process completes.\u003C\u002Fp\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003Cdiv class=\"sk-spinner small inline info mr-5\" ng-if=\"ctrl.formData.processing\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"inline bold\" ng-class=\"{'info' : !ctrl.formData.statusError, 'error' : ctrl.formData.statusError}\"\u003E{{ctrl.formData.status}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-column\" delay=\"1000\" delay-hide=\"true\" show=\"ctrl.syncStatus.syncOpInProgress || ctrl.syncStatus.needsMoreSync\"\u003E\u003Cp class=\"info\"\u003ESyncing {{ctrl.syncStatus.current}}\u002F{{ctrl.syncStatus.total}}\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"ctrl.step == 5\"\u003E\u003Cdiv ng-if=\"ctrl.changePassword\"\u003E\u003Cp class=\"sk-p sk-panel-row info-i\"\u003EYour password has been successfully changed.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"ctrl.securityUpdate\"\u003E\u003Cp class=\"sk-p sk-panel-row info-i\"\u003EThe security update has been successfully applied to your account.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003EPlease ensure you are running the latest version of Standard Notes \non all platforms to ensure maximum compatibility.\u003C\u002Fp\u003E\u003Cp class=\"sk-p sk-panel-row\"\u003E You may now sign back in on all your devices and close this window.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-footer\"\u003E\u003Cdiv class=\"empty\"\u003E\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info right\" ng-class=\"{'disabled' : ctrl.lockContinue}\" ng-click=\"ctrl.nextStep()\" ng-disabled=\"ctrl.lockContinue\"\u003E\u003Cdiv class=\"sk-spinner small inline info mr-5\" ng-if=\"ctrl.showSpinner\"\u003E\u003C\u002Fdiv\u003E{{ctrl.continueTitle}}\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),
