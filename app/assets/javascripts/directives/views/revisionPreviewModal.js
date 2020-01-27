@@ -1,93 +1,132 @@
 import { protocolManager, SNComponent, SFItem, SFModelManager } from 'snjs';
 import template from '%/directives/revision-preview-modal.pug';
 
-export class RevisionPreviewModal {
-  constructor() {
-    this.restrict = 'E';
-    this.template = template;
-    this.scope = {
-      uuid: '=',
-      content: '='
-    };
-  }
-
-  link($scope, el, attrs) {
-    $scope.el = el;
-  }
-
+class RevisionPreviewModalCtrl {
   /* @ngInject */
-  controller($scope, modelManager, syncManager, componentManager, $timeout, alertManager) {
-    $scope.dismiss = function() {
-      $scope.el.remove();
-      $scope.$destroy();
-    }
-
-    $scope.$on("$destroy", function() {
-      if($scope.identifier) {
-        componentManager.deregisterHandler($scope.identifier);
+  constructor(
+    $element,
+    $scope,
+    $timeout,
+    alertManager,
+    componentManager,
+    modelManager,
+    syncManager,
+  ) {
+    this.$element = $element;
+    this.$scope = $scope;
+    this.alertManager = alertManager;
+    this.componentManager = componentManager;
+    this.modelManager = modelManager;
+    this.syncManager = syncManager;
+    this.createNote();
+    this.configureEditor();
+    $scope.$on('$destroy', () => {
+      if (this.identifier) {
+        this.componentManager.deregisterHandler(this.identifier);
       }
     });
+  }
 
-    $scope.note = new SFItem({content: $scope.content, content_type: "Note"});
-    // Set UUID to editoForNote can find proper editor,
-    // but then generate new uuid for note as not to save changes to original, if editor makes changes.
-    $scope.note.uuid = $scope.uuid;
-    let editorForNote = componentManager.editorForNote($scope.note);
-    $scope.note.uuid = protocolManager.crypto.generateUUIDSync();
+  createNote() {
+    this.note = new SFItem({
+      content: this.content,
+      content_type: "Note"
+    });
+  }
 
-    if(editorForNote) {
-      // Create temporary copy, as a lot of componentManager is uuid based,
-      // so might interfere with active editor. Be sure to copy only the content, as the
-      // top level editor object has non-copyable properties like .window, which cannot be transfered
-      let editorCopy = new SNComponent({content: editorForNote.content});
+  configureEditor() {
+    /**
+     * Set UUID so editoForNote can find proper editor, but then generate new uuid 
+     * for note as not to save changes to original, if editor makes changes.
+     */
+    this.note.uuid = this.uuid;
+    const editorForNote = this.componentManager.editorForNote(this.note);
+    this.note.uuid = protocolManager.crypto.generateUUIDSync();
+    if (editorForNote) {
+      /** 
+       * Create temporary copy, as a lot of componentManager is uuid based, so might 
+       * interfere with active editor. Be sure to copy only the content, as the top level 
+       * editor object has non-copyable properties like .window, which cannot be transfered
+       */
+      const editorCopy = new SNComponent({ 
+        content: editorForNote.content
+      });
       editorCopy.readonly = true;
       editorCopy.lockReadonly = true;
-      $scope.identifier = editorCopy.uuid;
-
-      componentManager.registerHandler({identifier: $scope.identifier, areas: ["editor-editor"],
+      this.identifier = editorCopy.uuid;
+      this.componentManager.registerHandler({
+        identifier: this.identifier,
+        areas: ['editor-editor'],
         contextRequestHandler: (component) => {
-          if(component == $scope.editor) {
-            return $scope.note;
+          if (component === this.editor) {
+            return this.note;
           }
         },
         componentForSessionKeyHandler: (key) => {
-          if(key == $scope.editor.sessionKey) {
-            return $scope.editor;
+          if (key === this.editor.sessionKey) {
+            return this.editor;
           }
         }
       });
 
-      $scope.editor = editorCopy;
+      this.editor = editorCopy;
     }
+  }
 
-    $scope.restore = function(asCopy) {
-      const run = () => {
-        let item;
-        if(asCopy) {
-          let contentCopy = Object.assign({}, $scope.content);
-          if(contentCopy.title) { contentCopy.title += " (copy)"; }
-          item = modelManager.createItem({content_type: "Note", content: contentCopy});
-          modelManager.addItem(item);
-        } else {
-          let uuid = $scope.uuid;
-          item = modelManager.findItem(uuid);
-          item.content = Object.assign({}, $scope.content);
-          // mapResponseItemsToLocalModels is async, but we don't need to wait here.
-          modelManager.mapResponseItemsToLocalModels([item], SFModelManager.MappingSourceRemoteActionRetrieved);
+  restore(asCopy) {
+    const run = () => {
+      let item;
+      if (asCopy) {
+        const contentCopy = Object.assign({}, this.content);
+        if (contentCopy.title) {
+          contentCopy.title += " (copy)";
         }
-
-        modelManager.setItemDirty(item, true);
-        syncManager.sync();
-        $scope.dismiss();
-      }
-
-      if(!asCopy) {
-        alertManager.confirm({text: "Are you sure you want to replace the current note's contents with what you see in this preview?", destructive: true, onConfirm: () => {
-          run();
-        }})
+        item = this.modelManager.createItem({
+          content_type: 'Note',
+          content: contentCopy
+        });
+        this.modelManager.addItem(item);
       } else {
-        run();
+        const uuid = this.uuid;
+        item = this.modelManager.findItem(uuid);
+        item.content = Object.assign({}, this.content);
+        this.modelManager.mapResponseItemsToLocalModels(
+          [item],
+          SFModelManager.MappingSourceRemoteActionRetrieved
+        );
       }
+      this.modelManager.setItemDirty(item);
+      this.syncManager.sync();
+      this.dismiss();
     }
+
+    if (!asCopy) {
+      this.alertManager.confirm({
+        text: "Are you sure you want to replace the current note's contents with what you see in this preview?",
+        destructive: true,
+        onConfirm: run
+      })
+    } else {
+      run();
+    }
+  }
+
+  dismiss() {
+    this.$element.remove();
+    this.$scope.$destroy();
+  }
+}
+
+export class RevisionPreviewModal {
+  constructor() {
+    this.restrict = 'E';
+    this.template = template;
+    this.controller = RevisionPreviewModalCtrl;
+    this.controllerAs = 'ctrl';
+    this.bindToController = true;
+    this.scope = {
+      uuid: '=',
+      content: '='
+    };
   }
 }

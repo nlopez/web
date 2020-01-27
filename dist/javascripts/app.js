@@ -8010,123 +8010,153 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var RevisionPreviewModal =
+
+var RevisionPreviewModalCtrl =
 /*#__PURE__*/
 function () {
-  function RevisionPreviewModal() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, RevisionPreviewModal);
+  RevisionPreviewModalCtrl.$inject = ["$element", "$scope", "$timeout", "alertManager", "componentManager", "modelManager", "syncManager"];
 
-    this.restrict = 'E';
-    this.template = _directives_revision_preview_modal_pug__WEBPACK_IMPORTED_MODULE_3___default.a;
-    this.scope = {
-      uuid: '=',
-      content: '='
-    };
+  /* @ngInject */
+  function RevisionPreviewModalCtrl($element, $scope, $timeout, alertManager, componentManager, modelManager, syncManager) {
+    var _this = this;
+
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, RevisionPreviewModalCtrl);
+
+    this.$element = $element;
+    this.$scope = $scope;
+    this.alertManager = alertManager;
+    this.componentManager = componentManager;
+    this.modelManager = modelManager;
+    this.syncManager = syncManager;
+    this.createNote();
+    this.configureEditor();
+    $scope.$on('$destroy', function () {
+      if (_this.identifier) {
+        _this.componentManager.deregisterHandler(_this.identifier);
+      }
+    });
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(RevisionPreviewModal, [{
-    key: "link",
-    value: function link($scope, el, attrs) {
-      $scope.el = el;
-    }
-    /* @ngInject */
-
-  }, {
-    key: "controller",
-    value: ["$scope", "modelManager", "syncManager", "componentManager", "$timeout", "alertManager", function controller($scope, modelManager, syncManager, componentManager, $timeout, alertManager) {
-      $scope.dismiss = function () {
-        $scope.el.remove();
-        $scope.$destroy();
-      };
-
-      $scope.$on("$destroy", function () {
-        if ($scope.identifier) {
-          componentManager.deregisterHandler($scope.identifier);
-        }
-      });
-      $scope.note = new snjs__WEBPACK_IMPORTED_MODULE_2__["SFItem"]({
-        content: $scope.content,
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(RevisionPreviewModalCtrl, [{
+    key: "createNote",
+    value: function createNote() {
+      this.note = new snjs__WEBPACK_IMPORTED_MODULE_2__["SFItem"]({
+        content: this.content,
         content_type: "Note"
-      }); // Set UUID to editoForNote can find proper editor,
-      // but then generate new uuid for note as not to save changes to original, if editor makes changes.
+      });
+    }
+  }, {
+    key: "configureEditor",
+    value: function configureEditor() {
+      var _this2 = this;
 
-      $scope.note.uuid = $scope.uuid;
-      var editorForNote = componentManager.editorForNote($scope.note);
-      $scope.note.uuid = snjs__WEBPACK_IMPORTED_MODULE_2__["protocolManager"].crypto.generateUUIDSync();
+      /**
+       * Set UUID so editoForNote can find proper editor, but then generate new uuid 
+       * for note as not to save changes to original, if editor makes changes.
+       */
+      this.note.uuid = this.uuid;
+      var editorForNote = this.componentManager.editorForNote(this.note);
+      this.note.uuid = snjs__WEBPACK_IMPORTED_MODULE_2__["protocolManager"].crypto.generateUUIDSync();
 
       if (editorForNote) {
-        // Create temporary copy, as a lot of componentManager is uuid based,
-        // so might interfere with active editor. Be sure to copy only the content, as the
-        // top level editor object has non-copyable properties like .window, which cannot be transfered
+        /** 
+         * Create temporary copy, as a lot of componentManager is uuid based, so might 
+         * interfere with active editor. Be sure to copy only the content, as the top level 
+         * editor object has non-copyable properties like .window, which cannot be transfered
+         */
         var editorCopy = new snjs__WEBPACK_IMPORTED_MODULE_2__["SNComponent"]({
           content: editorForNote.content
         });
         editorCopy.readonly = true;
         editorCopy.lockReadonly = true;
-        $scope.identifier = editorCopy.uuid;
-        componentManager.registerHandler({
-          identifier: $scope.identifier,
-          areas: ["editor-editor"],
+        this.identifier = editorCopy.uuid;
+        this.componentManager.registerHandler({
+          identifier: this.identifier,
+          areas: ['editor-editor'],
           contextRequestHandler: function contextRequestHandler(component) {
-            if (component == $scope.editor) {
-              return $scope.note;
+            if (component === _this2.editor) {
+              return _this2.note;
             }
           },
           componentForSessionKeyHandler: function componentForSessionKeyHandler(key) {
-            if (key == $scope.editor.sessionKey) {
-              return $scope.editor;
+            if (key === _this2.editor.sessionKey) {
+              return _this2.editor;
             }
           }
         });
-        $scope.editor = editorCopy;
+        this.editor = editorCopy;
       }
+    }
+  }, {
+    key: "restore",
+    value: function restore(asCopy) {
+      var _this3 = this;
 
-      $scope.restore = function (asCopy) {
-        var run = function run() {
-          var item;
+      var run = function run() {
+        var item;
 
-          if (asCopy) {
-            var contentCopy = Object.assign({}, $scope.content);
+        if (asCopy) {
+          var contentCopy = Object.assign({}, _this3.content);
 
-            if (contentCopy.title) {
-              contentCopy.title += " (copy)";
-            }
-
-            item = modelManager.createItem({
-              content_type: "Note",
-              content: contentCopy
-            });
-            modelManager.addItem(item);
-          } else {
-            var uuid = $scope.uuid;
-            item = modelManager.findItem(uuid);
-            item.content = Object.assign({}, $scope.content); // mapResponseItemsToLocalModels is async, but we don't need to wait here.
-
-            modelManager.mapResponseItemsToLocalModels([item], snjs__WEBPACK_IMPORTED_MODULE_2__["SFModelManager"].MappingSourceRemoteActionRetrieved);
+          if (contentCopy.title) {
+            contentCopy.title += " (copy)";
           }
 
-          modelManager.setItemDirty(item, true);
-          syncManager.sync();
-          $scope.dismiss();
-        };
-
-        if (!asCopy) {
-          alertManager.confirm({
-            text: "Are you sure you want to replace the current note's contents with what you see in this preview?",
-            destructive: true,
-            onConfirm: function onConfirm() {
-              run();
-            }
+          item = _this3.modelManager.createItem({
+            content_type: 'Note',
+            content: contentCopy
           });
+
+          _this3.modelManager.addItem(item);
         } else {
-          run();
+          var uuid = _this3.uuid;
+          item = _this3.modelManager.findItem(uuid);
+          item.content = Object.assign({}, _this3.content);
+
+          _this3.modelManager.mapResponseItemsToLocalModels([item], snjs__WEBPACK_IMPORTED_MODULE_2__["SFModelManager"].MappingSourceRemoteActionRetrieved);
         }
+
+        _this3.modelManager.setItemDirty(item);
+
+        _this3.syncManager.sync();
+
+        _this3.dismiss();
       };
-    }]
+
+      if (!asCopy) {
+        this.alertManager.confirm({
+          text: "Are you sure you want to replace the current note's contents with what you see in this preview?",
+          destructive: true,
+          onConfirm: run
+        });
+      } else {
+        run();
+      }
+    }
+  }, {
+    key: "dismiss",
+    value: function dismiss() {
+      this.$element.remove();
+      this.$scope.$destroy();
+    }
   }]);
 
-  return RevisionPreviewModal;
+  return RevisionPreviewModalCtrl;
 }();
+
+var RevisionPreviewModal = function RevisionPreviewModal() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, RevisionPreviewModal);
+
+  this.restrict = 'E';
+  this.template = _directives_revision_preview_modal_pug__WEBPACK_IMPORTED_MODULE_3___default.a;
+  this.controller = RevisionPreviewModalCtrl;
+  this.controllerAs = 'ctrl';
+  this.bindToController = true;
+  this.scope = {
+    uuid: '=',
+    content: '='
+  };
+};
 
 /***/ }),
 
@@ -8149,116 +8179,141 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var SessionHistoryMenu =
+
+var SessionHistoryMenuCtrl =
 /*#__PURE__*/
 function () {
-  function SessionHistoryMenu() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, SessionHistoryMenu);
+  SessionHistoryMenuCtrl.$inject = ["$timeout", "actionsManager", "alertManager", "sessionHistory"];
 
-    this.restrict = 'E';
-    this.template = _directives_session_history_menu_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
-    this.scope = {
-      item: '='
-    };
-  }
   /* @ngInject */
+  function SessionHistoryMenuCtrl($timeout, actionsManager, alertManager, sessionHistory) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, SessionHistoryMenuCtrl);
 
+    this.$timeout = $timeout;
+    this.alertManager = alertManager;
+    this.actionsManager = actionsManager;
+    this.sessionHistory = sessionHistory;
+    this.diskEnabled = this.sessionHistory.diskEnabled;
+    this.autoOptimize = this.sessionHistory.autoOptimize;
+  }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(SessionHistoryMenu, [{
-    key: "controller",
-    value: ["$scope", "modelManager", "sessionHistory", "actionsManager", "$timeout", "alertManager", function controller($scope, modelManager, sessionHistory, actionsManager, $timeout, alertManager) {
-      $scope.diskEnabled = sessionHistory.diskEnabled;
-      $scope.autoOptimize = sessionHistory.autoOptimize;
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(SessionHistoryMenuCtrl, [{
+    key: "$onInit",
+    value: function $onInit() {
+      this.reloadHistory();
+    }
+  }, {
+    key: "reloadHistory",
+    value: function reloadHistory() {
+      var history = this.sessionHistory.historyForItem(this.item);
+      this.entries = history.entries.slice(0).sort(function (a, b) {
+        return a.item.updated_at < b.item.updated_at ? 1 : -1;
+      });
+      this.history = history;
+    }
+  }, {
+    key: "openRevision",
+    value: function openRevision(revision) {
+      this.actionsManager.presentRevisionPreviewModal(revision.item.uuid, revision.item.content);
+    }
+  }, {
+    key: "classForRevision",
+    value: function classForRevision(revision) {
+      var vector = revision.operationVector();
 
-      $scope.reloadHistory = function () {
-        var history = sessionHistory.historyForItem($scope.item); // make copy as not to sort inline
+      if (vector === 0) {
+        return 'default';
+      } else if (vector === 1) {
+        return 'success';
+      } else if (vector === -1) {
+        return 'danger';
+      }
+    }
+  }, {
+    key: "clearItemHistory",
+    value: function clearItemHistory() {
+      var _this = this;
 
-        $scope.entries = history.entries.slice(0).sort(function (a, b) {
-          return a.item.updated_at < b.item.updated_at ? 1 : -1;
-        });
-        $scope.history = history;
-      };
-
-      $scope.reloadHistory();
-
-      $scope.openRevision = function (revision) {
-        actionsManager.presentRevisionPreviewModal(revision.item.uuid, revision.item.content);
-      };
-
-      $scope.classForRevision = function (revision) {
-        var vector = revision.operationVector();
-
-        if (vector == 0) {
-          return "default";
-        } else if (vector == 1) {
-          return "success";
-        } else if (vector == -1) {
-          return "danger";
+      this.alertManager.confirm({
+        text: "Are you sure you want to delete the local session history for this note?",
+        destructive: true,
+        onConfirm: function onConfirm() {
+          _this.sessionHistory.clearHistoryForItem(_this.item).then(function () {
+            _this.$timeout(function () {
+              _this.reloadHistory();
+            });
+          });
         }
-      };
+      });
+    }
+  }, {
+    key: "clearAllHistory",
+    value: function clearAllHistory() {
+      var _this2 = this;
 
-      $scope.clearItemHistory = function () {
-        alertManager.confirm({
-          text: "Are you sure you want to delete the local session history for this note?",
-          destructive: true,
-          onConfirm: function onConfirm() {
-            sessionHistory.clearHistoryForItem($scope.item).then(function () {
-              $timeout(function () {
-                $scope.reloadHistory();
-              });
-            });
-          }
-        });
-      };
-
-      $scope.clearAllHistory = function () {
-        alertManager.confirm({
-          text: "Are you sure you want to delete the local session history for all notes?",
-          destructive: true,
-          onConfirm: function onConfirm() {
-            sessionHistory.clearAllHistory().then(function () {
-              $timeout(function () {
-                $scope.reloadHistory();
-              });
-            });
-          }
-        });
-      };
-
-      $scope.toggleDiskSaving = function () {
-        var run = function run() {
-          sessionHistory.toggleDiskSaving().then(function () {
-            $timeout(function () {
-              $scope.diskEnabled = sessionHistory.diskEnabled;
+      this.alertManager.confirm({
+        text: "Are you sure you want to delete the local session history for all notes?",
+        destructive: true,
+        onConfirm: function onConfirm() {
+          _this2.sessionHistory.clearAllHistory().then(function () {
+            _this2.$timeout(function () {
+              _this2.reloadHistory();
             });
           });
-        };
-
-        if (!sessionHistory.diskEnabled) {
-          alertManager.confirm({
-            text: "Are you sure you want to save history to disk? This will decrease general performance, especially as you type. You are advised to disable this feature if you experience any lagging.",
-            destructive: true,
-            onConfirm: function onConfirm() {
-              run();
-            }
-          });
-        } else {
-          run();
         }
-      };
+      });
+    }
+  }, {
+    key: "toggleDiskSaving",
+    value: function toggleDiskSaving() {
+      var _this3 = this;
 
-      $scope.toggleAutoOptimize = function () {
-        sessionHistory.toggleAutoOptimize().then(function () {
-          $timeout(function () {
-            $scope.autoOptimize = sessionHistory.autoOptimize;
+      var run = function run() {
+        _this3.sessionHistory.toggleDiskSaving().then(function () {
+          _this3.$timeout(function () {
+            _this3.diskEnabled = _this3.sessionHistory.diskEnabled;
           });
         });
       };
-    }]
+
+      if (!this.sessionHistory.diskEnabled) {
+        this.alertManager.confirm({
+          text: "Are you sure you want to save history to disk? This will decrease general \n        performance, especially as you type. You are advised to disable this feature \n        if you experience any lagging.",
+          destructive: true,
+          onConfirm: run
+        });
+      } else {
+        run();
+      }
+    }
+  }, {
+    key: "toggleAutoOptimize",
+    value: function toggleAutoOptimize() {
+      var _this4 = this;
+
+      this.sessionHistory.toggleAutoOptimize().then(function () {
+        _this4.$timeout(function () {
+          _this4.autoOptimize = _this4.sessionHistory.autoOptimize;
+        });
+      });
+    }
   }]);
 
-  return SessionHistoryMenu;
+  return SessionHistoryMenuCtrl;
 }();
+
+var SessionHistoryMenu = function SessionHistoryMenu() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, SessionHistoryMenu);
+
+  this.restrict = 'E';
+  this.template = _directives_session_history_menu_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
+  this.controller = SessionHistoryMenuCtrl;
+  this.controllerAs = 'ctrl';
+  this.bindToController = true;
+  this.scope = {
+    item: '='
+  };
+};
 
 /***/ }),
 
@@ -68891,7 +68946,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-modal medium\" id=\"item-preview-modal\"\u003E\u003Cdiv class=\"sk-modal-background\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-modal-content\"\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003EPreview\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"restore(false)\"\u003ERestore\u003C\u002Fa\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"restore(true)\"\u003ERestore as copy\u003C\u002Fa\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"dismiss(); $event.stopPropagation()\"\u003EClose\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content selectable\" ng-if=\"!editor\"\u003E\u003Cdiv class=\"sk-h2\"\u003E{{content.title}}\u003C\u002Fdiv\u003E\u003Cp class=\"normal sk-p\" style=\"white-space: pre-wrap; font-size: 16px;\"\u003E{{content.text}}\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Ccomponent-view class=\"component-view\" component=\"editor\" ng-if=\"editor\"\u003E\u003C\u002Fcomponent-view\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-modal medium\" id=\"item-preview-modal\"\u003E\u003Cdiv class=\"sk-modal-background\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-modal-content\"\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003EPreview\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"ctrl.restore(false)\"\u003ERestore\u003C\u002Fa\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"ctrl.restore(true)\"\u003ERestore as copy\u003C\u002Fa\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"ctrl.dismiss(); $event.stopPropagation()\"\u003EClose\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content selectable\" ng-if=\"!ctrl.editor\"\u003E\u003Cdiv class=\"sk-h2\"\u003E{{ctrl.content.title}}\u003C\u002Fdiv\u003E\u003Cp class=\"normal sk-p\" style=\"white-space: pre-wrap; font-size: 16px;\"\u003E{{ctrl.content.text}}\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Ccomponent-view class=\"component-view\" component=\"ctrl.editor\" ng-if=\"ctrl.editor\"\u003E\u003C\u002Fcomponent-view\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),
@@ -68905,7 +68960,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\" id=\"session-history-menu\"\u003E\u003Cdiv class=\"sk-menu-panel dropdown-menu\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003E{{history.entries.length || 'No'}} revisions\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info sk-h5\" ng-click=\"showOptions = !showOptions; $event.stopPropagation();\"\u003EOptions\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"showOptions\"\u003E\u003Cmenu-row action=\"clearItemHistory()\" label=\"'Clear note local history'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"clearAllHistory()\" label=\"'Clear all local history'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"toggleAutoOptimize()\" label=\"(autoOptimize ? 'Disable' : 'Enable') + ' auto cleanup'\"\u003E\u003Cdiv class=\"sk-sublabel\"\u003EAutomatically cleans up small revisions to conserve space.\u003C\u002Fdiv\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"toggleDiskSaving()\" label=\"(diskEnabled ? 'Disable' : 'Enable') + ' saving history to disk'\"\u003E\u003Cdiv class=\"sk-sublabel\"\u003ESaving to disk is not recommended. Decreases performance and increases app loading time and memory footprint.\u003C\u002Fdiv\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"openRevision(revision);\" label=\"revision.previewTitle()\" ng-repeat=\"revision in entries\"\u003E\u003Cdiv class=\"sk-sublabel opaque\" ng-class=\"classForRevision(revision)\"\u003E{{revision.previewSubTitle()}}\u003C\u002Fdiv\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\" id=\"session-history-menu\"\u003E\u003Cdiv class=\"sk-menu-panel dropdown-menu\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003E{{ctrl.history.entries.length || 'No'}} revisions\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info sk-h5\" ng-click=\"ctrl.showOptions = !ctrl.showOptions; $event.stopPropagation();\"\u003EOptions\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"ctrl.showOptions\"\u003E\u003Cmenu-row action=\"ctrl.clearItemHistory()\" label=\"'Clear note local history'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"ctrl.clearAllHistory()\" label=\"'Clear all local history'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"ctrl.toggleAutoOptimize()\" label=\"(ctrl.autoOptimize ? 'Disable' : 'Enable') + ' auto cleanup'\"\u003E\u003Cdiv class=\"sk-sublabel\"\u003EAutomatically cleans up small revisions to conserve space.\u003C\u002Fdiv\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"ctrl.toggleDiskSaving()\" label=\"(ctrl.diskEnabled ? 'Disable' : 'Enable') + ' saving history to disk'\"\u003E\u003Cdiv class=\"sk-sublabel\"\u003ESaving to disk is not recommended. Decreases performance and increases app \nloading time and memory footprint.\u003C\u002Fdiv\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row ng-repeat=\"revision in ctrl.entries\" action=\"ctrl.openRevision(revision);\" label=\"revision.previewTitle()\"\u003E\u003Cdiv class=\"sk-sublabel opaque\" ng-class=\"ctrl.classForRevision(revision)\"\u003E{{revision.previewSubTitle()}}\u003C\u002Fdiv\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),
