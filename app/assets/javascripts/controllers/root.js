@@ -184,7 +184,7 @@ class RootCtrl {
   configureKeyRequestHandler() {
     this.syncManager.setKeyRequestHandler(async () => {
       const offline = this.authManager.offline();
-      const auth_params = (
+      const authParams = (
         offline
         ? this.passcodeManager.passcodeAuthParams()
         : await this.authManager.getAuthParams()
@@ -195,7 +195,7 @@ class RootCtrl {
       return {
         keys: keys,
         offline: offline,
-        auth_params: auth_params
+        auth_params: authParams
       }
     });
   }

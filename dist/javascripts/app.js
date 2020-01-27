@@ -2112,7 +2112,7 @@ function () {
     value: function submitPasscodeForm($event) {
       var _this3 = this;
 
-      if (!this.formData.passcode || this.formData.passcode.length == 0) {
+      if (!this.formData.passcode || this.formData.passcode.length === 0) {
         return;
       }
 
@@ -3502,7 +3502,7 @@ function () {
       var _this6 = this;
 
       this.syncManager.setKeyRequestHandler(function _callee() {
-        var offline, auth_params, keys;
+        var offline, authParams, keys;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -3526,7 +3526,7 @@ function () {
                 _context.t0 = _context.sent;
 
               case 8:
-                auth_params = _context.t0;
+                authParams = _context.t0;
 
                 if (!offline) {
                   _context.next = 13;
@@ -3549,7 +3549,7 @@ function () {
                 return _context.abrupt("return", {
                   keys: keys,
                   offline: offline,
-                  auth_params: auth_params
+                  auth_params: authParams
                 });
 
               case 18:
@@ -4457,24 +4457,21 @@ function snEnter() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AccountMenu", function() { return AccountMenu; });
-/* harmony import */ var _babel_runtime_helpers_readOnlyError__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/readOnlyError */ "./node_modules/@babel/runtime/helpers/readOnlyError.js");
-/* harmony import */ var _babel_runtime_helpers_readOnlyError__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_readOnlyError__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/defineProperty.js");
-/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/utils.js");
-/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/services/privilegesManager.js");
-/* harmony import */ var _directives_account_menu_pug__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! %/directives/account-menu.pug */ "./app/assets/templates/directives/account-menu.pug");
-/* harmony import */ var _directives_account_menu_pug__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_directives_account_menu_pug__WEBPACK_IMPORTED_MODULE_7__);
-/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
-/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var _strings__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/strings */ "./app/assets/javascripts/strings.js");
-
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/defineProperty.js");
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/utils.js");
+/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/services/privilegesManager.js");
+/* harmony import */ var _directives_account_menu_pug__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! %/directives/account-menu.pug */ "./app/assets/templates/directives/account-menu.pug");
+/* harmony import */ var _directives_account_menu_pug__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_directives_account_menu_pug__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
+/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _strings__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/strings */ "./app/assets/javascripts/strings.js");
 
 
 
@@ -4495,7 +4492,7 @@ function () {
   function AccountMenuCtrl($scope, $rootScope, $timeout, alertManager, archiveManager, appVersion, authManager, modelManager, passcodeManager, privilegesManager, storageManager, syncManager) {
     var _this = this;
 
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_3___default()(this, AccountMenuCtrl);
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, AccountMenuCtrl);
 
     this.$scope = $scope;
     this.$rootScope = $rootScope;
@@ -4519,7 +4516,7 @@ function () {
       ephemeral: false
     };
     this.archiveFormData = {
-      encrypted: this.encryptedBackupsAvailable() ? true : false
+      encrypted: this.encryptedBackupsAvailable()
     };
     this.syncManager.getServerURL().then(function (url) {
       _this.$timeout(function () {
@@ -4533,7 +4530,7 @@ function () {
     this.reloadAutoLockInterval();
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_4___default()(AccountMenuCtrl, [{
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3___default()(AccountMenuCtrl, [{
     key: "close",
     value: function close() {
       var _this2 = this;
@@ -4550,7 +4547,7 @@ function () {
   }, {
     key: "submitMfaForm",
     value: function submitMfaForm() {
-      var params = _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_2___default()({}, this.formData.mfa.payload.mfa_key, this.formData.userMfaCode);
+      var params = _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_1___default()({}, this.formData.mfa.payload.mfa_key, this.formData.userMfaCode);
 
       this.login(params);
     }
@@ -4571,16 +4568,16 @@ function () {
     key: "login",
     value: function login(extraParams) {
       var response, hasError, error;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function login$(_context) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function login$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               /** Prevent a timed sync from occuring while signing in. */
               this.syncManager.lockSyncing();
-              this.formData.status = _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_GENERATING_LOGIN_KEYS"];
+              this.formData.status = _strings__WEBPACK_IMPORTED_MODULE_8__["STRING_GENERATING_LOGIN_KEYS"];
               this.formData.authenticating = true;
               _context.next = 5;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.authManager.login(this.formData.url, this.formData.email, this.formData.user_password, this.formData.ephemeral, this.formData.strictSignin, extraParams));
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.authManager.login(this.formData.url, this.formData.email, this.formData.user_password, this.formData.ephemeral, this.formData.strictSignin, extraParams));
 
             case 5:
               response = _context.sent;
@@ -4592,7 +4589,7 @@ function () {
               }
 
               _context.next = 10;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.onAuthSuccess());
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.onAuthSuccess());
 
             case 10:
               this.syncManager.unlockSyncing();
@@ -4635,7 +4632,7 @@ function () {
     key: "register",
     value: function register() {
       var confirmation, response, error;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function register$(_context2) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function register$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
@@ -4647,16 +4644,16 @@ function () {
               }
 
               this.alertManager.alert({
-                text: _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_NON_MATCHING_PASSWORDS"]
+                text: _strings__WEBPACK_IMPORTED_MODULE_8__["STRING_NON_MATCHING_PASSWORDS"]
               });
               return _context2.abrupt("return");
 
             case 4:
               this.formData.confirmPassword = false;
-              this.formData.status = _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_GENERATING_REGISTER_KEYS"];
+              this.formData.status = _strings__WEBPACK_IMPORTED_MODULE_8__["STRING_GENERATING_REGISTER_KEYS"];
               this.formData.authenticating = true;
               _context2.next = 9;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.authManager.register(this.formData.url, this.formData.email, this.formData.user_password, this.formData.ephemeral));
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.authManager.register(this.formData.url, this.formData.email, this.formData.user_password, this.formData.ephemeral));
 
             case 9:
               response = _context2.sent;
@@ -4679,7 +4676,7 @@ function () {
 
             case 17:
               _context2.next = 19;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.onAuthSuccess());
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.onAuthSuccess());
 
             case 19:
               this.syncManager.sync();
@@ -4698,7 +4695,7 @@ function () {
 
       if (!this.formData.mergeLocal) {
         this.alertManager.confirm({
-          text: _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_ACCOUNT_MENU_UNCHECK_MERGE"],
+          text: _strings__WEBPACK_IMPORTED_MODULE_8__["STRING_ACCOUNT_MENU_UNCHECK_MERGE"],
           destructive: true,
           onCancel: function onCancel() {
             _this3.formData.mergeLocal = true;
@@ -4709,7 +4706,7 @@ function () {
   }, {
     key: "onAuthSuccess",
     value: function onAuthSuccess() {
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function onAuthSuccess$(_context3) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function onAuthSuccess$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
@@ -4720,7 +4717,7 @@ function () {
 
               this.$rootScope.$broadcast('major-data-change');
               _context3.next = 4;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.clearDatabaseAndRewriteAllItems({
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.clearDatabaseAndRewriteAllItems({
                 alternateUuids: true
               }));
 
@@ -4731,7 +4728,7 @@ function () {
             case 6:
               this.modelManager.removeAllItemsFromMemory();
               _context3.next = 9;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.storageManager.clearAllModels());
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.storageManager.clearAllModels());
 
             case 9:
               this.formData.authenticating = false;
@@ -4757,7 +4754,7 @@ function () {
       var _this4 = this;
 
       var run, needsPrivilege;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function openPrivilegesModal$(_context4) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function openPrivilegesModal$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
@@ -4770,13 +4767,13 @@ function () {
               };
 
               _context4.next = 4;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_6__["PrivilegesManager"].ActionManagePrivileges));
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_5__["PrivilegesManager"].ActionManagePrivileges));
 
             case 4:
               needsPrivilege = _context4.sent;
 
               if (needsPrivilege) {
-                this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_6__["PrivilegesManager"].ActionManagePrivileges, function () {
+                this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_5__["PrivilegesManager"].ActionManagePrivileges, function () {
                   run();
                 });
               } else {
@@ -4804,17 +4801,17 @@ function () {
           alternateUuids,
           _args5 = arguments;
 
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function clearDatabaseAndRewriteAllItems$(_context5) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function clearDatabaseAndRewriteAllItems$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
               _ref = _args5.length > 0 && _args5[0] !== undefined ? _args5[0] : {}, alternateUuids = _ref.alternateUuids;
               _context5.next = 3;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.storageManager.clearAllModels());
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.storageManager.clearAllModels());
 
             case 3:
               _context5.next = 5;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.syncManager.markAllItemsDirtyAndSaveOffline(alternateUuids));
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.syncManager.markAllItemsDirtyAndSaveOffline(alternateUuids));
 
             case 5:
             case "end":
@@ -4829,15 +4826,15 @@ function () {
       var _this5 = this;
 
       this.alertManager.confirm({
-        text: _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_SIGN_OUT_CONFIRMATION"],
+        text: _strings__WEBPACK_IMPORTED_MODULE_8__["STRING_SIGN_OUT_CONFIRMATION"],
         destructive: true,
         onConfirm: function onConfirm() {
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function onConfirm$(_context6) {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function onConfirm$(_context6) {
             while (1) {
               switch (_context6.prev = _context6.next) {
                 case 0:
                   _context6.next = 2;
-                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(_this5.authManager.signout(true));
+                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this5.authManager.signout(true));
 
                 case 2:
                   window.location.reload();
@@ -4854,12 +4851,12 @@ function () {
   }, {
     key: "submitImportPassword",
     value: function submitImportPassword() {
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function submitImportPassword$(_context7) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function submitImportPassword$(_context7) {
         while (1) {
           switch (_context7.prev = _context7.next) {
             case 0:
               _context7.next = 2;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.performImport(this.importData.data, this.importData.password));
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.performImport(this.importData.data, this.importData.password));
 
             case 2:
             case "end":
@@ -4871,7 +4868,7 @@ function () {
   }, {
     key: "readFile",
     value: function readFile(file) {
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function readFile$(_context8) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function readFile$(_context8) {
         while (1) {
           switch (_context8.prev = _context8.next) {
             case 0:
@@ -4884,7 +4881,7 @@ function () {
                     resolve(data);
                   } catch (e) {
                     this.alertManager.alert({
-                      text: _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_INVALID_IMPORT_FILE"]
+                      text: _strings__WEBPACK_IMPORTED_MODULE_8__["STRING_INVALID_IMPORT_FILE"]
                     });
                   }
                 };
@@ -4907,20 +4904,20 @@ function () {
       var _this6 = this;
 
       var run, needsPrivilege;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function importFileSelected$(_context10) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function importFileSelected$(_context10) {
         while (1) {
           switch (_context10.prev = _context10.next) {
             case 0:
               run = function run() {
                 var file, data, element;
-                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function run$(_context9) {
+                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function run$(_context9) {
                   while (1) {
                     switch (_context9.prev = _context9.next) {
                       case 0:
                         _this6.importData = {};
                         file = files[0];
                         _context9.next = 4;
-                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(_this6.readFile(file));
+                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this6.readFile(file));
 
                       case 4:
                         data = _context9.sent;
@@ -4951,7 +4948,7 @@ function () {
 
                       case 14:
                         _context9.next = 16;
-                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(_this6.performImport(data, null));
+                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this6.performImport(data, null));
 
                       case 16:
                       case "end":
@@ -4962,13 +4959,13 @@ function () {
               };
 
               _context10.next = 3;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_6__["PrivilegesManager"].ActionManageBackups));
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_5__["PrivilegesManager"].ActionManageBackups));
 
             case 3:
               needsPrivilege = _context10.sent;
 
               if (needsPrivilege) {
-                this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_6__["PrivilegesManager"].ActionManageBackups, function () {
+                this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_5__["PrivilegesManager"].ActionManageBackups, function () {
                   _this6.$timeout(run);
                 });
               } else {
@@ -4986,13 +4983,13 @@ function () {
     key: "performImport",
     value: function performImport(data, password) {
       var errorCount, message;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function performImport$(_context11) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function performImport$(_context11) {
         while (1) {
           switch (_context11.prev = _context11.next) {
             case 0:
               this.importData.loading = true;
               _context11.next = 3;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.importJSONData(data, password));
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.importJSONData(data, password));
 
             case 3:
               errorCount = _context11.sent;
@@ -5000,7 +4997,7 @@ function () {
               this.importData = null;
 
               if (errorCount > 0) {
-                message = Object(_strings__WEBPACK_IMPORTED_MODULE_9__["StringImportError"])({
+                message = Object(_strings__WEBPACK_IMPORTED_MODULE_8__["StringImportError"])({
                   errorCount: errorCount
                 });
                 this.alertManager.alert({
@@ -5008,7 +5005,7 @@ function () {
                 });
               } else {
                 this.alertManager.alert({
-                  text: _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_IMPORT_SUCCESS"]
+                  text: _strings__WEBPACK_IMPORTED_MODULE_8__["STRING_IMPORT_SUCCESS"]
                 });
               }
 
@@ -5024,7 +5021,7 @@ function () {
     value: function importJSONData(data, password) {
       var errorCount, keys, throws, _items, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, item, items, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _item;
 
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function importJSONData$(_context12) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function importJSONData$(_context12) {
         while (1) {
           switch (_context12.prev = _context12.next) {
             case 0:
@@ -5036,14 +5033,14 @@ function () {
               }
 
               _context12.next = 4;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(snjs__WEBPACK_IMPORTED_MODULE_8__["protocolManager"].computeEncryptionKeysForUser(password, data.auth_params));
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(snjs__WEBPACK_IMPORTED_MODULE_7__["protocolManager"].computeEncryptionKeysForUser(password, data.auth_params));
 
             case 4:
               keys = _context12.sent;
               _context12.prev = 5;
               throws = false;
               _context12.next = 9;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(snjs__WEBPACK_IMPORTED_MODULE_8__["protocolManager"].decryptMultipleItems(data.items, keys, throws));
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(snjs__WEBPACK_IMPORTED_MODULE_7__["protocolManager"].decryptMultipleItems(data.items, keys, throws));
 
             case 9:
               _items = [];
@@ -5106,13 +5103,13 @@ function () {
               _context12.prev = 32;
               _context12.t1 = _context12["catch"](5);
               this.alertManager.alert({
-                text: _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_ERROR_DECRYPTING_IMPORT"]
+                text: _strings__WEBPACK_IMPORTED_MODULE_8__["STRING_ERROR_DECRYPTING_IMPORT"]
               });
               return _context12.abrupt("return");
 
             case 36:
               _context12.next = 38;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.modelManager.importItems(data.items));
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.modelManager.importItems(data.items));
 
             case 38:
               items = _context12.sent;
@@ -5180,7 +5177,7 @@ function () {
   }, {
     key: "downloadDataArchive",
     value: function downloadDataArchive() {
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function downloadDataArchive$(_context13) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function downloadDataArchive$(_context13) {
         while (1) {
           switch (_context13.prev = _context13.next) {
             case 0:
@@ -5224,23 +5221,23 @@ function () {
     key: "encryptionStatusString",
     value: function encryptionStatusString() {
       if (!this.authManager.offline()) {
-        return _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_E2E_ENABLED"];
+        return _strings__WEBPACK_IMPORTED_MODULE_8__["STRING_E2E_ENABLED"];
       } else if (this.passcodeManager.hasPasscode()) {
-        return _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_LOCAL_ENC_ENABLED"];
+        return _strings__WEBPACK_IMPORTED_MODULE_8__["STRING_LOCAL_ENC_ENABLED"];
       } else {
-        return _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_ENC_NOT_ENABLED"];
+        return _strings__WEBPACK_IMPORTED_MODULE_8__["STRING_ENC_NOT_ENABLED"];
       }
     }
   }, {
     key: "reloadAutoLockInterval",
     value: function reloadAutoLockInterval() {
       var interval;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function reloadAutoLockInterval$(_context14) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function reloadAutoLockInterval$(_context14) {
         while (1) {
           switch (_context14.prev = _context14.next) {
             case 0:
               _context14.next = 2;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.passcodeManager.getAutoLockInterval());
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.passcodeManager.getAutoLockInterval());
 
             case 2:
               interval = _context14.sent;
@@ -5259,17 +5256,17 @@ function () {
       var _this7 = this;
 
       var run, needsPrivilege;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function selectAutoLockInterval$(_context16) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function selectAutoLockInterval$(_context16) {
         while (1) {
           switch (_context16.prev = _context16.next) {
             case 0:
               run = function run() {
-                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function run$(_context15) {
+                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function run$(_context15) {
                   while (1) {
                     switch (_context15.prev = _context15.next) {
                       case 0:
                         _context15.next = 2;
-                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(_this7.passcodeManager.setAutoLockInterval(interval));
+                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this7.passcodeManager.setAutoLockInterval(interval));
 
                       case 2:
                         _this7.$timeout(function () {
@@ -5285,13 +5282,13 @@ function () {
               };
 
               _context16.next = 3;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_6__["PrivilegesManager"].ActionManagePasscode));
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_5__["PrivilegesManager"].ActionManagePasscode));
 
             case 3:
               needsPrivilege = _context16.sent;
 
               if (needsPrivilege) {
-                this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_6__["PrivilegesManager"].ActionManagePasscode, function () {
+                this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_5__["PrivilegesManager"].ActionManagePasscode, function () {
                   run();
                 });
               } else {
@@ -5324,7 +5321,7 @@ function () {
 
       if (passcode !== this.formData.confirmPasscode) {
         this.alertManager.alert({
-          text: _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_NON_MATCHING_PASSCODES"]
+          text: _strings__WEBPACK_IMPORTED_MODULE_8__["STRING_NON_MATCHING_PASSCODES"]
         });
         return;
       }
@@ -5332,7 +5329,7 @@ function () {
       var func = this.formData.changingPasscode ? this.passcodeManager.changePasscode.bind(this.passcodeManager) : this.passcodeManager.setPasscode.bind(this.passcodeManager);
       func(passcode, function () {
         _this8.$timeout(function _callee() {
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function _callee$(_context17) {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function _callee$(_context17) {
             while (1) {
               switch (_context17.prev = _context17.next) {
                 case 0:
@@ -5340,7 +5337,7 @@ function () {
                   _this8.formData.confirmPasscode = null;
                   _this8.formData.showPasscodeForm = false;
                   _context17.next = 5;
-                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(_this8.authManager.offline());
+                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this8.authManager.offline());
 
                 case 5:
                   if (!_context17.sent) {
@@ -5367,7 +5364,7 @@ function () {
       var _this9 = this;
 
       var run, needsPrivilege;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function changePasscodePressed$(_context18) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function changePasscodePressed$(_context18) {
         while (1) {
           switch (_context18.prev = _context18.next) {
             case 0:
@@ -5378,13 +5375,13 @@ function () {
               };
 
               _context18.next = 3;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_6__["PrivilegesManager"].ActionManagePasscode));
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_5__["PrivilegesManager"].ActionManagePasscode));
 
             case 3:
               needsPrivilege = _context18.sent;
 
               if (needsPrivilege) {
-                this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_6__["PrivilegesManager"].ActionManagePasscode, function () {
+                this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_5__["PrivilegesManager"].ActionManagePasscode, function () {
                   _this9.$timeout(run);
                 });
               } else {
@@ -5404,16 +5401,16 @@ function () {
       var _this10 = this;
 
       var run, needsPrivilege;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.async(function removePasscodePressed$(_context19) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function removePasscodePressed$(_context19) {
         while (1) {
           switch (_context19.prev = _context19.next) {
             case 0:
               run = function run() {
                 var signedIn = !_this10.authManager.offline();
-                var message = _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_REMOVE_PASSCODE_CONFIRMATION"];
+                var message = _strings__WEBPACK_IMPORTED_MODULE_8__["STRING_REMOVE_PASSCODE_CONFIRMATION"];
 
                 if (!signedIn) {
-                  message += (_babel_runtime_helpers_readOnlyError__WEBPACK_IMPORTED_MODULE_0___default()("message"), _strings__WEBPACK_IMPORTED_MODULE_9__["STRING_REMOVE_PASSCODE_OFFLINE_ADDENDUM"]);
+                  message += _strings__WEBPACK_IMPORTED_MODULE_8__["STRING_REMOVE_PASSCODE_OFFLINE_ADDENDUM"];
                 }
 
                 _this10.alertManager.confirm({
@@ -5430,13 +5427,13 @@ function () {
               };
 
               _context19.next = 3;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_6__["PrivilegesManager"].ActionManagePasscode));
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_5__["PrivilegesManager"].ActionManagePasscode));
 
             case 3:
               needsPrivilege = _context19.sent;
 
               if (needsPrivilege) {
-                this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_6__["PrivilegesManager"].ActionManagePasscode, function () {
+                this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_5__["PrivilegesManager"].ActionManagePasscode, function () {
                   _this10.$timeout(run);
                 });
               } else {
@@ -5453,7 +5450,7 @@ function () {
   }, {
     key: "isDesktopApplication",
     value: function isDesktopApplication() {
-      return Object(_utils__WEBPACK_IMPORTED_MODULE_5__["isDesktopApplication"])();
+      return Object(_utils__WEBPACK_IMPORTED_MODULE_4__["isDesktopApplication"])();
     }
   }]);
 
@@ -5461,10 +5458,10 @@ function () {
 }();
 
 var AccountMenu = function AccountMenu() {
-  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_3___default()(this, AccountMenu);
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, AccountMenu);
 
   this.restrict = 'E';
-  this.template = _directives_account_menu_pug__WEBPACK_IMPORTED_MODULE_7___default.a;
+  this.template = _directives_account_menu_pug__WEBPACK_IMPORTED_MODULE_6___default.a;
   this.controller = AccountMenuCtrl;
   this.controllerAs = 'ctrl';
   this.bindToController = true;
@@ -7808,156 +7805,186 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var PrivilegesManagementModal =
+
+var PrivilegesManagementModalCtrl =
 /*#__PURE__*/
 function () {
-  function PrivilegesManagementModal() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, PrivilegesManagementModal);
+  PrivilegesManagementModalCtrl.$inject = ["$timeout", "$element", "privilegesManager", "authManager", "passcodeManager"];
 
-    this.restrict = 'E';
-    this.template = _directives_privileges_management_modal_pug__WEBPACK_IMPORTED_MODULE_4___default.a;
-    this.scope = {};
+  /* @ngInject */
+  function PrivilegesManagementModalCtrl($timeout, $element, privilegesManager, authManager, passcodeManager) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, PrivilegesManagementModalCtrl);
+
+    this.$element = $element;
+    this.$timeout = $timeout;
+    this.privilegesManager = privilegesManager;
+    this.hasPasscode = passcodeManager.hasPasscode();
+    this.hasAccount = !authManager.offline();
+    this.reloadPrivileges();
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(PrivilegesManagementModal, [{
-    key: "link",
-    value: function link($scope, el, attrs) {
-      $scope.dismiss = function () {
-        el.remove();
-      };
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(PrivilegesManagementModalCtrl, [{
+    key: "displayInfoForCredential",
+    value: function displayInfoForCredential(credential) {
+      var info = this.privilegesManager.displayInfoForCredential(credential);
+
+      if (credential === _services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__["PrivilegesManager"].CredentialLocalPasscode) {
+        info.availability = this.hasPasscode;
+      } else if (credential === _services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__["PrivilegesManager"].CredentialAccountPassword) {
+        info.availability = this.hasAccount;
+      } else {
+        info.availability = true;
+      }
+
+      return info;
     }
-    /* @ngInject */
-
   }, {
-    key: "controller",
-    value: ["$scope", "privilegesManager", "passcodeManager", "authManager", "$timeout", function controller($scope, privilegesManager, passcodeManager, authManager, $timeout) {
-      $scope.dummy = {};
-      $scope.hasPasscode = passcodeManager.hasPasscode();
-      $scope.hasAccount = !authManager.offline();
+    key: "displayInfoForAction",
+    value: function displayInfoForAction(action) {
+      return this.privilegesManager.displayInfoForAction(action).label;
+    }
+  }, {
+    key: "isCredentialRequiredForAction",
+    value: function isCredentialRequiredForAction(action, credential) {
+      if (!this.privileges) {
+        return false;
+      }
 
-      $scope.displayInfoForCredential = function (credential) {
-        var info = privilegesManager.displayInfoForCredential(credential);
+      return this.privileges.isCredentialRequiredForAction(action, credential);
+    }
+  }, {
+    key: "clearSession",
+    value: function clearSession() {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function clearSession$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.next = 2;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.privilegesManager.clearSession());
 
-        if (credential == _services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__["PrivilegesManager"].CredentialLocalPasscode) {
-          info["availability"] = $scope.hasPasscode;
-        } else if (credential == _services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__["PrivilegesManager"].CredentialAccountPassword) {
-          info["availability"] = $scope.hasAccount;
-        } else {
-          info["availability"] = true;
-        }
+            case 2:
+              this.reloadPrivileges();
 
-        return info;
-      };
-
-      $scope.displayInfoForAction = function (action) {
-        return privilegesManager.displayInfoForAction(action).label;
-      };
-
-      $scope.isCredentialRequiredForAction = function (action, credential) {
-        if (!$scope.privileges) {
-          return false;
-        }
-
-        return $scope.privileges.isCredentialRequiredForAction(action, credential);
-      };
-
-      $scope.clearSession = function () {
-        privilegesManager.clearSession().then(function () {
-          $scope.reloadPrivileges();
-        });
-      };
-
-      $scope.reloadPrivileges = function _callee() {
-        var sessionEndDate, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, cred;
-
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                $scope.availableActions = privilegesManager.getAvailableActions();
-                $scope.availableCredentials = privilegesManager.getAvailableCredentials();
-                _context.next = 4;
-                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(privilegesManager.getSessionExpirey());
-
-              case 4:
-                sessionEndDate = _context.sent;
-                $scope.sessionExpirey = sessionEndDate.toLocaleString();
-                $scope.sessionExpired = new Date() >= sessionEndDate;
-                $scope.credentialDisplayInfo = {};
-                _iteratorNormalCompletion = true;
-                _didIteratorError = false;
-                _iteratorError = undefined;
-                _context.prev = 11;
-
-                for (_iterator = $scope.availableCredentials[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                  cred = _step.value;
-                  $scope.credentialDisplayInfo[cred] = $scope.displayInfoForCredential(cred);
-                }
-
-                _context.next = 19;
-                break;
-
-              case 15:
-                _context.prev = 15;
-                _context.t0 = _context["catch"](11);
-                _didIteratorError = true;
-                _iteratorError = _context.t0;
-
-              case 19:
-                _context.prev = 19;
-                _context.prev = 20;
-
-                if (!_iteratorNormalCompletion && _iterator.return != null) {
-                  _iterator.return();
-                }
-
-              case 22:
-                _context.prev = 22;
-
-                if (!_didIteratorError) {
-                  _context.next = 25;
-                  break;
-                }
-
-                throw _iteratorError;
-
-              case 25:
-                return _context.finish(22);
-
-              case 26:
-                return _context.finish(19);
-
-              case 27:
-                privilegesManager.getPrivileges().then(function (privs) {
-                  $timeout(function () {
-                    $scope.privileges = privs;
-                  });
-                });
-
-              case 28:
-              case "end":
-                return _context.stop();
-            }
+            case 3:
+            case "end":
+              return _context.stop();
           }
-        }, null, null, [[11, 15, 19, 27], [20,, 22, 26]]);
-      };
+        }
+      }, null, this);
+    }
+  }, {
+    key: "reloadPrivileges",
+    value: function reloadPrivileges() {
+      var _this = this;
 
-      $scope.checkboxValueChanged = function (action, credential) {
-        $scope.privileges.toggleCredentialForAction(action, credential);
-        privilegesManager.savePrivileges();
-      };
+      var sessionEndDate, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, cred, privs;
 
-      $scope.reloadPrivileges();
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function reloadPrivileges$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              this.availableActions = this.privilegesManager.getAvailableActions();
+              this.availableCredentials = this.privilegesManager.getAvailableCredentials();
+              _context2.next = 4;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.privilegesManager.getSessionExpirey());
 
-      $scope.cancel = function () {
-        $scope.dismiss();
-        $scope.onCancel && $scope.onCancel();
-      };
-    }]
+            case 4:
+              sessionEndDate = _context2.sent;
+              this.sessionExpirey = sessionEndDate.toLocaleString();
+              this.sessionExpired = new Date() >= sessionEndDate;
+              this.credentialDisplayInfo = {};
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context2.prev = 11;
+
+              for (_iterator = this.availableCredentials[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                cred = _step.value;
+                this.credentialDisplayInfo[cred] = this.displayInfoForCredential(cred);
+              }
+
+              _context2.next = 19;
+              break;
+
+            case 15:
+              _context2.prev = 15;
+              _context2.t0 = _context2["catch"](11);
+              _didIteratorError = true;
+              _iteratorError = _context2.t0;
+
+            case 19:
+              _context2.prev = 19;
+              _context2.prev = 20;
+
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+
+            case 22:
+              _context2.prev = 22;
+
+              if (!_didIteratorError) {
+                _context2.next = 25;
+                break;
+              }
+
+              throw _iteratorError;
+
+            case 25:
+              return _context2.finish(22);
+
+            case 26:
+              return _context2.finish(19);
+
+            case 27:
+              _context2.next = 29;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.privilegesManager.getPrivileges());
+
+            case 29:
+              privs = _context2.sent;
+              this.$timeout(function () {
+                _this.privileges = privs;
+              });
+
+            case 31:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this, [[11, 15, 19, 27], [20,, 22, 26]]);
+    }
+  }, {
+    key: "checkboxValueChanged",
+    value: function checkboxValueChanged(action, credential) {
+      this.privileges.toggleCredentialForAction(action, credential);
+      this.privilegesManager.savePrivileges();
+    }
+  }, {
+    key: "cancel",
+    value: function cancel() {
+      this.dismiss();
+      this.onCancel && this.onCancel();
+    }
+  }, {
+    key: "dismiss",
+    value: function dismiss() {
+      this.$element.remove();
+    }
   }]);
 
-  return PrivilegesManagementModal;
+  return PrivilegesManagementModalCtrl;
 }();
+
+var PrivilegesManagementModal = function PrivilegesManagementModal() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, PrivilegesManagementModal);
+
+  this.restrict = 'E';
+  this.template = _directives_privileges_management_modal_pug__WEBPACK_IMPORTED_MODULE_4___default.a;
+  this.controller = PrivilegesManagementModalCtrl;
+  this.controllerAs = 'ctrl';
+  this.bindToController = true;
+  this.scope = {};
+};
 
 /***/ }),
 
@@ -15021,21 +15048,6 @@ function _possibleConstructorReturn(self, call) {
 }
 
 module.exports = _possibleConstructorReturn;
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/helpers/readOnlyError.js":
-/*!**************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/readOnlyError.js ***!
-  \**************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-function _readOnlyError(name) {
-  throw new Error("\"" + name + "\" is read-only");
-}
-
-module.exports = _readOnlyError;
 
 /***/ }),
 
@@ -68865,7 +68877,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sk-modal-background\" ng-click=\"cancel()\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-modal-content\" id=\"privileges-modal\"\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003EManage Privileges\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a close-button info\" ng-click=\"cancel()\"\u003EDone\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Ctable class=\"sk-table\"\u003E\u003Cthead\u003E\u003Ctr\u003E\u003Cth\u003E\u003C\u002Fth\u003E\u003Cth ng-repeat=\"cred in availableCredentials\"\u003E\u003Cdiv class=\"priv-header\"\u003E\u003Cstrong\u003E{{credentialDisplayInfo[cred].label}}\u003C\u002Fstrong\u003E\u003Cdiv class=\"sk-p font-small\" ng-show=\"!credentialDisplayInfo[cred].availability\" style=\"margin-top: 2px\"\u003ENot Configured\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fth\u003E\u003C\u002Ftr\u003E\u003C\u002Fthead\u003E\u003Ctbody\u003E\u003Ctr ng-repeat=\"action in availableActions\"\u003E\u003Ctd\u003E\u003Cdiv class=\"sk-p\"\u003E{{displayInfoForAction(action)}}\u003C\u002Fdiv\u003E\u003C\u002Ftd\u003E\u003Cth ng-repeat=\"credential in availableCredentials\"\u003E\u003Cinput ng-checked=\"isCredentialRequiredForAction(action, credential)\" ng-click=\"checkboxValueChanged(action, credential)\" ng-disabled=\"!credentialDisplayInfo[credential].availability\" type=\"checkbox\"\u003E\u003C\u002Fth\u003E\u003C\u002Ftr\u003E\u003C\u002Ftbody\u003E\u003C\u002Ftable\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section\" ng-if=\"sessionExpirey &amp;&amp; !sessionExpired\"\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003EYou will not be asked to authenticate until {{sessionExpirey}}.\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a sk-panel-row info\" ng-click=\"clearSession()\"\u003EClear Session\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-footer\"\u003E\u003Cdiv class=\"sk-h2 sk-bold\"\u003EAbout Privileges\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section no-bottom-pad\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"text-content\"\u003E\u003Cdiv class=\"sk-p\"\u003EPrivileges represent interface level authentication for accessing certain items and features.\nNote that when your application is unlocked, your data exists in temporary memory in an unencrypted state.\nPrivileges are meant to protect against unwanted access in the event of an unlocked application, but do not affect data encryption state.\u003C\u002Fdiv\u003E\u003Cp class=\"sk-p\"\u003EPrivileges sync across your other devices; however, note that if you require\na \"Local Passcode\" privilege, and another device does not have a local passcode set up, the local passcode\nrequirement will be ignored on that device.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sk-modal-background\" ng-click=\"ctrl.cancel()\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-modal-content\" id=\"privileges-modal\"\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003EManage Privileges\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a close-button info\" ng-click=\"ctrl.cancel()\"\u003EDone\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Ctable class=\"sk-table\"\u003E\u003Cthead\u003E\u003Ctr\u003E\u003Cth\u003E\u003C\u002Fth\u003E\u003Cth ng-repeat=\"cred in ctrl.availableCredentials\"\u003E\u003Cdiv class=\"priv-header\"\u003E\u003Cstrong\u003E{{ctrl.credentialDisplayInfo[cred].label}}\u003C\u002Fstrong\u003E\u003Cdiv class=\"sk-p font-small\" ng-show=\"!ctrl.credentialDisplayInfo[cred].availability\" style=\"margin-top: 2px\"\u003ENot Configured\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fth\u003E\u003C\u002Ftr\u003E\u003C\u002Fthead\u003E\u003Ctbody\u003E\u003Ctr ng-repeat=\"action in ctrl.availableActions\"\u003E\u003Ctd\u003E\u003Cdiv class=\"sk-p\"\u003E{{ctrl.displayInfoForAction(action)}}\u003C\u002Fdiv\u003E\u003C\u002Ftd\u003E\u003Cth ng-repeat=\"credential in ctrl.availableCredentials\"\u003E\u003Cinput ng-checked=\"ctrl.isCredentialRequiredForAction(action, credential)\" ng-click=\"ctrl.checkboxValueChanged(action, credential)\" ng-disabled=\"!ctrl.credentialDisplayInfo[credential].availability\" type=\"checkbox\"\u003E\u003C\u002Fth\u003E\u003C\u002Ftr\u003E\u003C\u002Ftbody\u003E\u003C\u002Ftable\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section\" ng-if=\"ctrl.sessionExpirey &amp;&amp; !ctrl.sessionExpired\"\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003E You will not be asked to authenticate until {{ctrl.sessionExpirey}}.\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a sk-panel-row info\" ng-click=\"ctrl.clearSession()\"\u003EClear Session\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-footer\"\u003E\u003Cdiv class=\"sk-h2 sk-bold\"\u003EAbout Privileges\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section no-bottom-pad\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"text-content\"\u003E\u003Cdiv class=\"sk-p\"\u003EPrivileges represent interface level authentication for accessing \ncertain items and features. Note that when your application is unlocked,\nyour data exists in temporary memory in an unencrypted state.\nPrivileges are meant to protect against unwanted access in the event of\nan unlocked application, but do not affect data encryption state.\u003C\u002Fdiv\u003E\u003Cp class=\"sk-p\"\u003EPrivileges sync across your other devices; however, note that if you \nrequire a \"Local Passcode\" privilege, and another device does not have \na local passcode set up, the local passcode requirement will be ignored \non that device.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),

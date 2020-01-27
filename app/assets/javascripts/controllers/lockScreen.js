@@ -50,7 +50,7 @@ class LockScreenCtrl {
   submitPasscodeForm($event) {
     if(
       !this.formData.passcode ||
-      this.formData.passcode.length == 0
+      this.formData.passcode.length === 0
     ) {
       return;
     }

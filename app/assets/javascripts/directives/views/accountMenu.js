@@ -61,7 +61,7 @@ class AccountMenuCtrl {
       ephemeral: false
     };
     this.archiveFormData = {
-      encrypted: this.encryptedBackupsAvailable() ? true : false
+      encrypted: this.encryptedBackupsAvailable()
     };
     this.syncManager.getServerURL().then((url) => {
       this.$timeout(() => {
@@ -297,7 +297,6 @@ class AccountMenuCtrl {
         await this.performImport(data, null);
       }
     }
-
     const needsPrivilege = await this.privilegesManager.actionRequiresPrivilege(
       PrivilegesManager.ActionManageBackups
     );
@@ -496,7 +495,7 @@ class AccountMenuCtrl {
   async removePasscodePressed() {
     const run = () => {
       const signedIn = !this.authManager.offline();
-      const message = STRING_REMOVE_PASSCODE_CONFIRMATION;
+      let message = STRING_REMOVE_PASSCODE_CONFIRMATION;
       if(!signedIn) {
         message += STRING_REMOVE_PASSCODE_OFFLINE_ADDENDUM;
       }
