@@ -14,6 +14,7 @@ class RevisionPreviewModalCtrl {
   ) {
     this.$element = $element;
     this.$scope = $scope;
+    this.$timeout = $timeout;
     this.alertManager = alertManager;
     this.componentManager = componentManager;
     this.modelManager = modelManager;

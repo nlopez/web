@@ -1551,10 +1551,10 @@ __webpack_require__.r(__webpack_exports__);
 var FooterCtrl =
 /*#__PURE__*/
 function () {
-  FooterCtrl.$inject = ["$scope", "$rootScope", "$timeout", "alertManager", "appState", "authManager", "componentManager", "modelManager", "nativeExtManager", "passcodeManager", "privilegesManager", "statusManager", "syncManager"];
+  FooterCtrl.$inject = ["$rootScope", "$timeout", "alertManager", "appState", "authManager", "componentManager", "modelManager", "nativeExtManager", "passcodeManager", "privilegesManager", "statusManager", "syncManager"];
 
   /* @ngInject */
-  function FooterCtrl($scope, $rootScope, $timeout, alertManager, appState, authManager, componentManager, modelManager, nativeExtManager, passcodeManager, privilegesManager, statusManager, syncManager) {
+  function FooterCtrl($rootScope, $timeout, alertManager, appState, authManager, componentManager, modelManager, nativeExtManager, passcodeManager, privilegesManager, statusManager, syncManager) {
     var _this = this;
 
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, FooterCtrl);
@@ -1581,6 +1581,7 @@ function () {
     this.syncManager = syncManager;
     this.rooms = [];
     this.themesWithIcons = [];
+    this.showSyncResolution = false;
     this.addAppStateObserver();
     this.updateOfflineStatus();
     this.addSyncEventHandler();
@@ -8024,6 +8025,7 @@ function () {
 
     this.$element = $element;
     this.$scope = $scope;
+    this.$timeout = $timeout;
     this.alertManager = alertManager;
     this.componentManager = componentManager;
     this.modelManager = modelManager;
@@ -8327,68 +8329,103 @@ var SessionHistoryMenu = function SessionHistoryMenu() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SyncResolutionMenu", function() { return SyncResolutionMenu; });
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _directives_sync_resolution_menu_pug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! %/directives/sync-resolution-menu.pug */ "./app/assets/templates/directives/sync-resolution-menu.pug");
-/* harmony import */ var _directives_sync_resolution_menu_pug__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_directives_sync_resolution_menu_pug__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _directives_sync_resolution_menu_pug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! %/directives/sync-resolution-menu.pug */ "./app/assets/templates/directives/sync-resolution-menu.pug");
+/* harmony import */ var _directives_sync_resolution_menu_pug__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_directives_sync_resolution_menu_pug__WEBPACK_IMPORTED_MODULE_3__);
 
 
 
-var SyncResolutionMenu =
+
+
+var SyncResolutionMenuCtrl =
 /*#__PURE__*/
 function () {
-  function SyncResolutionMenu() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, SyncResolutionMenu);
+  SyncResolutionMenuCtrl.$inject = ["$timeout", "archiveManager", "syncManager"];
 
-    this.restrict = 'E';
-    this.template = _directives_sync_resolution_menu_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
-    this.scope = {
-      closeFunction: '&'
-    };
-  }
   /* @ngInject */
+  function SyncResolutionMenuCtrl($timeout, archiveManager, syncManager) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, SyncResolutionMenuCtrl);
 
+    this.$timeout = $timeout;
+    this.archiveManager = archiveManager;
+    this.syncManager = syncManager;
+    this.status = {};
+  }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(SyncResolutionMenu, [{
-    key: "controller",
-    value: ["$scope", "modelManager", "syncManager", "archiveManager", "$timeout", function controller($scope, modelManager, syncManager, archiveManager, $timeout) {
-      $scope.status = {};
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(SyncResolutionMenuCtrl, [{
+    key: "downloadBackup",
+    value: function downloadBackup(encrypted) {
+      this.archiveManager.downloadBackup(encrypted);
+      this.status.backupFinished = true;
+    }
+  }, {
+    key: "skipBackup",
+    value: function skipBackup() {
+      this.status.backupFinished = true;
+    }
+  }, {
+    key: "performSyncResolution",
+    value: function performSyncResolution() {
+      var _this = this;
 
-      $scope.close = function () {
-        $timeout(function () {
-          $scope.closeFunction()();
-        });
-      };
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function performSyncResolution$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              this.status.resolving = true;
+              _context.next = 3;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.syncManager.resolveOutOfSync());
 
-      $scope.downloadBackup = function (encrypted) {
-        archiveManager.downloadBackup(encrypted);
-        $scope.status.backupFinished = true;
-      };
+            case 3:
+              this.$timeout(function () {
+                _this.status.resolving = false;
+                _this.status.attemptedResolution = true;
 
-      $scope.skipBackup = function () {
-        $scope.status.backupFinished = true;
-      };
+                if (_this.syncManager.isOutOfSync()) {
+                  _this.status.fail = true;
+                } else {
+                  _this.status.success = true;
+                }
+              });
 
-      $scope.performSyncResolution = function () {
-        $scope.status.resolving = true;
-        syncManager.resolveOutOfSync().then(function () {
-          $scope.status.resolving = false;
-          $scope.status.attemptedResolution = true;
-
-          if (syncManager.isOutOfSync()) {
-            $scope.status.fail = true;
-          } else {
-            $scope.status.success = true;
+            case 4:
+            case "end":
+              return _context.stop();
           }
-        });
-      };
-    }]
+        }
+      }, null, this);
+    }
+  }, {
+    key: "close",
+    value: function close() {
+      var _this2 = this;
+
+      this.$timeout(function () {
+        _this2.closeFunction()();
+      });
+    }
   }]);
 
-  return SyncResolutionMenu;
+  return SyncResolutionMenuCtrl;
 }();
+
+var SyncResolutionMenu = function SyncResolutionMenu() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, SyncResolutionMenu);
+
+  this.restrict = 'E';
+  this.template = _directives_sync_resolution_menu_pug__WEBPACK_IMPORTED_MODULE_3___default.a;
+  this.controller = SyncResolutionMenuCtrl;
+  this.controllerAs = 'ctrl';
+  this.bindToController = true;
+  this.scope = {
+    closeFunction: '&'
+  };
+};
 
 /***/ }),
 
@@ -68974,7 +69011,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel sk-panel-right\" id=\"sync-resolution-menu\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003EOut of Sync\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"close()\"\u003EClose\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Cdiv class=\"sk-panel-row sk-p\"\u003EWe've detected that the data on the server may not match the data in the current application session.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003Cstrong class=\"sk-panel-row\"\u003EOption 1 — Restart App:\u003C\u002Fstrong\u003E\u003Cdiv class=\"sk-p\"\u003EQuit the application and re-open it. Sometimes, this may resolve the issue.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003Cstrong class=\"sk-panel-row\"\u003EOption 2 (recommended) — Sign Out:\u003C\u002Fstrong\u003E\u003Cdiv class=\"sk-p\"\u003ESign out of your account, then sign back in. This will ensure your data is consistent with the server.\u003C\u002Fdiv\u003EBe sure to download a backup of your data before doing so.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003Cstrong class=\"sk-panel-row\"\u003EOption 3 — Sync Resolution:\u003C\u002Fstrong\u003E\u003Cdiv class=\"sk-p\"\u003EWe can attempt to reconcile changes by downloading all data from the server.\u003C\u002Fdiv\u003ENo existing data will be overwritten. If the local contents of an item differ from what the server has,\na conflicted copy will be created.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"!status.backupFinished\"\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003EPlease download a backup before we attempt to perform a full account sync resolution.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-button-group\"\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"downloadBackup(true)\"\u003E\u003Cdiv class=\"sk-label\"\u003EEncrypted\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"downloadBackup(false)\"\u003E\u003Cdiv class=\"sk-label\"\u003EDecrypted\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button danger\" ng-click=\"skipBackup()\"\u003E\u003Cdiv class=\"sk-label\"\u003ESkip\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"status.backupFinished\"\u003E\u003Cdiv class=\"sk-panel-row\" ng-if=\"!status.resolving &amp;&amp; !status.attemptedResolution\"\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"performSyncResolution()\"\u003E\u003Cdiv class=\"sk-label\"\u003EPerform Sync Resolution\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row justify-left\" ng-if=\"status.resolving\"\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Cdiv class=\"sk-spinner small info\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-label\"\u003EAttempting sync resolution...\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-column\" ng-if=\"status.fail\"\u003E\u003Cdiv class=\"sk-panel-row sk-label danger\"\u003ESync Resolution Failed\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003EWe attempted to reconcile local content and server content, but were unable to do so.\nAt this point, we recommend signing out of your account and signing back in. You may\nwish to download a data backup before doing so.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-column\" ng-if=\"status.success\"\u003E\u003Cdiv class=\"sk-panel-row sk-label success\"\u003ESync Resolution Success\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003EYour local data is now in sync with the server. You may close this window.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel sk-panel-right\" id=\"sync-resolution-menu\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003EOut of Sync\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"ctrl.close()\"\u003EClose\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Cdiv class=\"sk-panel-row sk-p\"\u003EWe've detected that the data on the server may not match \nthe data in the current application session.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003Cstrong class=\"sk-panel-row\"\u003EOption 1 — Restart App:\u003C\u002Fstrong\u003E\u003Cdiv class=\"sk-p\"\u003E Quit the application and re-open it. \nSometimes, this may resolve the issue.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003Cstrong class=\"sk-panel-row\"\u003EOption 2 (recommended) — Sign Out:\u003C\u002Fstrong\u003E\u003Cdiv class=\"sk-p\"\u003ESign out of your account, then sign back in. \nThis will ensure your data is consistent with the server.\u003C\u002Fdiv\u003EBe sure to download a backup of your data before doing so.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003Cstrong class=\"sk-panel-row\"\u003EOption 3 — Sync Resolution:\u003C\u002Fstrong\u003E\u003Cdiv class=\"sk-p\"\u003EWe can attempt to reconcile changes by downloading all data from the \nserver. No existing data will be overwritten. If the local contents of \nan item differ from what the server has, a conflicted copy will be created.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"!ctrl.status.backupFinished\"\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003EPlease download a backup before we attempt to \nperform a full account sync resolution.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-button-group\"\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"ctrl.downloadBackup(true)\"\u003E\u003Cdiv class=\"sk-label\"\u003EEncrypted\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"ctrl.downloadBackup(false)\"\u003E\u003Cdiv class=\"sk-label\"\u003EDecrypted\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button danger\" ng-click=\"ctrl.skipBackup()\"\u003E\u003Cdiv class=\"sk-label\"\u003ESkip\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"ctrl.status.backupFinished\"\u003E\u003Cdiv class=\"sk-panel-row\" ng-if=\"!ctrl.status.resolving &amp;&amp; !ctrl.status.attemptedResolution\"\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"ctrl.performSyncResolution()\"\u003E\u003Cdiv class=\"sk-label\"\u003EPerform Sync Resolution\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row justify-left\" ng-if=\"ctrl.status.resolving\"\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Cdiv class=\"sk-spinner small info\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-label\"\u003EAttempting sync resolution...\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-column\" ng-if=\"ctrl.status.fail\"\u003E\u003Cdiv class=\"sk-panel-row sk-label danger\"\u003ESync Resolution Failed\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003EWe attempted to reconcile local content and server content, but were \nunable to do so. At this point, we recommend signing out of your account \nand signing back in. You may wish to download a data backup before doing so.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-column\" ng-if=\"ctrl.status.success\"\u003E\u003Cdiv class=\"sk-panel-row sk-label success\"\u003ESync Resolution Success\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003EYour local data is now in sync with the server. You may close this window.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),

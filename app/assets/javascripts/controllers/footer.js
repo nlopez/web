@@ -14,7 +14,6 @@ class FooterCtrl {
 
   /* @ngInject */
   constructor(
-    $scope,
     $rootScope,
     $timeout,
     alertManager,
@@ -28,7 +27,6 @@ class FooterCtrl {
     statusManager,
     syncManager,
   ) {
-
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
     this.alertManager = alertManager;
@@ -44,6 +42,7 @@ class FooterCtrl {
 
     this.rooms = [];
     this.themesWithIcons = [];
+    this.showSyncResolution = false;
 
     this.addAppStateObserver();
     this.updateOfflineStatus();
