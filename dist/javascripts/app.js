@@ -2618,6 +2618,17 @@ function () {
       }
 
       var note = displayableNotes[index];
+      /** Dont auto-select protected notes */
+
+      while (note && note.content.protected) {
+        index++;
+
+        if (index >= displayableNotes.length) {
+          break;
+        }
+
+        note = displayableNotes[index];
+      }
 
       if (note) {
         this.selectNote(note);
@@ -7534,48 +7545,56 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var PermissionsModal =
+
+var PermissionsModalCtrl =
 /*#__PURE__*/
 function () {
-  function PermissionsModal() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, PermissionsModal);
+  PermissionsModalCtrl.$inject = ["$element"];
 
-    this.restrict = 'E';
-    this.template = _directives_permissions_modal_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
-    this.scope = {
-      show: '=',
-      component: '=',
-      permissionsString: '=',
-      callback: '='
-    };
+  /* @ngInject */
+  function PermissionsModalCtrl($element) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, PermissionsModalCtrl);
+
+    this.$element = $element;
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(PermissionsModal, [{
-    key: "link",
-    value: function link($scope, el, attrs) {
-      $scope.dismiss = function () {
-        el.remove();
-      };
-
-      $scope.accept = function () {
-        $scope.callback(true);
-        $scope.dismiss();
-      };
-
-      $scope.deny = function () {
-        $scope.callback(false);
-        $scope.dismiss();
-      };
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(PermissionsModalCtrl, [{
+    key: "dismiss",
+    value: function dismiss() {
+      this.$element.remove();
     }
-    /* @ngInject */
-
   }, {
-    key: "controller",
-    value: ["$scope", "modelManager", function controller($scope, modelManager) {}]
+    key: "accept",
+    value: function accept() {
+      this.callback(true);
+      this.dismiss();
+    }
+  }, {
+    key: "deny",
+    value: function deny() {
+      this.callback(false);
+      this.dismiss();
+    }
   }]);
 
-  return PermissionsModal;
+  return PermissionsModalCtrl;
 }();
+
+var PermissionsModal = function PermissionsModal() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, PermissionsModal);
+
+  this.restrict = 'E';
+  this.template = _directives_permissions_modal_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
+  this.controller = PermissionsModalCtrl;
+  this.controllerAs = 'ctrl';
+  this.bindToController = true;
+  this.scope = {
+    show: '=',
+    component: '=',
+    permissionsString: '=',
+    callback: '='
+  };
+};
 
 /***/ }),
 
@@ -7589,137 +7608,179 @@ function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PrivilegesAuthModal", function() { return PrivilegesAuthModal; });
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _directives_privileges_auth_modal_pug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! %/directives/privileges-auth-modal.pug */ "./app/assets/templates/directives/privileges-auth-modal.pug");
-/* harmony import */ var _directives_privileges_auth_modal_pug__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_directives_privileges_auth_modal_pug__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _directives_privileges_auth_modal_pug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! %/directives/privileges-auth-modal.pug */ "./app/assets/templates/directives/privileges-auth-modal.pug");
+/* harmony import */ var _directives_privileges_auth_modal_pug__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_directives_privileges_auth_modal_pug__WEBPACK_IMPORTED_MODULE_3__);
 
 
 
-/* @ngInject */
 
-var PrivilegesAuthModal =
+
+var PrivilegesAuthModalCtrl =
 /*#__PURE__*/
 function () {
-  function PrivilegesAuthModal() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, PrivilegesAuthModal);
+  PrivilegesAuthModalCtrl.$inject = ["$element", "$timeout", "privilegesManager"];
 
-    this.restrict = 'E';
-    this.template = _directives_privileges_auth_modal_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
-    this.scope = {
-      action: '=',
-      onSuccess: '=',
-      onCancel: '='
-    };
+  /* @ngInject */
+  function PrivilegesAuthModalCtrl($element, $timeout, privilegesManager) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, PrivilegesAuthModalCtrl);
+
+    this.$element = $element;
+    this.$timeout = $timeout;
+    this.privilegesManager = privilegesManager;
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(PrivilegesAuthModal, [{
-    key: "link",
-    value: function link($scope, el, attrs) {
-      $scope.dismiss = function () {
-        el.remove();
-      };
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(PrivilegesAuthModalCtrl, [{
+    key: "$onInit",
+    value: function $onInit() {
+      var _this = this;
+
+      this.authParameters = {};
+      this.sessionLengthOptions = this.privilegesManager.getSessionLengthOptions();
+      this.privilegesManager.getSelectedSessionLength().then(function (length) {
+        _this.$timeout(function () {
+          _this.selectedSessionLength = length;
+        });
+      });
+      this.privilegesManager.netCredentialsForAction(this.action).then(function (credentials) {
+        _this.$timeout(function () {
+          _this.requiredCredentials = credentials.sort();
+        });
+      });
     }
   }, {
-    key: "controller",
-    value: ["$scope", "privilegesManager", "passcodeManager", "authManager", "$timeout", function controller($scope, privilegesManager, passcodeManager, authManager, $timeout) {
-      'ngInject';
+    key: "selectSessionLength",
+    value: function selectSessionLength(length) {
+      this.selectedSessionLength = length;
+    }
+  }, {
+    key: "promptForCredential",
+    value: function promptForCredential(credential) {
+      return this.privilegesManager.displayInfoForCredential(credential).prompt;
+    }
+  }, {
+    key: "cancel",
+    value: function cancel() {
+      this.dismiss();
+      this.onCancel && this.onCancel();
+    }
+  }, {
+    key: "isCredentialInFailureState",
+    value: function isCredentialInFailureState(credential) {
+      if (!this.failedCredentials) {
+        return false;
+      }
 
-      $scope.authenticationParameters = {};
-      $scope.sessionLengthOptions = privilegesManager.getSessionLengthOptions();
-      privilegesManager.getSelectedSessionLength().then(function (length) {
-        $timeout(function () {
-          $scope.selectedSessionLength = length;
-        });
-      });
+      return this.failedCredentials.find(function (candidate) {
+        return candidate === credential;
+      }) != null;
+    }
+  }, {
+    key: "validate",
+    value: function validate() {
+      var failed = [];
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
 
-      $scope.selectSessionLength = function (length) {
-        $scope.selectedSessionLength = length;
-      };
+      try {
+        for (var _iterator = this.requiredCredentials[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var cred = _step.value;
+          var value = this.authParameters[cred];
 
-      privilegesManager.netCredentialsForAction($scope.action).then(function (credentials) {
-        $timeout(function () {
-          $scope.requiredCredentials = credentials.sort();
-        });
-      });
-
-      $scope.promptForCredential = function (credential) {
-        return privilegesManager.displayInfoForCredential(credential).prompt;
-      };
-
-      $scope.cancel = function () {
-        $scope.dismiss();
-        $scope.onCancel && $scope.onCancel();
-      };
-
-      $scope.isCredentialInFailureState = function (credential) {
-        if (!$scope.failedCredentials) {
-          return false;
+          if (!value || value.length === 0) {
+            failed.push(cred);
+          }
         }
-
-        return $scope.failedCredentials.find(function (candidate) {
-          return candidate == credential;
-        }) != null;
-      };
-
-      $scope.validate = function () {
-        var failed = [];
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
         try {
-          for (var _iterator = $scope.requiredCredentials[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var cred = _step.value;
-            var value = $scope.authenticationParameters[cred];
-
-            if (!value || value.length == 0) {
-              failed.push(cred);
-            }
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
           }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
         } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return != null) {
-              _iterator.return();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
+          if (_didIteratorError) {
+            throw _iteratorError;
           }
         }
+      }
 
-        $scope.failedCredentials = failed;
-        return failed.length == 0;
-      };
+      this.failedCredentials = failed;
+      return failed.length === 0;
+    }
+  }, {
+    key: "submit",
+    value: function submit() {
+      var _this2 = this;
 
-      $scope.submit = function () {
-        if (!$scope.validate()) {
-          return;
+      var result;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function submit$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              if (this.validate()) {
+                _context.next = 2;
+                break;
+              }
+
+              return _context.abrupt("return");
+
+            case 2:
+              _context.next = 4;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.privilegesManager.authenticateAction(this.action, this.authParameters));
+
+            case 4:
+              result = _context.sent;
+              this.$timeout(function () {
+                if (result.success) {
+                  _this2.privilegesManager.setSessionLength(_this2.selectedSessionLength);
+
+                  _this2.onSuccess();
+
+                  _this2.dismiss();
+                } else {
+                  _this2.failedCredentials = result.failedCredentials;
+                }
+              });
+
+            case 6:
+            case "end":
+              return _context.stop();
+          }
         }
-
-        privilegesManager.authenticateAction($scope.action, $scope.authenticationParameters).then(function (result) {
-          $timeout(function () {
-            if (result.success) {
-              privilegesManager.setSessionLength($scope.selectedSessionLength);
-              $scope.onSuccess();
-              $scope.dismiss();
-            } else {
-              $scope.failedCredentials = result.failedCredentials;
-            }
-          });
-        });
-      };
-    }]
+      }, null, this);
+    }
+  }, {
+    key: "dismiss",
+    value: function dismiss() {
+      this.$element.remove();
+    }
   }]);
 
-  return PrivilegesAuthModal;
+  return PrivilegesAuthModalCtrl;
 }();
+
+var PrivilegesAuthModal = function PrivilegesAuthModal() {
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, PrivilegesAuthModal);
+
+  this.restrict = 'E';
+  this.template = _directives_privileges_auth_modal_pug__WEBPACK_IMPORTED_MODULE_3___default.a;
+  this.controller = PrivilegesAuthModalCtrl;
+  this.controllerAs = 'ctrl';
+  this.bindToController = true;
+  this.scope = {
+    action: '=',
+    onSuccess: '=',
+    onCancel: '='
+  };
+};
 
 /***/ }),
 
@@ -68776,7 +68837,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sk-modal-background\" ng-click=\"deny()\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-modal-content\" id=\"permissions-modal\"\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003EActivate Extension\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"deny()\"\u003ECancel\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-h2\"\u003E\u003Cstrong\u003E{{component.name}}\u003C\u002Fstrong\u003E would like to interact with your\n {{permissionsString}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cp class=\"sk-p\"\u003EExtensions use an offline messaging system to communicate. Learn more at\u003Ca class=\"sk-a info\" href=\"https:\u002F\u002Fstandardnotes.org\u002Fpermissions\" rel=\"noopener\" target=\"_blank\"\u003Ehttps:\u002F\u002Fstandardnotes.org\u002Fpermissions.\u003C\u002Fa\u003E\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-footer\"\u003E\u003Cdiv class=\"sk-button info big block bold\" ng-click=\"accept()\"\u003E\u003Cdiv class=\"sk-label\"\u003EContinue\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sk-modal-background\" ng-click=\"ctrl.deny()\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-modal-content\" id=\"permissions-modal\"\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003EActivate Extension\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"ctrl.deny()\"\u003ECancel\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-h2\"\u003E\u003Cstrong\u003E{{ctrl.component.name}}\u003C\u002Fstrong\u003E would like to interact with your\n {{ctrl.permissionsString}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cp class=\"sk-p\"\u003EExtensions use an offline messaging system to communicate. Learn more at\u003Ca class=\"sk-a info\" href=\"https:\u002F\u002Fstandardnotes.org\u002Fpermissions\" rel=\"noopener\" target=\"_blank\"\u003Ehttps:\u002F\u002Fstandardnotes.org\u002Fpermissions.\u003C\u002Fa\u003E\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-footer\"\u003E\u003Cdiv class=\"sk-button info big block bold\" ng-click=\"ctrl.accept()\"\u003E\u003Cdiv class=\"sk-label\"\u003EContinue\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),
@@ -68790,7 +68851,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sk-modal-background\" ng-click=\"cancel()\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-modal-content\" id=\"privileges-modal\"\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003EAuthentication Required\u003C\u002Fdiv\u003E\u003Ca class=\"close-button info\" ng-click=\"cancel()\"\u003ECancel\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Cdiv ng-repeat=\"credential in requiredCredentials\"\u003E\u003Cdiv class=\"sk-p sk-bold sk-panel-row\"\u003E\u003Cstrong\u003E{{promptForCredential(credential)}}\u003C\u002Fstrong\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cinput class=\"sk-input contrast\" ng-model=\"authenticationParameters[credential]\" should-focus=\"$index == 0\" sn-autofocus=\"true\" sn-enter=\"submit()\" type=\"password\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Clabel class=\"sk-label danger\" ng-if=\"isCredentialInFailureState(credential)\"\u003EInvalid authentication. Please try again.\u003C\u002Flabel\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Cdiv class=\"sk-p sk-bold\"\u003ERemember For\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info\" ng-class=\"{'boxed' : option.value == selectedSessionLength}\" ng-click=\"selectSessionLength(option.value)\" ng-repeat=\"option in sessionLengthOptions\"\u003E{{option.label}}\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-footer extra-padding\"\u003E\u003Cdiv class=\"sk-button info big block bold\" ng-click=\"submit()\"\u003E\u003Cdiv class=\"sk-label\"\u003ESubmit\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sk-modal-background\" ng-click=\"ctrl.cancel()\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-modal-content\" id=\"privileges-modal\"\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003EAuthentication Required\u003C\u002Fdiv\u003E\u003Ca class=\"close-button info\" ng-click=\"ctrl.cancel()\"\u003ECancel\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Cdiv ng-repeat=\"credential in ctrl.requiredCredentials\"\u003E\u003Cdiv class=\"sk-p sk-bold sk-panel-row\"\u003E\u003Cstrong\u003E{{ctrl.promptForCredential(credential)}}\u003C\u002Fstrong\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cinput class=\"sk-input contrast\" ng-model=\"ctrl.authParameters[credential]\" should-focus=\"$index == 0\" sn-autofocus=\"true\" sn-enter=\"ctrl.submit()\" type=\"password\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Clabel class=\"sk-label danger\" ng-if=\"ctrl.isCredentialInFailureState(credential)\"\u003EInvalid authentication. Please try again.\u003C\u002Flabel\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Cdiv class=\"sk-p sk-bold\"\u003ERemember For\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info\" ng-repeat=\"option in ctrl.sessionLengthOptions\" ng-class=\"{'boxed' : option.value == ctrl.selectedSessionLength}\" ng-click=\"ctrl.selectSessionLength(option.value)\"\u003E{{option.label}}\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-footer extra-padding\"\u003E\u003Cdiv class=\"sk-button info big block bold\" ng-click=\"ctrl.submit()\"\u003E\u003Cdiv class=\"sk-label\"\u003ESubmit\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),

@@ -1,91 +1,101 @@
 import template from '%/directives/privileges-auth-modal.pug';
 
-/* @ngInject */
+class PrivilegesAuthModalCtrl {
+  /* @ngInject */
+  constructor(
+    $element,
+    $timeout,
+    privilegesManager,
+  ) {
+    this.$element = $element;
+    this.$timeout = $timeout;
+    this.privilegesManager = privilegesManager;
+  }
+
+  $onInit() {
+    this.authParameters = {};
+    this.sessionLengthOptions = this.privilegesManager.getSessionLengthOptions();
+    this.privilegesManager.getSelectedSessionLength().then((length) => {
+      this.$timeout(() => {
+        this.selectedSessionLength = length;
+      })
+    })
+    this.privilegesManager.netCredentialsForAction(this.action).then((credentials) => {
+      this.$timeout(() => {
+        this.requiredCredentials = credentials.sort();
+      });
+    });
+  }
+
+  selectSessionLength(length) {
+    this.selectedSessionLength = length;
+  }
+
+  promptForCredential(credential) {
+    return this.privilegesManager.displayInfoForCredential(credential).prompt;
+  }
+
+  cancel() {
+    this.dismiss();
+    this.onCancel && this.onCancel();
+  }
+
+  isCredentialInFailureState(credential) {
+    if (!this.failedCredentials) {
+      return false;
+    }
+    return this.failedCredentials.find((candidate) => {
+      return candidate === credential;
+    }) != null;
+  }
+
+  validate() {
+    const failed = [];
+    for (const cred of this.requiredCredentials) {
+      const value = this.authParameters[cred];
+      if (!value || value.length === 0) {
+        failed.push(cred);
+      }
+    }
+    this.failedCredentials = failed;
+    return failed.length === 0;
+  }
+
+  async submit() {
+    if (!this.validate()) {
+      return;
+    }
+    const result = await this.privilegesManager.authenticateAction(
+      this.action, 
+      this.authParameters
+    );
+    this.$timeout(() => {
+      if (result.success) {
+        this.privilegesManager.setSessionLength(this.selectedSessionLength);
+        this.onSuccess();
+        this.dismiss();
+      } else {
+        this.failedCredentials = result.failedCredentials;
+      }
+    })
+  }
+
+  dismiss() {
+    this.$element.remove();
+  }
+}
+
 export class PrivilegesAuthModal {
   constructor() {
     this.restrict = 'E';
     this.template = template;
+    this.controller = PrivilegesAuthModalCtrl;
+    this.controllerAs = 'ctrl';
+    this.bindToController = true;
     this.scope = {
       action: '=',
       onSuccess: '=',
       onCancel: '='
     };
-  }
-
-  link($scope, el, attrs) {
-    $scope.dismiss = function() {
-      el.remove();
-    }
-  }
-
-  controller($scope, privilegesManager, passcodeManager, authManager, $timeout) {
-    'ngInject';
-
-    $scope.authenticationParameters = {};
-    $scope.sessionLengthOptions = privilegesManager.getSessionLengthOptions();
-
-    privilegesManager.getSelectedSessionLength().then((length) => {
-      $timeout(() => {
-        $scope.selectedSessionLength = length;
-      })
-    })
-
-    $scope.selectSessionLength = function(length) {
-      $scope.selectedSessionLength = length;
-    }
-
-    privilegesManager.netCredentialsForAction($scope.action).then((credentials) => {
-      $timeout(() => {
-        $scope.requiredCredentials = credentials.sort();
-      });
-    });
-
-    $scope.promptForCredential = function(credential) {
-      return privilegesManager.displayInfoForCredential(credential).prompt;
-    }
-
-    $scope.cancel = function() {
-      $scope.dismiss();
-      $scope.onCancel && $scope.onCancel();
-    }
-
-    $scope.isCredentialInFailureState = function(credential) {
-      if(!$scope.failedCredentials) {
-        return false;
-      }
-      return $scope.failedCredentials.find((candidate) => {
-        return candidate == credential;
-      }) != null;
-    }
-
-    $scope.validate = function() {
-      var failed = [];
-      for(var cred of $scope.requiredCredentials) {
-        var value = $scope.authenticationParameters[cred];
-        if(!value || value.length == 0) {
-          failed.push(cred);
-        }
-      }
-
-      $scope.failedCredentials = failed;
-      return failed.length == 0;
-    }
-
-    $scope.submit = function() {
-      if(!$scope.validate()) {
-        return;
-      }
-      privilegesManager.authenticateAction($scope.action, $scope.authenticationParameters).then((result) => {
-        $timeout(() => {
-          if(result.success) {
-            privilegesManager.setSessionLength($scope.selectedSessionLength);
-            $scope.onSuccess();
-            $scope.dismiss();
-          } else {
-            $scope.failedCredentials = result.failedCredentials;
-          }
-        })
-      })
-    }
   }
 }

@@ -285,7 +285,16 @@ class NotesCtrl {
       index = 0;
     }
 
-    const note = displayableNotes[index];
+    let note = displayableNotes[index];
+    /** Dont auto-select protected notes */
+    while(note && note.content.protected) {
+      index++;
+      if(index >= displayableNotes.length) {
+        break;
+      }
+      note = displayableNotes[index];
+    }
+
     if(note) {
       this.selectNote(note);
     } else if(!this.tag || !this.tag.isSmartTag()) {
