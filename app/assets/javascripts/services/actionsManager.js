@@ -50,7 +50,7 @@ export class ActionsManager {
       item_uuid: item.uuid
     };
     const emptyFunc = () => { };
-    this.httpManager.getAbsolute(extension.url, params, emptyFunc).then((response) => {
+    return this.httpManager.getAbsolute(extension.url, params, emptyFunc).then((response) => {
       this.updateExtensionFromRemoteResponse(extension, response);
       return extension;
     }).catch((response) => {

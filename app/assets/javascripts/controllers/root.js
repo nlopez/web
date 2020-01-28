@@ -21,20 +21,21 @@ const AUTO_SYNC_INTERVAL = 30000;
 class RootCtrl {
   /* @ngInject */
   constructor(
-    $scope,
     $location,
     $rootScope,
+    $scope,
     $timeout,
-    appState,
-    modelManager,
-    dbManager,
-    syncManager,
-    authManager,
-    passcodeManager,
-    storageManager,
-    statusManager,
     alertManager,
+    appState,
+    authManager,
+    dbManager,
+    modelManager,
+    passcodeManager,
     preferencesManager,
+    themeManager /** Unused below, required to load globally */,
+    statusManager,
+    storageManager,
+    syncManager,
   ) {
     this.$rootScope = $rootScope;
     this.$scope = $scope;

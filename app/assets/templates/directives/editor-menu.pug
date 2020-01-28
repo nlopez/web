@@ -4,32 +4,32 @@
       .sk-menu-panel-header
         .sk-menu-panel-header-title Note Editor
       menu-row(
-        action='ctrl.selectComponent(null)', 
-        circle="ctrl.selectedEditor == null && 'success'", 
+        action='self.selectComponent(null)', 
+        circle="self.selectedEditor == null && 'success'", 
         label="'Plain Editor'"
         )
       menu-row(
-        ng-repeat='editor in ctrl.editors'
-        action='ctrl.selectComponent(editor)', 
-        button-action='ctrl.toggleDefaultForEditor(editor)', 
-        button-class="ctrl.defaultEditor == editor ? 'warning' : 'info'", 
-        button-text="ctrl.defaultEditor == editor ? 'Undefault' : 'Set Default'", 
-        circle="ctrl.selectedEditor === editor && 'success'", 
-        has-button='ctrl.selectedEditor == editor || ctrl.defaultEditor == editor', 
+        ng-repeat='editor in self.state.editors'
+        action='self.selectComponent(editor)', 
+        button-action='self.toggleDefaultForEditor(editor)', 
+        button-class="self.state.defaultEditor == editor ? 'warning' : 'info'", 
+        button-text="self.state.defaultEditor == editor ? 'Undefault' : 'Set Default'", 
+        circle="self.selectedEditor === editor && 'success'", 
+        has-button='self.selectedEditor == editor || self.state.defaultEditor == editor', 
         label='editor.name', 
         )
         .sk-menu-panel-column(
-          ng-if='editor.content.conflict_of || ctrl.shouldDisplayRunningLocallyLabel(editor)'
+          ng-if='editor.content.conflict_of || self.shouldDisplayRunningLocallyLabel(editor)'
           )
           strong.danger.medium-text(
             ng-if='editor.content.conflict_of'
             ) Conflicted copy
           .sk-sublabel(
-            ng-if='ctrl.shouldDisplayRunningLocallyLabel(editor)'
+            ng-if='self.shouldDisplayRunningLocallyLabel(editor)'
             ) Running Locally
       a.no-decoration(
         href='https://standardnotes.org/extensions', 
-        ng-if='ctrl.editors.length == 0', 
+        ng-if='self.state.editors.length == 0', 
         rel='noopener', 
         target='blank'
         )

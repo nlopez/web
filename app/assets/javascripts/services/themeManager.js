@@ -31,9 +31,9 @@ export class ThemeManager {
       this.cacheThemes();
     })
 
-    if(desktopManager.isDesktop) {
+    if (desktopManager.isDesktop) {
       appState.addObserver((eventName, data) => {
-        if(eventName === APP_STATE_EVENT_DESKTOP_EXTS_READY) {
+        if (eventName === APP_STATE_EVENT_DESKTOP_EXTS_READY) {
           this.activateCachedThemes();
         }
       })
@@ -43,9 +43,9 @@ export class ThemeManager {
   }
 
   activateCachedThemes() {
-    let cachedThemes = this.getCachedThemes();
-    let writeToCache = false;
-    for(var theme of cachedThemes) {
+    const cachedThemes = this.getCachedThemes();
+    const writeToCache = false;
+    for (const theme of cachedThemes) {
       this.activateTheme(theme, writeToCache);
     }
   }
@@ -53,7 +53,7 @@ export class ThemeManager {
   registerObservers() {
     this.desktopManager.registerUpdateObserver((component) => {
       // Reload theme if active
-      if(component.active && component.isTheme()) {
+      if (component.active && component.isTheme()) {
         this.deactivateTheme(component);
         setTimeout(() => {
           this.activateTheme(component);
@@ -61,13 +61,17 @@ export class ThemeManager {
       }
     })
 
-    this.componentManager.registerHandler({identifier: "themeManager", areas: ["themes"], activationHandler: (component) => {
-      if(component.active) {
-        this.activateTheme(component);
-      } else {
-        this.deactivateTheme(component);
+    this.componentManager.registerHandler({
+      identifier: "themeManager",
+      areas: ["themes"],
+      activationHandler: (component) => {
+        if (component.active) {
+          this.activateTheme(component);
+        } else {
+          this.deactivateTheme(component);
+        }
       }
-    }});
+    });
   }
 
   hasActiveTheme() {
@@ -76,8 +80,8 @@ export class ThemeManager {
 
   deactivateAllThemes() {
     var activeThemes = this.componentManager.getActiveThemes();
-    for(var theme of activeThemes) {
-      if(theme) {
+    for (var theme of activeThemes) {
+      if (theme) {
         this.componentManager.deactivateComponent(theme);
       }
     }
@@ -86,7 +90,7 @@ export class ThemeManager {
   }
 
   activateTheme(theme, writeToCache = true) {
-    if(_.find(this.activeThemes, {uuid: theme.uuid})) {
+    if (_.find(this.activeThemes, { uuid: theme.uuid })) {
       return;
     }
 
@@ -101,19 +105,19 @@ export class ThemeManager {
     link.id = theme.uuid;
     document.getElementsByTagName("head")[0].appendChild(link);
 
-    if(writeToCache) {
+    if (writeToCache) {
       this.cacheThemes();
     }
   }
 
   deactivateTheme(theme) {
     var element = document.getElementById(theme.uuid);
-    if(element) {
+    if (element) {
       element.disabled = true;
       element.parentNode.removeChild(element);
     }
 
-    _.remove(this.activeThemes, {uuid: theme.uuid});
+    _.remove(this.activeThemes, { uuid: theme.uuid });
 
     this.cacheThemes();
   }
@@ -134,7 +138,7 @@ export class ThemeManager {
 
   getCachedThemes() {
     let cachedThemes = this.storageManager.getItemSync(ThemeManager.CachedThemesKey, StorageManager.Fixed);
-    if(cachedThemes) {
+    if (cachedThemes) {
       let parsed = JSON.parse(cachedThemes);
       return parsed.map((theme) => {
         return new SNTheme(theme);

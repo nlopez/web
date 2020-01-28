@@ -1,7 +1,8 @@
-import { isDesktopApplication } from '@/utils';
+import { isDesktopApplication, isNullOrUndefined } from '@/utils';
 import { PrivilegesManager } from '@/services/privilegesManager';
 import template from '%/directives/account-menu.pug';
 import { protocolManager } from 'snjs';
+import { PureCtrl } from '@Controllers';
 import {
   STRING_ACCOUNT_MENU_UNCHECK_MERGE,
   STRING_SIGN_OUT_CONFIRMATION,
@@ -22,7 +23,7 @@ import {
 
 const ELEMENT_ID_IMPORT_PASSWORD_INPUT = 'import-password-request';
 
-class AccountMenuCtrl {
+class AccountMenuCtrl extends PureCtrl {
   /* @ngInject */
   constructor(
     $scope,
@@ -38,6 +39,7 @@ class AccountMenuCtrl {
     storageManager,
     syncManager,
   ) {
+    super($timeout);
     this.$scope = $scope;
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
@@ -50,53 +52,63 @@ class AccountMenuCtrl {
     this.storageManager = storageManager;
     this.syncManager = syncManager;
 
-    this.appVersion = 'v' + (window.electronAppVersion || appVersion);
-    this.user = this.authManager.user;
-    this.canAddPasscode = !this.authManager.isEphemeralSession();
+    this.state = {
+      appVersion: 'v' + (window.electronAppVersion || appVersion),
+      user: this.authManager.user,
+      canAddPasscode: !this.authManager.isEphemeralSession(),
+      passcodeAutoLockOptions: this.passcodeManager.getAutoLockIntervalOptions(),
+      formData: {
+        mergeLocal: true,
+        ephemeral: false
+      },
+      mutable: {
+        backupEncrypted: this.encryptedBackupsAvailable()
+      }
+    }
+
     this.syncStatus = this.syncManager.syncStatus;
-    this.user = this.authManager.user;
-    this.passcodeAutoLockOptions = this.passcodeManager.getAutoLockIntervalOptions();
-    this.formData = {
-      mergeLocal: true,
-      ephemeral: false
-    };
-    this.archiveFormData = {
-      encrypted: this.encryptedBackupsAvailable()
-    };
     this.syncManager.getServerURL().then((url) => {
-      this.$timeout(() => {
-        this.server = url;
-        this.formData.url = url;
+      this.setState({
+        server: url,
+        formData: { ...this.state.formData, url: url }
       })
     })
     this.authManager.checkForSecurityUpdate().then((available) => {
-      this.securityUpdateAvailable = available;
+      this.setState({
+        securityUpdateAvailable: available
+      })
     })
     this.reloadAutoLockInterval();
   }
 
+  $onInit() {
+    this.initProps({
+      closeFunction: this.closeFunction
+    })
+  }
+
   close() {
     this.$timeout(() => {
-      this.closeFunction()();
+      this.props.closeFunction()();
     })
   }
 
   encryptedBackupsAvailable() {
-    return this.authManager.user || this.passcodeManager.hasPasscode();
+    return !isNullOrUndefined(this.authManager.user) || this.passcodeManager.hasPasscode();
   }
 
   submitMfaForm() {
     const params = {
-      [this.formData.mfa.payload.mfa_key]: this.formData.userMfaCode
+      [this.state.formData.mfa.payload.mfa_key]: this.state.formData.userMfaCode
     };
     this.login(params);
   }
 
   submitAuthForm() {
-    if(!this.formData.email || !this.formData.user_password) {
+    if (!this.state.formData.email || !this.state.formData.user_password) {
       return;
     }
-    if(this.formData.showLogin) {
+    if (this.state.formData.showLogin) {
       this.login();
     } else {
       this.register();
@@ -106,67 +118,67 @@ class AccountMenuCtrl {
   async login(extraParams) {
     /** Prevent a timed sync from occuring while signing in. */
     this.syncManager.lockSyncing();
-    this.formData.status = STRING_GENERATING_LOGIN_KEYS;
-    this.formData.authenticating = true;
+    this.state.formData.status = STRING_GENERATING_LOGIN_KEYS;
+    this.state.formData.authenticating = true;
     const response = await this.authManager.login(
-      this.formData.url,
-      this.formData.email,
-      this.formData.user_password,
-      this.formData.ephemeral,
-      this.formData.strictSignin,
+      this.state.formData.url,
+      this.state.formData.email,
+      this.state.formData.user_password,
+      this.state.formData.ephemeral,
+      this.state.formData.strictSignin,
       extraParams
     );
     const hasError = !response || response.error;
-    if(!hasError) {
+    if (!hasError) {
       await this.onAuthSuccess();
       this.syncManager.unlockSyncing();
-      this.syncManager.sync({performIntegrityCheck: true});
+      this.syncManager.sync({ performIntegrityCheck: true });
       return;
     }
     this.syncManager.unlockSyncing();
-    this.formData.status = null;
+    this.state.formData.status = null;
     const error = response
       ? response.error
-      : {message: "An unknown error occured."}
+      : { message: "An unknown error occured." }
 
-    if(error.tag === 'mfa-required' || error.tag === 'mfa-invalid') {
-      this.formData.showLogin = false;
-      this.formData.mfa = error;
+    if (error.tag === 'mfa-required' || error.tag === 'mfa-invalid') {
+      this.state.formData.showLogin = false;
+      this.state.formData.mfa = error;
     } else {
-      this.formData.showLogin = true;
-      this.formData.mfa = null;
-      if(error.message) {
+      this.state.formData.showLogin = true;
+      this.state.formData.mfa = null;
+      if (error.message) {
         this.alertManager.alert({
           text: error.message
         });
       }
     }
-    this.formData.authenticating = false;
+    this.state.formData.authenticating = false;
   }
 
   async register() {
-    const confirmation = this.formData.password_conf;
-    if(confirmation !== this.formData.user_password) {
+    const confirmation = this.state.formData.password_conf;
+    if (confirmation !== this.state.formData.user_password) {
       this.alertManager.alert({
         text: STRING_NON_MATCHING_PASSWORDS
       });
       return;
     }
-    this.formData.confirmPassword = false;
-    this.formData.status = STRING_GENERATING_REGISTER_KEYS;
-    this.formData.authenticating = true;
+    this.state.formData.confirmPassword = false;
+    this.state.formData.status = STRING_GENERATING_REGISTER_KEYS;
+    this.state.formData.authenticating = true;
     const response = await this.authManager.register(
-      this.formData.url,
-      this.formData.email,
-      this.formData.user_password,
-      this.formData.ephemeral
+      this.state.formData.url,
+      this.state.formData.email,
+      this.state.formData.user_password,
+      this.state.formData.ephemeral
     )
-    if(!response || response.error) {
-      this.formData.status = null;
+    if (!response || response.error) {
+      this.state.formData.status = null;
       const error = response
         ? response.error
-        : {message: "An unknown error occured."};
-      this.formData.authenticating = false;
+        : { message: "An unknown error occured." };
+      this.state.formData.authenticating = false;
       this.alertManager.alert({
         text: error.message
       });
@@ -177,26 +189,26 @@ class AccountMenuCtrl {
   }
 
   mergeLocalChanged() {
-    if(!this.formData.mergeLocal) {
+    if (!this.state.formData.mergeLocal) {
       this.alertManager.confirm({
         text: STRING_ACCOUNT_MENU_UNCHECK_MERGE,
         destructive: true,
         onCancel: () => {
-          this.formData.mergeLocal = true;
+          this.state.formData.mergeLocal = true;
         }
       })
     }
   }
 
   async onAuthSuccess() {
-    if(this.formData.mergeLocal) {
+    if (this.state.formData.mergeLocal) {
       this.$rootScope.$broadcast('major-data-change');
-      await this.clearDatabaseAndRewriteAllItems({alternateUuids: true});
+      await this.clearDatabaseAndRewriteAllItems({ alternateUuids: true });
     } else {
       this.modelManager.removeAllItemsFromMemory();
       await this.storageManager.clearAllModels();
     }
-    this.formData.authenticating = false;
+    this.state.formData.authenticating = false;
     this.syncManager.refreshErroredItems();
     this.close();
   }
@@ -209,14 +221,12 @@ class AccountMenuCtrl {
   async openPrivilegesModal() {
     this.close();
     const run = () => {
-      this.$timeout(() => {
-        this.privilegesManager.presentPrivilegesManagementModal();
-      })
+      this.privilegesManager.presentPrivilegesManagementModal();
     }
     const needsPrivilege = await this.privilegesManager.actionRequiresPrivilege(
       PrivilegesManager.ActionManagePrivileges
     );
-    if(needsPrivilege) {
+    if (needsPrivilege) {
       this.privilegesManager.presentPrivilegesModal(
         PrivilegesManager.ActionManagePrivileges,
         () => {
@@ -234,7 +244,7 @@ class AccountMenuCtrl {
    * but not from working memory See:
    * https://github.com/standardnotes/desktop/issues/131
    */
-  async clearDatabaseAndRewriteAllItems({alternateUuids} = {}) {
+  async clearDatabaseAndRewriteAllItems({ alternateUuids } = {}) {
     await this.storageManager.clearAllModels();
     await this.syncManager.markAllItemsDirtyAndSaveOffline(alternateUuids)
   }
@@ -252,15 +262,15 @@ class AccountMenuCtrl {
 
   async submitImportPassword() {
     await this.performImport(
-      this.importData.data,
-      this.importData.password
+      this.state.importData.data,
+      this.state.importData.password
     );
   }
 
   async readFile(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         try {
           const data = JSON.parse(e.target.result);
           resolve(data);
@@ -275,22 +285,28 @@ class AccountMenuCtrl {
     })
   }
 
-  /** Called by template. */
+  /**
+   * @template 
+   */
   async importFileSelected(files) {
     const run = async () => {
-      this.importData = {};
       const file = files[0];
       const data = await this.readFile(file);
-      if(!data) {
+      if (!data) {
         return;
       }
-      if(data.auth_params) {
-        this.importData.requestPassword = true;
-        this.importData.data = data;
+      if (data.auth_params) {
+        await this.setState({
+          importData: {
+            ...this.state.importData,
+            requestPassword: true,
+            data: data
+          }
+        })
         const element = document.getElementById(
           ELEMENT_ID_IMPORT_PASSWORD_INPUT
         );
-        if(element) {
+        if (element) {
           element.scrollIntoView(false);
         }
       } else {
@@ -300,25 +316,29 @@ class AccountMenuCtrl {
     const needsPrivilege = await this.privilegesManager.actionRequiresPrivilege(
       PrivilegesManager.ActionManageBackups
     );
-    if(needsPrivilege) {
+    if (needsPrivilege) {
       this.privilegesManager.presentPrivilegesModal(
         PrivilegesManager.ActionManageBackups,
-        () => {
-          this.$timeout(run);
-        }
+        run
       );
     } else {
-      this.$timeout(run);
+      run();
     }
   }
 
   async performImport(data, password) {
-    this.importData.loading = true;
+    await this.setState({
+      importData: {
+        ...this.state.importData,
+        loading: true
+      }
+    })
     const errorCount = await this.importJSONData(data, password);
-    this.importData.loading = false;
-    this.importData = null;
-    if(errorCount > 0) {
-      const message = StringImportError({errorCount: errorCount})
+    this.setState({
+      importData: null
+    })
+    if (errorCount > 0) {
+      const message = StringImportError({ errorCount: errorCount })
       this.alertManager.alert({
         text: message
       });
@@ -331,7 +351,7 @@ class AccountMenuCtrl {
 
   async importJSONData(data, password) {
     let errorCount = 0;
-    if(data.auth_params) {
+    if (data.auth_params) {
       const keys = await protocolManager.computeEncryptionKeysForUser(
         password,
         data.auth_params
@@ -340,10 +360,10 @@ class AccountMenuCtrl {
         const throws = false;
         await protocolManager.decryptMultipleItems(data.items, keys, throws);
         const items = [];
-        for(const item of data.items) {
+        for (const item of data.items) {
           item.enc_item_key = null;
           item.auth_hash = null;
-          if(item.errorDecrypting) {
+          if (item.errorDecrypting) {
             errorCount++;
           } else {
             items.push(item);
@@ -359,12 +379,12 @@ class AccountMenuCtrl {
     }
 
     const items = await this.modelManager.importItems(data.items);
-    for(const item of items) {
+    for (const item of items) {
       /**
        * Don't want to activate any components during import process in
        * case of exceptions breaking up the import proccess
        */
-      if(item.content_type === 'SN|Component') {
+      if (item.content_type === 'SN|Component') {
         item.active = false;
       }
     }
@@ -374,7 +394,7 @@ class AccountMenuCtrl {
   }
 
   async downloadDataArchive() {
-    this.archiveManager.downloadBackup(this.archiveFormData.encrypted);
+    this.archiveManager.downloadBackup(this.state.mutable.backupEncrypted);
   }
 
   notesAndTagsCount() {
@@ -394,9 +414,9 @@ class AccountMenuCtrl {
   }
 
   encryptionSource() {
-    if(!this.authManager.offline()) {
+    if (!this.authManager.offline()) {
       return "Account keys";
-    } else if(this.passcodeManager.hasPasscode()) {
+    } else if (this.passcodeManager.hasPasscode()) {
       return "Local Passcode";
     } else {
       return null;
@@ -404,9 +424,9 @@ class AccountMenuCtrl {
   }
 
   encryptionStatusString() {
-    if(!this.authManager.offline()) {
+    if (!this.authManager.offline()) {
       return STRING_E2E_ENABLED;
-    } else if(this.passcodeManager.hasPasscode()) {
+    } else if (this.passcodeManager.hasPasscode()) {
       return STRING_LOCAL_ENC_ENABLED;
     } else {
       return STRING_ENC_NOT_ENABLED;
@@ -415,20 +435,20 @@ class AccountMenuCtrl {
 
   async reloadAutoLockInterval() {
     const interval = await this.passcodeManager.getAutoLockInterval();
-    this.selectedAutoLockInterval = interval;
+    this.setState({
+      selectedAutoLockInterval: interval
+    })
   }
 
   async selectAutoLockInterval(interval) {
     const run = async () => {
       await this.passcodeManager.setAutoLockInterval(interval);
-      this.$timeout(() => {
-        this.reloadAutoLockInterval();
-      });
+      this.reloadAutoLockInterval();
     }
     const needsPrivilege = await this.privilegesManager.actionRequiresPrivilege(
       PrivilegesManager.ActionManagePasscode
     );
-    if(needsPrivilege) {
+    if (needsPrivilege) {
       this.privilegesManager.presentPrivilegesModal(
         PrivilegesManager.ActionManagePasscode,
         () => {
@@ -445,50 +465,51 @@ class AccountMenuCtrl {
   }
 
   addPasscodeClicked() {
-    this.formData.showPasscodeForm = true;
+    this.state.formData.showPasscodeForm = true;
   }
 
   submitPasscodeForm() {
-    const passcode = this.formData.passcode;
-    if(passcode !== this.formData.confirmPasscode) {
+    const passcode = this.state.formData.passcode;
+    if (passcode !== this.state.formData.confirmPasscode) {
       this.alertManager.alert({
         text: STRING_NON_MATCHING_PASSCODES
       });
       return;
     }
-    const func = this.formData.changingPasscode
+    const func = this.state.formData.changingPasscode
       ? this.passcodeManager.changePasscode.bind(this.passcodeManager)
       : this.passcodeManager.setPasscode.bind(this.passcodeManager);
-    func(passcode, () => {
-      this.$timeout(async () => {
-        this.formData.passcode = null;
-        this.formData.confirmPasscode = null;
-        this.formData.showPasscodeForm = false;
-        if(await this.authManager.offline()) {
-          this.$rootScope.$broadcast('major-data-change');
-          this.clearDatabaseAndRewriteAllItems();
+    func(passcode, async () => {
+      this.setState({
+        formData: {
+          ...this.state.formData,
+          passcode: null,
+          confirmPasscode: null,
+          showPasscodeForm: false
         }
       })
+      if (await this.authManager.offline()) {
+        this.$rootScope.$broadcast('major-data-change');
+        this.clearDatabaseAndRewriteAllItems();
+      }
     })
   }
 
   async changePasscodePressed() {
     const run = () => {
-      this.formData.changingPasscode = true;
+      this.state.formData.changingPasscode = true;
       this.addPasscodeClicked();
     }
     const needsPrivilege = await this.privilegesManager.actionRequiresPrivilege(
       PrivilegesManager.ActionManagePasscode
     );
-    if(needsPrivilege) {
+    if (needsPrivilege) {
       this.privilegesManager.presentPrivilegesModal(
         PrivilegesManager.ActionManagePasscode,
-        () => {
-          this.$timeout(run);
-        }
+        run
       );
     } else {
-      this.$timeout(run);
+      run();
     }
   }
 
@@ -496,7 +517,7 @@ class AccountMenuCtrl {
     const run = () => {
       const signedIn = !this.authManager.offline();
       let message = STRING_REMOVE_PASSCODE_CONFIRMATION;
-      if(!signedIn) {
+      if (!signedIn) {
         message += STRING_REMOVE_PASSCODE_OFFLINE_ADDENDUM;
       }
       this.alertManager.confirm({
@@ -504,7 +525,7 @@ class AccountMenuCtrl {
         destructive: true,
         onConfirm: () => {
           this.passcodeManager.clearPasscode();
-          if(this.authManager.offline()) {
+          if (this.authManager.offline()) {
             this.syncManager.markAllItemsDirtyAndSaveOffline();
           }
         }
@@ -513,15 +534,13 @@ class AccountMenuCtrl {
     const needsPrivilege = await this.privilegesManager.actionRequiresPrivilege(
       PrivilegesManager.ActionManagePasscode
     );
-    if(needsPrivilege) {
+    if (needsPrivilege) {
       this.privilegesManager.presentPrivilegesModal(
         PrivilegesManager.ActionManagePasscode,
-        () => {
-          this.$timeout(run);
-        }
+        run
       );
     } else {
-      this.$timeout(run);
+      run();
     }
   }
 
@@ -535,7 +554,7 @@ export class AccountMenu {
     this.restrict = 'E';
     this.template = template;
     this.controller = AccountMenuCtrl;
-    this.controllerAs = 'ctrl';
+    this.controllerAs = 'self';
     this.bindToController = true;
     this.scope = {
       closeFunction: '&'

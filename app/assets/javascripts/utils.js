@@ -16,6 +16,10 @@ export function parametersFromURL(url) {
   return obj;
 }
 
+export function isNullOrUndefined(value) {
+  return value === null || value === undefined;
+}
+
 export function getPlatformString() {
   try {
     var platform = navigator.platform.toLowerCase();

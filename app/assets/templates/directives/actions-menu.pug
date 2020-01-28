@@ -2,12 +2,12 @@
   .sk-menu-panel.dropdown-menu
     a.no-decoration(
       href='https://standardnotes.org/extensions', 
-      ng-if='ctrl.extensions.length == 0', 
+      ng-if='self.state.extensions.length == 0', 
       rel='noopener', 
       target='blank'
       )
       menu-row(label="'Download Actions'")
-    div(ng-repeat='extension in ctrl.extensions')
+    div(ng-repeat='extension in self.state.extensions')
       .sk-menu-panel-header(
         ng-click='extension.hide = !extension.hide; $event.stopPropagation();'
         )
@@ -16,10 +16,10 @@
           .sk-spinner.small.loading(ng-if='extension.loading')
           div(ng-if='extension.hide') …
       menu-row(
-        action='ctrl.executeAction(action, extension);', 
+        action='self.executeAction(action, extension);', 
         label='action.label', 
         ng-if='!extension.hide', 
-        ng-repeat='action in extension.actionsWithContextForItem(ctrl.item)', 
+        ng-repeat='action in extension.actionsWithContextForItem(self.props.item)', 
         spinner-class="action.running ? 'info' : null", 
         sub-rows='action.subrows', 
         subtitle='action.desc'
@@ -31,5 +31,5 @@
       menu-row(
         faded='true', 
         label="'No Actions Available'", 
-        ng-if='extension.actionsWithContextForItem(ctrl.item).length == 0'
+        ng-if='extension.actionsWithContextForItem(self.props.item).length == 0'
         )

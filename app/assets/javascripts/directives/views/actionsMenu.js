@@ -1,27 +1,37 @@
 import template from '%/directives/actions-menu.pug';
+import { PureCtrl } from '@Controllers';
 
-class ActionsMenuCtrl {
+class ActionsMenuCtrl extends PureCtrl {
   /* @ngInject */
-  constructor(actionsManager) {
+  constructor(
+    $scope,
+    $timeout,
+    actionsManager,
+  ) {
+    super($timeout);
+    this.$timeout = $timeout;
     this.actionsManager = actionsManager;
   }
 
   $onInit() {
+    this.initProps({
+      item: this.item
+    })
     this.loadExtensions();
   };
 
   async loadExtensions() {
-    this.extensions = this.actionsManager.extensions.sort((a, b) => {
+    const extensions = this.actionsManager.extensions.sort((a, b) => {
       return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
     });
-    for (const extension of this.extensions) {
+    for (const extension of extensions) {
       extension.loading = true;
-      await this.actionsManager.loadExtensionInContextOfItem(
-        extension,
-        this.item
-      )
+      await this.actionsManager.loadExtensionInContextOfItem(extension, this.props.item);
       extension.loading = false;
     }
+    this.setState({
+      extensions: extensions
+    });
   }
 
   async executeAction(action, extension) {
@@ -37,17 +47,17 @@ class ActionsMenuCtrl {
     const result = await this.actionsManager.executeAction(
       action,
       extension,
-      this.item
+      this.props.item
     );
     if (action.error) {
       return;
     }
     action.running = false;
     this.handleActionResult(action, result);
-    await this.actionsManager.loadExtensionInContextOfItem(
-      extension,
-      this.item
-    );
+    await this.actionsManager.loadExtensionInContextOfItem(extension, this.props.item);
+    this.setState({
+      extensions: this.state.extensions
+    })
   }
 
   handleActionResult(action, result) {
@@ -82,13 +92,13 @@ class ActionsMenuCtrl {
 export class ActionsMenu {
   constructor() {
     this.restrict = 'E';
-    this.scope = {
-      item: '='
-    };
     this.template = template;
     this.replace = true;
     this.controller = ActionsMenuCtrl;
-    this.controllerAs = 'ctrl';
+    this.controllerAs = 'self';
     this.bindToController = true;
+    this.scope = {
+      item: '='
+    };
   }
 }

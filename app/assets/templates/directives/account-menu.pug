@@ -2,30 +2,37 @@
   #account-panel.sk-panel
     .sk-panel-header
       .sk-panel-header-title Account
-      a.sk-a.info.close-button(ng-click='ctrl.close()') Close
+      a.sk-a.info.close-button(ng-click='self.close()') Close
     .sk-panel-content
       .sk-panel-section.sk-panel-hero(
-        ng-if='!ctrl.user && !ctrl.formData.showLogin && !ctrl.formData.showRegister && !ctrl.formData.mfa'
+        ng-if=`
+          !self.state.user && 
+          !self.state.formData.showLogin && 
+          !self.state.formData.showRegister && 
+          !self.state.formData.mfa`
         )
         .sk-panel-row
           .sk-h1 Sign in or register to enable sync and end-to-end encryption.
         .sk-panel-row
           .sk-button-group.stretch
-            .sk-button.info.featured(ng-click='ctrl.formData.showLogin = true')
+            .sk-button.info.featured(ng-click='self.state.formData.showLogin = true')
               .sk-label Sign In
-            .sk-button.info.featured(ng-click='ctrl.formData.showRegister = true')
+            .sk-button.info.featured(ng-click='self.state.formData.showRegister = true')
               .sk-label Register
         .sk-panel-row.sk-p
           | Standard Notes is free on every platform, and comes 
           | standard with sync and encryption.
-      .sk-panel-section(ng-if='ctrl.formData.showLogin || ctrl.formData.showRegister')
+      .sk-panel-section(ng-if=`
+          self.state.formData.showLogin || 
+          self.state.formData.showRegister`
+        )
         .sk-panel-section-title
-          | {{ctrl.formData.showLogin ? "Sign In" : "Register"}}
-        form.sk-panel-form(ng-submit='ctrl.submitAuthForm()')
+          | {{self.state.formData.showLogin ? "Sign In" : "Register"}}
+        form.sk-panel-form(ng-submit='self.submitAuthForm()')
           .sk-panel-section
             input.sk-input.contrast(
               name='email', 
-              ng-model='ctrl.formData.email', 
+              ng-model='self.state.formData.email', 
               ng-model-options='{allowInvalid: true}', 
               placeholder='Email', 
               required='', 
@@ -36,28 +43,30 @@
               )
             input.sk-input.contrast(
               name='password', 
-              ng-model='ctrl.formData.user_password', 
+              ng-model='self.state.formData.user_password', 
               placeholder='Password', 
               required='', 
-              sn-enter='ctrl.submitAuthForm()', 
+              sn-enter='self.submitAuthForm()', 
               type='password'
               )
             input.sk-input.contrast(
               name='password', 
-              ng-if='ctrl.formData.showRegister', 
-              ng-model='ctrl.formData.password_conf', 
+              ng-if='self.state.formData.showRegister', 
+              ng-model='self.state.formData.password_conf', 
               placeholder='Confirm Password', 
               required='', 
-              sn-enter='ctrl.submitAuthForm()', 
+              sn-enter='self.submitAuthForm()', 
               type='password'
               )
             .sk-panel-row
             a.sk-panel-row.sk-bold(
-              ng-click='ctrl.formData.showAdvanced = !ctrl.formData.showAdvanced'
+              ng-click=`
+                self.state.formData.showAdvanced = !self.state.formData.showAdvanced
+                `
               )
               | Advanced Options
           .sk-notification.unpadded.contrast.advanced-options.sk-panel-row(
-            ng-if='ctrl.formData.showAdvanced'
+            ng-if='self.state.formData.showAdvanced'
             )
             .sk-panel-column.stretch
               .sk-notification-title.sk-panel-row.padded-row Advanced Options
@@ -65,14 +74,14 @@
                 label.sk-label Sync Server Domain
                 input.sk-input.mt-5.sk-base(
                   name='server', 
-                  ng-model='ctrl.formData.url', 
+                  ng-model='self.state.formData.url', 
                   placeholder='Server URL', 
                   required='', 
                   type='text'
                   )
-              label.sk-label.padded-row(ng-if='ctrl.formData.showLogin')
+              label.sk-label.padded-row(ng-if='self.state.formData.showLogin')
                 input.sk-input(
-                  ng-model='ctrl.formData.strictSignin', 
+                  ng-model='self.state.formData.strictSignin', 
                   type='checkbox'
                   )
                 | Use strict sign in
@@ -82,75 +91,78 @@
                     rel='noopener', 
                     target='_blank'
                     ) (Learn more)
-          .sk-panel-section.form-submit(ng-if='!ctrl.formData.authenticating')
+          .sk-panel-section.form-submit(ng-if='!self.state.formData.authenticating')
             .sk-button-group.stretch
               .sk-button.info.featured(
-                ng-click='ctrl.submitAuthForm()', 
-                ng-disabled='ctrl.formData.authenticating'
+                ng-click='self.submitAuthForm()', 
+                ng-disabled='self.state.formData.authenticating'
                 )
-                .sk-label {{ctrl.formData.showLogin ? "Sign In" : "Register"}}
-          .sk-notification.neutral(ng-if='ctrl.formData.showRegister')
+                .sk-label {{self.state.formData.showLogin ? "Sign In" : "Register"}}
+          .sk-notification.neutral(ng-if='self.state.formData.showRegister')
             .sk-notification-title No Password Reset.
             .sk-notification-text
               | Because your notes are encrypted using your password, 
               | Standard Notes does not have a password reset option. 
               | You cannot forget your password.
-          .sk-panel-section.no-bottom-pad(ng-if='ctrl.formData.status')
+          .sk-panel-section.no-bottom-pad(ng-if='self.state.formData.status')
             .sk-horizontal-group
               .sk-spinner.small.neutral
-              .sk-label {{ctrl.formData.status}}
-          .sk-panel-section.no-bottom-pad(ng-if='!ctrl.formData.authenticating')
+              .sk-label {{self.state.formData.status}}
+          .sk-panel-section.no-bottom-pad(ng-if='!self.state.formData.authenticating')
             label.sk-panel-row.justify-left
               .sk-horizontal-group
                 input(
                   ng-false-value='true', 
-                  ng-model='ctrl.formData.ephemeral', 
+                  ng-model='self.state.formData.ephemeral', 
                   ng-true-value='false', 
                   type='checkbox'
                   )
                 | Stay signed in
-            label.sk-panel-row.justify-left(ng-if='ctrl.notesAndTagsCount() > 0')
+            label.sk-panel-row.justify-left(ng-if='self.notesAndTagsCount() > 0')
               .sk-panel-row
               input(
                 ng-bind='true', 
-                ng-change='ctrl.mergeLocalChanged()', 
-                ng-model='ctrl.formData.mergeLocal', 
+                ng-change='self.mergeLocalChanged()', 
+                ng-model='self.state.formData.mergeLocal', 
                 type='checkbox'
                 )
-              | Merge local data ({{ctrl.notesAndTagsCount()}} notes and tags)
-      .sk-panel-section(ng-if='ctrl.formData.mfa')
-        form.sk-panel-form(ng-submit='ctrl.submitMfaForm()')
-          .sk-p.sk-panel-row {{ctrl.formData.mfa.message}}
+              | Merge local data ({{self.notesAndTagsCount()}} notes and tags)
+      .sk-panel-section(ng-if='self.state.formData.mfa')
+        form.sk-panel-form(ng-submit='self.submitMfaForm()')
+          .sk-p.sk-panel-row {{self.state.formData.mfa.message}}
           .sk-panel-row
             input.sk-input.contrast(
               autofocus='true', 
               name='mfa', 
-              ng-model='ctrl.formData.userMfaCode', 
+              ng-model='self.state.formData.userMfaCode', 
               placeholder='Enter Code', 
               required='', 
               should-focus='true', 
               sn-autofocus='true'
               )
           .sk-button-group.stretch.sk-panel-row.form-submit(
-            ng-if='!ctrl.formData.status'
+            ng-if='!self.state.formData.status'
             )
             button.sk-button.info.featured(type='submit')
               .sk-label Sign In
-        .sk-panel-section.no-bottom-pad(ng-if='ctrl.formData.status')
+        .sk-panel-section.no-bottom-pad(ng-if='self.state.formData.status')
           .sk-panel-row
           .sk-panel-row
           .sk-horizontal-group
             .sk-spinner.small.neutral
-            .sk-label {{ctrl.formData.status}}
+            .sk-label {{self.state.formData.status}}
       div(
-        ng-if='!ctrl.formData.showLogin && !ctrl.formData.showRegister && !ctrl.formData.mfa'
+        ng-if=`
+          !self.state.formData.showLogin && 
+          !self.state.formData.showRegister && 
+          !self.state.formData.mfa`
         )
-        .sk-panel-section(ng-if='ctrl.user')
-          .sk-notification.danger(ng-if='ctrl.syncStatus.error')
+        .sk-panel-section(ng-if='self.state.user')
+          .sk-notification.danger(ng-if='self.syncStatus.error')
             .sk-notification-title Sync Unreachable
             .sk-notification-text
               | Hmm...we can't seem to sync your account. 
-              | The reason: {{ctrl.syncStatus.error.message}}
+              | The reason: {{self.syncStatus.error.message}}
             a.sk-a.info-contrast.sk-bold.sk-panel-row(
               href='https://standardnotes.org/help', 
               rel='noopener', 
@@ -158,69 +170,71 @@
               ) Need help?
           .sk-panel-row
             .sk-panel-column
-              .sk-h1.sk-bold.wrap {{ctrl.user.email}}
-              .sk-subtitle.subtle.normal {{ctrl.server}}
+              .sk-h1.sk-bold.wrap {{self.state.user.email}}
+              .sk-subtitle.subtle.normal {{self.state.server}}
             .sk-horizontal-group(
               delay='1000', 
               delay-hide='true', 
-              show='ctrl.syncStatus.syncOpInProgress || ctrl.syncStatus.needsMoreSync'
+              show='self.syncStatus.syncOpInProgress || self.syncStatus.needsMoreSync'
               )
               .sk-spinner.small.info
               .sk-sublabel
-                | {{"Syncing" + (ctrl.syncStatus.total > 0 ? ":" : "")}}
+                | {{"Syncing" + (self.syncStatus.total > 0 ? ":" : "")}}
                 span(
-                  ng-if='ctrl.syncStatus.total > 0'
-                  ) {{ctrl.syncStatus.current}}/{{ctrl.syncStatus.total}}
+                  ng-if='self.syncStatus.total > 0'
+                  ) {{self.syncStatus.current}}/{{self.syncStatus.total}}
           .sk-panel-row
           a.sk-a.info.sk-panel-row.condensed(
-            ng-click="ctrl.openPasswordWizard('change-pw')"
+            ng-click="self.openPasswordWizard('change-pw')"
             )
             | Change Password
           a.sk-a.info.sk-panel-row.condensed(
-            ng-click="ctrl.openPrivilegesModal('')", 
-            ng-show='ctrl.user'
+            ng-click="self.openPrivilegesModal('')", 
+            ng-show='self.state.user'
             )
             | Manage Privileges
           a.sk-panel-row.justify-left.condensed.success(
-            ng-click="ctrl.openPasswordWizard('upgrade-security')", 
-            ng-if='ctrl.securityUpdateAvailable'
+            ng-click="self.openPasswordWizard('upgrade-security')", 
+            ng-if='self.state.securityUpdateAvailable'
             )
             .inline.sk-circle.small.success.mr-8
             .inline Security Update Available
         .sk-panel-section
           .sk-panel-section-title Encryption
-          .sk-panel-section-subtitle.info(ng-if='ctrl.encryptionEnabled()')
-            | {{ctrl.encryptionStatusForNotes()}}
+          .sk-panel-section-subtitle.info(ng-if='self.encryptionEnabled()')
+            | {{self.encryptionStatusForNotes()}}
           p.sk-p
-            | {{ctrl.encryptionStatusString()}}
+            | {{self.encryptionStatusString()}}
         .sk-panel-section
           .sk-panel-section-title Passcode Lock
-          div(ng-if='!ctrl.hasPasscode()')
-            div(ng-if='ctrl.canAddPasscode')
-              .sk-panel-row(ng-if='!ctrl.formData.showPasscodeForm')
-                .sk-button.info(ng-click='ctrl.addPasscodeClicked(); $event.stopPropagation();')
+          div(ng-if='!self.hasPasscode()')
+            div(ng-if='self.state.canAddPasscode')
+              .sk-panel-row(ng-if='!self.state.formData.showPasscodeForm')
+                .sk-button.info(
+                  ng-click='self.addPasscodeClicked(); $event.stopPropagation();'
+                  )
                   .sk-label Add Passcode
               p.sk-p 
                 | Add a passcode to lock the application and 
                 | encrypt on-device key storage.
-            div(ng-if='!ctrl.canAddPasscode')
+            div(ng-if='!self.state.canAddPasscode')
               p.sk-p
-                | Adding a passcode is not supported in temporary sessions. 
-                | Please sign out, then sign back in with the "Stay signed in" option checked.
+                | Adding a passcode is not supported in temporary sessions. Please sign 
+                | out, then sign back in with the "Stay signed in" option checked.
           form.sk-panel-form(
-            ng-if='ctrl.formData.showPasscodeForm', 
-            ng-submit='ctrl.submitPasscodeForm()'
+            ng-if='self.state.formData.showPasscodeForm', 
+            ng-submit='self.submitPasscodeForm()'
             )
             .sk-panel-row
             input.sk-input.contrast(
-              ng-model='ctrl.formData.passcode', 
+              ng-model='self.state.formData.passcode', 
               placeholder='Passcode', 
               should-focus='true', 
               sn-autofocus='true', 
               type='password'
               )
             input.sk-input.contrast(
-              ng-model='ctrl.formData.confirmPasscode', 
+              ng-model='self.state.formData.confirmPasscode', 
               placeholder='Confirm Passcode', 
               type='password'
               )
@@ -228,9 +242,9 @@
               button.sk-button.info(type='submit')
                 .sk-label Set Passcode
             a.neutral.sk-a.sk-panel-row(
-              ng-click='ctrl.formData.showPasscodeForm = false'
+              ng-click='self.state.formData.showPasscodeForm = false'
               ) Cancel
-          div(ng-if='ctrl.hasPasscode() && !ctrl.formData.showPasscodeForm')
+          div(ng-if='self.hasPasscode() && !self.state.formData.showPasscodeForm')
             .sk-p
               | Passcode lock is enabled.
             .sk-notification.contrast
@@ -240,66 +254,68 @@
                   .sk-horizontal-group
                     .sk-h4.sk-bold Autolock
                     a.sk-a.info(
-                      ng-class="{'boxed' : option.value == ctrl.selectedAutoLockInterval}", 
-                      ng-click='ctrl.selectAutoLockInterval(option.value)', 
-                      ng-repeat='option in ctrl.passcodeAutoLockOptions'
+                      ng-class=`{
+                        'boxed' : option.value == self.state.selectedAutoLockInterval
+                        }`, 
+                      ng-click='self.selectAutoLockInterval(option.value)', 
+                      ng-repeat='option in self.state.passcodeAutoLockOptions'
                       )
                       | {{option.label}}
                 .sk-p The autolock timer begins when the window or tab loses focus.
                 .sk-panel-row
                 a.sk-a.info.sk-panel-row.condensed(
-                  ng-click="ctrl.openPrivilegesModal('')", 
-                  ng-show='!ctrl.user'
+                  ng-click="self.openPrivilegesModal('')", 
+                  ng-show='!self.state.user'
                   ) Manage Privileges
                 a.sk-a.info.sk-panel-row.condensed(
-                  ng-click='ctrl.changePasscodePressed()'
+                  ng-click='self.changePasscodePressed()'
                   ) Change Passcode
                 a.sk-a.danger.sk-panel-row.condensed(
-                  ng-click='ctrl.removePasscodePressed()'
+                  ng-click='self.removePasscodePressed()'
                   ) Remove Passcode
-        .sk-panel-section(ng-if='!ctrl.importData.loading')
+        .sk-panel-section(ng-if='!self.state.importData.loading')
           .sk-panel-section-title Data Backups
           .sk-p
             | Download a backup of all your data.
           .sk-panel-row
-          form.sk-panel-form.sk-panel-row(ng-if='ctrl.encryptedBackupsAvailable()')
+          form.sk-panel-form.sk-panel-row(ng-if='self.encryptedBackupsAvailable()')
             .sk-input-group
               label
                 input(
-                  ng-change='ctrl.archiveFormData.encrypted = true', 
-                  ng-model='ctrl.archiveFormData.encrypted', 
+                  ng-change='self.state.mutable.backupEncrypted = true', 
+                  ng-model='self.state.mutable.backupEncrypted', 
                   ng-value='true', 
                   type='radio'
                   )
                 | Encrypted
               label
                 input(
-                  ng-change='ctrl.archiveFormData.encrypted = false', 
-                  ng-model='ctrl.archiveFormData.encrypted', 
+                  ng-change='self.state.mutable.backupEncrypted = false', 
+                  ng-model='self.state.mutable.backupEncrypted', 
                   ng-value='false', 
                   type='radio'
                   )
                 | Decrypted
           .sk-button-group.sk-panel-row.justify-left
-            .sk-button.info(ng-click='ctrl.downloadDataArchive()')
+            .sk-button.info(ng-click='self.downloadDataArchive()')
               .sk-label Download Backup
             label.sk-button.info
               input(
                 file-change='->', 
-                handler='ctrl.importFileSelected(files)', 
+                handler='self.importFileSelected(files)', 
                 style='display: none;', 
                 type='file'
                 )
               .sk-label Import Backup
-          span(ng-if='ctrl.isDesktopApplication()')
+          span(ng-if='self.isDesktopApplication()')
             | Backups are automatically created on desktop and can be managed 
             | via the "Backups" top-level menu.
-          #import-password-request(ng-if='ctrl.importData.requestPassword')
-            form.sk-panel-form.stretch(ng-submit='ctrl.submitImportPassword()')
+          #import-password-request(ng-if='self.state.importData.requestPassword')
+            form.sk-panel-form.stretch(ng-submit='self.submitImportPassword()')
               p Enter the account password associated with the import file.
               input.sk-input.contrast.mt-5(
                 autofocus='true', 
-                ng-model='ctrl.importData.password', 
+                ng-model='self.state.importData.password', 
                 placeholder='Enter File Account Password', 
                 type='password'
                 )
@@ -313,16 +329,22 @@
                 | If you'd like to import only a selection of items instead of 
                 | the whole file, please use the Batch Manager extension.
           .sk-panel-row
-            .sk-spinner.small.info(ng-if='ctrl.importData.loading')
+            .sk-spinner.small.info(ng-if='self.state.importData.loading')
     .sk-panel-footer
       .sk-panel-row
-        .sk-p.left.neutral.faded {{ctrl.appVersion}}
+        .sk-p.left.neutral.faded {{self.state.appVersion}}
         a.sk-a.right(
-          ng-click='ctrl.formData.showLogin = false; ctrl.formData.showRegister = false;', 
-          ng-if='ctrl.formData.showLogin || ctrl.formData.showRegister'
+          ng-click=`
+            self.state.formData.showLogin = false; 
+            self.state.formData.showRegister = false;
+            `, 
+          ng-if='self.state.formData.showLogin || self.state.formData.showRegister'
           )
           | Cancel
         a.sk-a.right.danger(
-          ng-click='ctrl.destroyLocalData()', 
-          ng-if='!ctrl.formData.showLogin && !ctrl.formData.showRegister')
-          | {{ ctrl.user ? "Sign out and clear local data" : "Clear all local data" }}
+          ng-click='self.destroyLocalData()', 
+          ng-if=`
+              !self.state.formData.showLogin && 
+              !self.state.formData.showRegister`
+            )
+          | {{ self.state.user ? "Sign out and clear local data" : "Clear all local data" }}
