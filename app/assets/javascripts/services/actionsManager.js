@@ -6,65 +6,67 @@ export class ActionsManager {
 
   /* @ngInject */
   constructor(
+    $compile,
+    $rootScope,
+    $timeout,
+    alertManager,
+    authManager,
     httpManager,
     modelManager,
-    authManager,
     syncManager,
-    $rootScope,
-    $compile,
-    $timeout,
-    alertManager
   ) {
+    this.$compile = $compile;
+    this.$rootScope = $rootScope;
+    this.$timeout = $timeout;
+    this.alertManager = alertManager;
+    this.authManager = authManager;
     this.httpManager = httpManager;
     this.modelManager = modelManager;
-    this.authManager = authManager;
     this.syncManager = syncManager;
-    this.alertManager = alertManager;
-    this.$rootScope = $rootScope;
-    this.$compile = $compile;
-    this.$timeout = $timeout;
-
-    // Used when decrypting old items with new keys. This array is only kept in memory.
+    /* Used when decrypting old items with new keys. This array is only kept in memory. */
     this.previousPasswords = [];
   }
 
   get extensions() {
-    return this.modelManager.validItemsForContentType("Extension");
+    return this.modelManager.validItemsForContentType('Extension');
   }
 
   extensionsInContextOfItem(item) {
-    return this.extensions.filter(function(ext){
-      return _.includes(ext.supported_types, item.content_type) || ext.actionsWithContextForItem(item).length > 0;
+    return this.extensions.filter((ext) => {
+      return _.includes(ext.supported_types, item.content_type) ||
+        ext.actionsWithContextForItem(item).length > 0;
     })
   }
 
-  /*
-  Loads an extension in the context of a certain item. The server then has the chance to respond with actions that are
-  relevant just to this item. The response extension is not saved, just displayed as a one-time thing.
+  /**
+   * Loads an extension in the context of a certain item. 
+   * The server then has the chance to respond with actions that are
+   * relevant just to this item. The response extension is not saved, 
+   * just displayed as a one-time thing.
   */
-  loadExtensionInContextOfItem(extension, item, callback) {
+  async loadExtensionInContextOfItem(extension, item) {
     const params = {
       content_type: item.content_type,
       item_uuid: item.uuid
     };
-    this.httpManager.getAbsolute(extension.url, params, function(response){
+    const emptyFunc = () => { };
+    this.httpManager.getAbsolute(extension.url, params, emptyFunc).then((response) => {
       this.updateExtensionFromRemoteResponse(extension, response);
-      callback && callback(extension);
-    }.bind(this), function(response){
+      return extension;
+    }).catch((response) => {
       console.error("Error loading extension", response);
-      callback && callback(null);
-    }.bind(this))
+      return null;
+    })
   }
 
   updateExtensionFromRemoteResponse(extension, response) {
-    if(response.description) {
+    if (response.description) {
       extension.description = response.description;
     }
-    if(response.supported_types) {
+    if (response.supported_types) {
       extension.supported_types = response.supported_types;
     }
-
-    if(response.actions) {
+    if (response.actions) {
       extension.actions = response.actions.map((action) => {
         return new Action(action);
       })
@@ -73,177 +75,205 @@ export class ActionsManager {
     }
   }
 
-  async executeAction(action, extension, item, callback) {
-
-    var customCallback = (response, error) => {
-      action.running = false;
-      this.$timeout(() => {
-        callback(response, error);
-      })
-    }
-
+  async executeAction(action, extension, item) {
     action.running = true;
-
-    let decrypted = action.access_type == "decrypted";
-
-    var triedPasswords = [];
-
-    let handleResponseDecryption = async (response, keys, merge) => {
-      var item = response.item;
-
-      await protocolManager.decryptItem(item, keys);
-
-      if(!item.errorDecrypting) {
-        if(merge) {
-          var items = await this.modelManager.mapResponseItemsToLocalModels([item], SFModelManager.MappingSourceRemoteActionRetrieved);
-          for(var mappedItem of items) {
-            this.modelManager.setItemDirty(mappedItem, true);
-          }
-          this.syncManager.sync();
-          customCallback({item: item});
-        } else {
-          item = this.modelManager.createItem(item);
-          customCallback({item: item});
-        }
-        return true;
-      } else {
-        // Error decrypting
-        if(!response.auth_params) {
-          // In some cases revisions were missing auth params. Instruct the user to email us to get this remedied.
-          this.alertManager.alert({text: "We were unable to decrypt this revision using your current keys, and this revision is missing metadata that would allow us to try different keys to decrypt it. This can likely be fixed with some manual intervention. Please email hello@standardnotes.org for assistance."});
-          return;
-        }
-
-        // Try previous passwords
-        for(let passwordCandidate of this.previousPasswords) {
-          if(triedPasswords.includes(passwordCandidate)) {
-            continue;
-          }
-          triedPasswords.push(passwordCandidate);
-
-          var keyResults = await protocolManager.computeEncryptionKeysForUser(passwordCandidate, response.auth_params);
-          if(!keyResults) {
-            continue;
-          }
-
-          var success = await handleResponseDecryption(response, keyResults, merge);
-          if(success) {
-            return true;
-          }
-        }
-
-        this.presentPasswordModal((password) => {
-          this.previousPasswords.push(password);
-          handleResponseDecryption(response, keys, merge);
-        });
-
-        return false;
-      }
-    }
-
+    let result;
     switch (action.verb) {
-      case "get": {
-        this.alertManager.confirm({text: "Are you sure you want to replace the current note contents with this action's results?", onConfirm: () => {
-          this.httpManager.getAbsolute(action.url, {}, async (response) => {
-            action.error = false;
-            handleResponseDecryption(response, await this.authManager.keys(), true);
-          }, (response) => {
-            let error = (response && response.error) || {message: "An issue occurred while processing this action. Please try again."}
-            this.alertManager.alert({text: error.message});
-            action.error = true;
-            customCallback(null, error);
-          })
-        }})
+      case 'get':
+        result = await this.handleGetAction(action);
         break;
-      }
-
-      case "render": {
-        this.httpManager.getAbsolute(action.url, {}, async (response) => {
-          action.error = false;
-          handleResponseDecryption(response, await this.authManager.keys(), false);
-        }, (response) => {
-          let error = (response && response.error) || {message: "An issue occurred while processing this action. Please try again."}
-          this.alertManager.alert({text: error.message});
-          action.error = true;
-          customCallback(null, error);
-        })
-
+      case 'render':
+        result = await this.handleRenderAction(action);
         break;
-      }
-
-      case "show": {
-        let win = window.open(action.url, '_blank');
-        if(win) {
-          win.focus();
-        }
-        customCallback();
+      case 'show':
+        result = await this.handleShowAction(action);
         break;
-      }
-
-      case "post": {
-        this.outgoingParamsForItem(item, extension, decrypted).then((itemParams) => {
-          var params = {
-            items: [itemParams] // Wrap it in an array
-          }
-
-          this.performPost(action, extension, params, (response) => {
-            if(response && response.error) {
-              this.alertManager.alert({text: "An issue occurred while processing this action. Please try again."});
-            }
-            customCallback(response);
-          });
-        })
-
+      case 'post':
+        result = await this.handlePostAction(action, item, extension);
         break;
-      }
-
-      default: {
-
-      }
+      default:
+        break;
     }
 
     action.lastExecuted = new Date();
+    action.running = false;
+    return result;
   }
 
-  async outgoingParamsForItem(item, extension, decrypted = false) {
-    var keys = await this.authManager.keys();
-    if(decrypted) {
-      keys = null;
+  async decryptResponse(response, keys) {
+    const responseItem = response.item;
+    await protocolManager.decryptItem(responseItem, keys);
+    if (!responseItem.errorDecrypting) {
+      return {
+        response: response,
+        item: responseItem
+      };
     }
-    var itemParams = new SFItemParams(item, keys, await this.authManager.getAuthParams());
-    return itemParams.paramsForExtension();
-  }
 
-  performPost(action, extension, params, callback) {
-    this.httpManager.postAbsolute(action.url, params, function(response){
-      action.error = false;
-      if(callback) {
-        callback(response);
+    if (!response.auth_params) {
+      /**
+       * In some cases revisions were missing auth params. 
+       * Instruct the user to email us to get this remedied. 
+       */
+      this.alertManager.alert({
+        text: `We were unable to decrypt this revision using your current keys, 
+            and this revision is missing metadata that would allow us to try different 
+            keys to decrypt it. This can likely be fixed with some manual intervention. 
+            Please email hello@standardnotes.org for assistance.`
+      });
+      return {};
+    }
+
+    /* Try previous passwords */
+    const triedPasswords = [];
+    for (const passwordCandidate of this.previousPasswords) {
+      if (triedPasswords.includes(passwordCandidate)) {
+        continue;
       }
-    }.bind(this), function(response){
-      action.error = true;
-      console.error("Action error response:", response);
-      if(callback) {
-        callback({error: "Request error"});
+      triedPasswords.push(passwordCandidate);
+      const keyResults = await protocolManager.computeEncryptionKeysForUser(
+        passwordCandidate,
+        response.auth_params
+      );
+      if (!keyResults) {
+        continue;
       }
+      const nestedResponse = await this.decryptResponse(
+        response,
+        keyResults
+      );
+      if (nestedResponse.item) {
+        return nestedResponse;
+      }
+    }
+    return new Promise((resolve, reject) => {
+      this.presentPasswordModal((password) => {
+        this.previousPasswords.push(password);
+        const result = this.decryptResponse(response, keys);
+        resolve(result);
+      });
     })
   }
 
+  async handlePostAction(action, item, extension) {
+    const decrypted = action.access_type === 'decrypted';
+    const itemParams = await this.outgoingParamsForItem(item, extension, decrypted);
+    const params = {
+      items: [itemParams]
+    }
+    const emptyFunc = () => { };
+    return this.httpManager.postAbsolute(action.url, params, emptyFunc).then((response) => {
+      action.error = false;
+      return {response: response};
+    }).catch((response) => {
+      action.error = true;
+      console.error("Action error response:", response);
+      this.alertManager.alert({
+        text: "An issue occurred while processing this action. Please try again."
+      });
+      return { response: response };
+    })
+  }
+
+  async handleShowAction(action) {
+    const win = window.open(action.url, '_blank');
+    if (win) {
+      win.focus();
+    }
+    return { response: null };
+  }
+
+  async handleGetAction(action) {
+    const emptyFunc = () => {};
+    const onConfirm = async () => {
+      return this.httpManager.getAbsolute(action.url, {}, emptyFunc)
+      .then(async (response) => {
+        action.error = false;
+        await this.decryptResponse(response, await this.authManager.keys());
+        const items = await this.modelManager.mapResponseItemsToLocalModels(
+          [response.item],
+          SFModelManager.MappingSourceRemoteActionRetrieved
+        );
+        for (const mappedItem of items) {
+          this.modelManager.setItemDirty(mappedItem, true);
+        }
+        this.syncManager.sync();
+        return { 
+          response: response,
+          item: response.item
+        };
+      }).catch((response) => {
+        const error = (response && response.error)
+          || { message: "An issue occurred while processing this action. Please try again." }
+        this.alertManager.alert({ text: error.message });
+        action.error = true;
+        return { error: error };
+      })
+    }
+    return new Promise((resolve, reject) => {
+      this.alertManager.confirm({
+        text: "Are you sure you want to replace the current note contents with this action's results?",
+        onConfirm: () => {
+          onConfirm().then(resolve)
+        }
+      })
+    })
+  }
+
+  async handleRenderAction(action) {
+    const emptyFunc = () => {};
+    return this.httpManager.getAbsolute(action.url, {}, emptyFunc).then(async (response) => {
+      action.error = false;
+      const result = await this.decryptResponse(response, await this.authManager.keys());
+      const item = this.modelManager.createItem(result.item);
+      return {
+        response: result.response,
+        item: item
+      };
+    }).catch((response) => {
+      const error = (response && response.error)
+        || { message: "An issue occurred while processing this action. Please try again." }
+      this.alertManager.alert({ text: error.message });
+      action.error = true;
+      return { error: error };
+    })
+  }
+
+  async outgoingParamsForItem(item, extension, decrypted = false) {
+    let keys = await this.authManager.keys();
+    if (decrypted) {
+      keys = null;
+    }
+    const itemParams = new SFItemParams(
+      item, 
+      keys, 
+      await this.authManager.getAuthParams()
+    );
+    return itemParams.paramsForExtension();
+  }
+
   presentRevisionPreviewModal(uuid, content) {
-    var scope = this.$rootScope.$new(true);
+    const scope = this.$rootScope.$new(true);
     scope.uuid = uuid;
     scope.content = content;
-    var el = this.$compile( "<revision-preview-modal uuid='uuid' content='content' class='sk-modal'></revision-preview-modal>" )(scope);
+    const el = this.$compile(
+      `<revision-preview-modal uuid='uuid' content='content' 
+      class='sk-modal'></revision-preview-modal>`
+    )(scope);
     angular.element(document.body).append(el);
   }
 
   presentPasswordModal(callback) {
-    var scope = this.$rootScope.$new(true);
+    const scope = this.$rootScope.$new(true);
     scope.type = "password";
     scope.title = "Decryption Assistance";
-    scope.message = "Unable to decrypt this item with your current keys. Please enter your account password at the time of this revision.";
+    scope.message = `Unable to decrypt this item with your current keys. 
+                     Please enter your account password at the time of this revision.`;
     scope.callback = callback;
-    var el = this.$compile( "<input-modal type='type' message='message' title='title' callback='callback'></input-modal>" )(scope);
+    const el = this.$compile(
+      `<input-modal type='type' message='message' 
+     title='title' callback='callback'></input-modal>`
+    )(scope);
     angular.element(document.body).append(el);
   }
 }

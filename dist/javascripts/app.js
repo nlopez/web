@@ -332,6 +332,7 @@ function () {
 
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
+    this.alertManager = alertManager;
     this.appState = appState;
     this.actionsManager = actionsManager;
     this.authManager = authManager;
@@ -4410,7 +4411,7 @@ function selectOnClick($window) {
     link: function link(scope, element, attrs) {
       element.on('focus', function () {
         if (!$window.getSelection().toString()) {
-          // Required for mobile Safari
+          /** Required for mobile Safari */
           this.setSelectionRange(0, this.value.length);
         }
       });
@@ -5483,12 +5484,15 @@ var AccountMenu = function AccountMenu() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ActionsMenu", function() { return ActionsMenu; });
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _directives_actions_menu_pug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! %/directives/actions-menu.pug */ "./app/assets/templates/directives/actions-menu.pug");
-/* harmony import */ var _directives_actions_menu_pug__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_directives_actions_menu_pug__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _directives_actions_menu_pug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! %/directives/actions-menu.pug */ "./app/assets/templates/directives/actions-menu.pug");
+/* harmony import */ var _directives_actions_menu_pug__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_directives_actions_menu_pug__WEBPACK_IMPORTED_MODULE_3__);
+
 
 
 
@@ -5500,12 +5504,12 @@ function () {
 
   /* @ngInject */
   function ActionsMenuCtrl(actionsManager) {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, ActionsMenuCtrl);
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, ActionsMenuCtrl);
 
     this.actionsManager = actionsManager;
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(ActionsMenuCtrl, [{
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(ActionsMenuCtrl, [{
     key: "$onInit",
     value: function $onInit() {
       this.loadExtensions();
@@ -5513,78 +5517,137 @@ function () {
   }, {
     key: "loadExtensions",
     value: function loadExtensions() {
-      var _this = this;
+      var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, extension;
 
-      this.extensions = this.actionsManager.extensions.sort(function (a, b) {
-        return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
-      });
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function loadExtensions$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              this.extensions = this.actionsManager.extensions.sort(function (a, b) {
+                return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+              });
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context.prev = 4;
+              _iterator = this.extensions[Symbol.iterator]();
 
-      try {
-        var _loop = function _loop() {
-          var extension = _step.value;
-          extension.loading = true;
+            case 6:
+              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                _context.next = 15;
+                break;
+              }
 
-          _this.actionsManager.loadExtensionInContextOfItem(extension, _this.item, function (scopedExtension) {
-            extension.loading = false;
-          });
-        };
+              extension = _step.value;
+              extension.loading = true;
+              _context.next = 11;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.actionsManager.loadExtensionInContextOfItem(extension, this.item));
 
-        for (var _iterator = this.extensions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          _loop();
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return != null) {
-            _iterator.return();
+            case 11:
+              extension.loading = false;
+
+            case 12:
+              _iteratorNormalCompletion = true;
+              _context.next = 6;
+              break;
+
+            case 15:
+              _context.next = 21;
+              break;
+
+            case 17:
+              _context.prev = 17;
+              _context.t0 = _context["catch"](4);
+              _didIteratorError = true;
+              _iteratorError = _context.t0;
+
+            case 21:
+              _context.prev = 21;
+              _context.prev = 22;
+
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+
+            case 24:
+              _context.prev = 24;
+
+              if (!_didIteratorError) {
+                _context.next = 27;
+                break;
+              }
+
+              throw _iteratorError;
+
+            case 27:
+              return _context.finish(24);
+
+            case 28:
+              return _context.finish(21);
+
+            case 29:
+            case "end":
+              return _context.stop();
           }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
         }
-      }
+      }, null, this, [[4, 17, 21, 29], [22,, 24, 28]]);
     }
   }, {
     key: "executeAction",
-    value: function executeAction(action, extension, parentAction) {
-      var _this2 = this;
+    value: function executeAction(action, extension) {
+      var result;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function executeAction$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              if (!(action.verb === 'nested')) {
+                _context2.next = 3;
+                break;
+              }
 
-      if (action.verb === 'nested') {
-        if (!action.subrows) {
-          action.subrows = this.subRowsForAction(action, extension);
-        } else {
-          action.subrows = null;
+              if (!action.subrows) {
+                action.subrows = this.subRowsForAction(action, extension);
+              } else {
+                action.subrows = null;
+              }
+
+              return _context2.abrupt("return");
+
+            case 3:
+              action.running = true;
+              _context2.next = 6;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.actionsManager.executeAction(action, extension, this.item));
+
+            case 6:
+              result = _context2.sent;
+
+              if (!action.error) {
+                _context2.next = 9;
+                break;
+              }
+
+              return _context2.abrupt("return");
+
+            case 9:
+              action.running = false;
+              this.handleActionResult(action, result);
+              _context2.next = 13;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.actionsManager.loadExtensionInContextOfItem(extension, this.item));
+
+            case 13:
+            case "end":
+              return _context2.stop();
+          }
         }
-
-        return;
-      }
-
-      action.running = true;
-      this.actionsManager.executeAction(action, extension, this.item, function (response, error) {
-        if (error) {
-          return;
-        }
-
-        action.running = false;
-
-        _this2.handleActionResponse(action, response);
-
-        _this2.actionsManager.loadExtensionInContextOfItem(extension, _this2.item);
-      });
+      }, null, this);
     }
   }, {
-    key: "handleActionResponse",
-    value: function handleActionResponse(action, response) {
+    key: "handleActionResult",
+    value: function handleActionResult(action, result) {
       switch (action.verb) {
         case 'render':
           {
-            var item = response.item;
+            var item = result.item;
             this.actionsManager.presentRevisionPreviewModal(item.uuid, item.content);
           }
       }
@@ -5592,7 +5655,7 @@ function () {
   }, {
     key: "subRowsForAction",
     value: function subRowsForAction(parentAction, extension) {
-      var _this3 = this;
+      var _this = this;
 
       if (!parentAction.subactions) {
         return null;
@@ -5601,7 +5664,7 @@ function () {
       return parentAction.subactions.map(function (subaction) {
         return {
           onClick: function onClick() {
-            _this3.executeAction(subaction, extension, parentAction);
+            _this.executeAction(subaction, extension, parentAction);
           },
           label: subaction.label,
           subtitle: subaction.desc,
@@ -5615,13 +5678,13 @@ function () {
 }();
 
 var ActionsMenu = function ActionsMenu() {
-  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, ActionsMenu);
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, ActionsMenu);
 
   this.restrict = 'E';
   this.scope = {
     item: '='
   };
-  this.template = _directives_actions_menu_pug__WEBPACK_IMPORTED_MODULE_2___default.a;
+  this.template = _directives_actions_menu_pug__WEBPACK_IMPORTED_MODULE_3___default.a;
   this.replace = true;
   this.controller = ActionsMenuCtrl;
   this.controllerAs = 'ctrl';
@@ -8692,20 +8755,21 @@ __webpack_require__.r(__webpack_exports__);
 var ActionsManager =
 /*#__PURE__*/
 function () {
-  ActionsManager.$inject = ["httpManager", "modelManager", "authManager", "syncManager", "$rootScope", "$compile", "$timeout", "alertManager"];
+  ActionsManager.$inject = ["$compile", "$rootScope", "$timeout", "alertManager", "authManager", "httpManager", "modelManager", "syncManager"];
 
   /* @ngInject */
-  function ActionsManager(httpManager, modelManager, authManager, syncManager, $rootScope, $compile, $timeout, alertManager) {
+  function ActionsManager($compile, $rootScope, $timeout, alertManager, authManager, httpManager, modelManager, syncManager) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, ActionsManager);
 
+    this.$compile = $compile;
+    this.$rootScope = $rootScope;
+    this.$timeout = $timeout;
+    this.alertManager = alertManager;
+    this.authManager = authManager;
     this.httpManager = httpManager;
     this.modelManager = modelManager;
-    this.authManager = authManager;
     this.syncManager = syncManager;
-    this.alertManager = alertManager;
-    this.$rootScope = $rootScope;
-    this.$compile = $compile;
-    this.$timeout = $timeout; // Used when decrypting old items with new keys. This array is only kept in memory.
+    /* Used when decrypting old items with new keys. This array is only kept in memory. */
 
     this.previousPasswords = [];
   }
@@ -8717,25 +8781,45 @@ function () {
         return lodash__WEBPACK_IMPORTED_MODULE_3___default.a.includes(ext.supported_types, item.content_type) || ext.actionsWithContextForItem(item).length > 0;
       });
     }
-    /*
-    Loads an extension in the context of a certain item. The server then has the chance to respond with actions that are
-    relevant just to this item. The response extension is not saved, just displayed as a one-time thing.
+    /**
+     * Loads an extension in the context of a certain item. 
+     * The server then has the chance to respond with actions that are
+     * relevant just to this item. The response extension is not saved, 
+     * just displayed as a one-time thing.
     */
 
   }, {
     key: "loadExtensionInContextOfItem",
-    value: function loadExtensionInContextOfItem(extension, item, callback) {
-      var params = {
-        content_type: item.content_type,
-        item_uuid: item.uuid
-      };
-      this.httpManager.getAbsolute(extension.url, params, function (response) {
-        this.updateExtensionFromRemoteResponse(extension, response);
-        callback && callback(extension);
-      }.bind(this), function (response) {
-        console.error("Error loading extension", response);
-        callback && callback(null);
-      }.bind(this));
+    value: function loadExtensionInContextOfItem(extension, item) {
+      var _this = this;
+
+      var params, emptyFunc;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function loadExtensionInContextOfItem$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              params = {
+                content_type: item.content_type,
+                item_uuid: item.uuid
+              };
+
+              emptyFunc = function emptyFunc() {};
+
+              this.httpManager.getAbsolute(extension.url, params, emptyFunc).then(function (response) {
+                _this.updateExtensionFromRemoteResponse(extension, response);
+
+                return extension;
+              }).catch(function (response) {
+                console.error("Error loading extension", response);
+                return null;
+              });
+
+            case 3:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
     }
   }, {
     key: "updateExtensionFromRemoteResponse",
@@ -8758,352 +8842,491 @@ function () {
     }
   }, {
     key: "executeAction",
-    value: function executeAction(action, extension, item, callback) {
-      var _this = this;
+    value: function executeAction(action, extension, item) {
+      var result;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function executeAction$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              action.running = true;
+              _context2.t0 = action.verb;
+              _context2.next = _context2.t0 === 'get' ? 4 : _context2.t0 === 'render' ? 8 : _context2.t0 === 'show' ? 12 : _context2.t0 === 'post' ? 16 : 20;
+              break;
 
-      var customCallback, decrypted, triedPasswords, handleResponseDecryption, win;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function executeAction$(_context4) {
+            case 4:
+              _context2.next = 6;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.handleGetAction(action));
+
+            case 6:
+              result = _context2.sent;
+              return _context2.abrupt("break", 21);
+
+            case 8:
+              _context2.next = 10;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.handleRenderAction(action));
+
+            case 10:
+              result = _context2.sent;
+              return _context2.abrupt("break", 21);
+
+            case 12:
+              _context2.next = 14;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.handleShowAction(action));
+
+            case 14:
+              result = _context2.sent;
+              return _context2.abrupt("break", 21);
+
+            case 16:
+              _context2.next = 18;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.handlePostAction(action, item, extension));
+
+            case 18:
+              result = _context2.sent;
+              return _context2.abrupt("break", 21);
+
+            case 20:
+              return _context2.abrupt("break", 21);
+
+            case 21:
+              action.lastExecuted = new Date();
+              action.running = false;
+              return _context2.abrupt("return", result);
+
+            case 24:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "decryptResponse",
+    value: function decryptResponse(response, keys) {
+      var _this2 = this;
+
+      var responseItem, triedPasswords, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, passwordCandidate, keyResults, nestedResponse;
+
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function decryptResponse$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              responseItem = response.item;
+              _context3.next = 3;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(snjs__WEBPACK_IMPORTED_MODULE_5__["protocolManager"].decryptItem(responseItem, keys));
+
+            case 3:
+              if (responseItem.errorDecrypting) {
+                _context3.next = 5;
+                break;
+              }
+
+              return _context3.abrupt("return", {
+                response: response,
+                item: responseItem
+              });
+
+            case 5:
+              if (response.auth_params) {
+                _context3.next = 8;
+                break;
+              }
+
+              /**
+               * In some cases revisions were missing auth params. 
+               * Instruct the user to email us to get this remedied. 
+               */
+              this.alertManager.alert({
+                text: "We were unable to decrypt this revision using your current keys, \n            and this revision is missing metadata that would allow us to try different \n            keys to decrypt it. This can likely be fixed with some manual intervention. \n            Please email hello@standardnotes.org for assistance."
+              });
+              return _context3.abrupt("return", {});
+
+            case 8:
+              /* Try previous passwords */
+              triedPasswords = [];
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context3.prev = 12;
+              _iterator = this.previousPasswords[Symbol.iterator]();
+
+            case 14:
+              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                _context3.next = 32;
+                break;
+              }
+
+              passwordCandidate = _step.value;
+
+              if (!triedPasswords.includes(passwordCandidate)) {
+                _context3.next = 18;
+                break;
+              }
+
+              return _context3.abrupt("continue", 29);
+
+            case 18:
+              triedPasswords.push(passwordCandidate);
+              _context3.next = 21;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(snjs__WEBPACK_IMPORTED_MODULE_5__["protocolManager"].computeEncryptionKeysForUser(passwordCandidate, response.auth_params));
+
+            case 21:
+              keyResults = _context3.sent;
+
+              if (keyResults) {
+                _context3.next = 24;
+                break;
+              }
+
+              return _context3.abrupt("continue", 29);
+
+            case 24:
+              _context3.next = 26;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.decryptResponse(response, keyResults));
+
+            case 26:
+              nestedResponse = _context3.sent;
+
+              if (!nestedResponse.item) {
+                _context3.next = 29;
+                break;
+              }
+
+              return _context3.abrupt("return", nestedResponse);
+
+            case 29:
+              _iteratorNormalCompletion = true;
+              _context3.next = 14;
+              break;
+
+            case 32:
+              _context3.next = 38;
+              break;
+
+            case 34:
+              _context3.prev = 34;
+              _context3.t0 = _context3["catch"](12);
+              _didIteratorError = true;
+              _iteratorError = _context3.t0;
+
+            case 38:
+              _context3.prev = 38;
+              _context3.prev = 39;
+
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+
+            case 41:
+              _context3.prev = 41;
+
+              if (!_didIteratorError) {
+                _context3.next = 44;
+                break;
+              }
+
+              throw _iteratorError;
+
+            case 44:
+              return _context3.finish(41);
+
+            case 45:
+              return _context3.finish(38);
+
+            case 46:
+              return _context3.abrupt("return", new Promise(function (resolve, reject) {
+                _this2.presentPasswordModal(function (password) {
+                  _this2.previousPasswords.push(password);
+
+                  var result = _this2.decryptResponse(response, keys);
+
+                  resolve(result);
+                });
+              }));
+
+            case 47:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, null, this, [[12, 34, 38, 46], [39,, 41, 45]]);
+    }
+  }, {
+    key: "handlePostAction",
+    value: function handlePostAction(action, item, extension) {
+      var _this3 = this;
+
+      var decrypted, itemParams, params, emptyFunc;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function handlePostAction$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
-              customCallback = function customCallback(response, error) {
-                action.running = false;
+              decrypted = action.access_type === 'decrypted';
+              _context4.next = 3;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.outgoingParamsForItem(item, extension, decrypted));
 
-                _this.$timeout(function () {
-                  callback(response, error);
-                });
+            case 3:
+              itemParams = _context4.sent;
+              params = {
+                items: [itemParams]
               };
 
-              action.running = true;
-              decrypted = action.access_type == "decrypted";
-              triedPasswords = [];
+              emptyFunc = function emptyFunc() {};
 
-              handleResponseDecryption = function handleResponseDecryption(response, keys, merge) {
-                var item, items, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, mappedItem, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, passwordCandidate, keyResults, success;
-
-                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function handleResponseDecryption$(_context) {
-                  while (1) {
-                    switch (_context.prev = _context.next) {
-                      case 0:
-                        item = response.item;
-                        _context.next = 3;
-                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(snjs__WEBPACK_IMPORTED_MODULE_5__["protocolManager"].decryptItem(item, keys));
-
-                      case 3:
-                        if (item.errorDecrypting) {
-                          _context.next = 36;
-                          break;
-                        }
-
-                        if (!merge) {
-                          _context.next = 31;
-                          break;
-                        }
-
-                        _context.next = 7;
-                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this.modelManager.mapResponseItemsToLocalModels([item], snjs__WEBPACK_IMPORTED_MODULE_5__["SFModelManager"].MappingSourceRemoteActionRetrieved));
-
-                      case 7:
-                        items = _context.sent;
-                        _iteratorNormalCompletion = true;
-                        _didIteratorError = false;
-                        _iteratorError = undefined;
-                        _context.prev = 11;
-
-                        for (_iterator = items[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                          mappedItem = _step.value;
-
-                          _this.modelManager.setItemDirty(mappedItem, true);
-                        }
-
-                        _context.next = 19;
-                        break;
-
-                      case 15:
-                        _context.prev = 15;
-                        _context.t0 = _context["catch"](11);
-                        _didIteratorError = true;
-                        _iteratorError = _context.t0;
-
-                      case 19:
-                        _context.prev = 19;
-                        _context.prev = 20;
-
-                        if (!_iteratorNormalCompletion && _iterator.return != null) {
-                          _iterator.return();
-                        }
-
-                      case 22:
-                        _context.prev = 22;
-
-                        if (!_didIteratorError) {
-                          _context.next = 25;
-                          break;
-                        }
-
-                        throw _iteratorError;
-
-                      case 25:
-                        return _context.finish(22);
-
-                      case 26:
-                        return _context.finish(19);
-
-                      case 27:
-                        _this.syncManager.sync();
-
-                        customCallback({
-                          item: item
-                        });
-                        _context.next = 33;
-                        break;
-
-                      case 31:
-                        item = _this.modelManager.createItem(item);
-                        customCallback({
-                          item: item
-                        });
-
-                      case 33:
-                        return _context.abrupt("return", true);
-
-                      case 36:
-                        if (response.auth_params) {
-                          _context.next = 39;
-                          break;
-                        }
-
-                        // In some cases revisions were missing auth params. Instruct the user to email us to get this remedied.
-                        _this.alertManager.alert({
-                          text: "We were unable to decrypt this revision using your current keys, and this revision is missing metadata that would allow us to try different keys to decrypt it. This can likely be fixed with some manual intervention. Please email hello@standardnotes.org for assistance."
-                        });
-
-                        return _context.abrupt("return");
-
-                      case 39:
-                        // Try previous passwords
-                        _iteratorNormalCompletion2 = true;
-                        _didIteratorError2 = false;
-                        _iteratorError2 = undefined;
-                        _context.prev = 42;
-                        _iterator2 = _this.previousPasswords[Symbol.iterator]();
-
-                      case 44:
-                        if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                          _context.next = 62;
-                          break;
-                        }
-
-                        passwordCandidate = _step2.value;
-
-                        if (!triedPasswords.includes(passwordCandidate)) {
-                          _context.next = 48;
-                          break;
-                        }
-
-                        return _context.abrupt("continue", 59);
-
-                      case 48:
-                        triedPasswords.push(passwordCandidate);
-                        _context.next = 51;
-                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(snjs__WEBPACK_IMPORTED_MODULE_5__["protocolManager"].computeEncryptionKeysForUser(passwordCandidate, response.auth_params));
-
-                      case 51:
-                        keyResults = _context.sent;
-
-                        if (keyResults) {
-                          _context.next = 54;
-                          break;
-                        }
-
-                        return _context.abrupt("continue", 59);
-
-                      case 54:
-                        _context.next = 56;
-                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(handleResponseDecryption(response, keyResults, merge));
-
-                      case 56:
-                        success = _context.sent;
-
-                        if (!success) {
-                          _context.next = 59;
-                          break;
-                        }
-
-                        return _context.abrupt("return", true);
-
-                      case 59:
-                        _iteratorNormalCompletion2 = true;
-                        _context.next = 44;
-                        break;
-
-                      case 62:
-                        _context.next = 68;
-                        break;
-
-                      case 64:
-                        _context.prev = 64;
-                        _context.t1 = _context["catch"](42);
-                        _didIteratorError2 = true;
-                        _iteratorError2 = _context.t1;
-
-                      case 68:
-                        _context.prev = 68;
-                        _context.prev = 69;
-
-                        if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                          _iterator2.return();
-                        }
-
-                      case 71:
-                        _context.prev = 71;
-
-                        if (!_didIteratorError2) {
-                          _context.next = 74;
-                          break;
-                        }
-
-                        throw _iteratorError2;
-
-                      case 74:
-                        return _context.finish(71);
-
-                      case 75:
-                        return _context.finish(68);
-
-                      case 76:
-                        _this.presentPasswordModal(function (password) {
-                          _this.previousPasswords.push(password);
-
-                          handleResponseDecryption(response, keys, merge);
-                        });
-
-                        return _context.abrupt("return", false);
-
-                      case 78:
-                      case "end":
-                        return _context.stop();
-                    }
-                  }
-                }, null, null, [[11, 15, 19, 27], [20,, 22, 26], [42, 64, 68, 76], [69,, 71, 75]]);
-              };
-
-              _context4.t0 = action.verb;
-              _context4.next = _context4.t0 === "get" ? 8 : _context4.t0 === "render" ? 10 : _context4.t0 === "show" ? 12 : _context4.t0 === "post" ? 16 : 18;
-              break;
-
-            case 8:
-              this.alertManager.confirm({
-                text: "Are you sure you want to replace the current note contents with this action's results?",
-                onConfirm: function onConfirm() {
-                  _this.httpManager.getAbsolute(action.url, {}, function _callee(response) {
-                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function _callee$(_context2) {
-                      while (1) {
-                        switch (_context2.prev = _context2.next) {
-                          case 0:
-                            action.error = false;
-                            _context2.t0 = handleResponseDecryption;
-                            _context2.t1 = response;
-                            _context2.next = 5;
-                            return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this.authManager.keys());
-
-                          case 5:
-                            _context2.t2 = _context2.sent;
-                            (0, _context2.t0)(_context2.t1, _context2.t2, true);
-
-                          case 7:
-                          case "end":
-                            return _context2.stop();
-                        }
-                      }
-                    });
-                  }, function (response) {
-                    var error = response && response.error || {
-                      message: "An issue occurred while processing this action. Please try again."
-                    };
-
-                    _this.alertManager.alert({
-                      text: error.message
-                    });
-
-                    action.error = true;
-                    customCallback(null, error);
-                  });
-                }
-              });
-              return _context4.abrupt("break", 18);
-
-            case 10:
-              this.httpManager.getAbsolute(action.url, {}, function _callee2(response) {
-                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function _callee2$(_context3) {
-                  while (1) {
-                    switch (_context3.prev = _context3.next) {
-                      case 0:
-                        action.error = false;
-                        _context3.t0 = handleResponseDecryption;
-                        _context3.t1 = response;
-                        _context3.next = 5;
-                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this.authManager.keys());
-
-                      case 5:
-                        _context3.t2 = _context3.sent;
-                        (0, _context3.t0)(_context3.t1, _context3.t2, false);
-
-                      case 7:
-                      case "end":
-                        return _context3.stop();
-                    }
-                  }
-                });
-              }, function (response) {
-                var error = response && response.error || {
-                  message: "An issue occurred while processing this action. Please try again."
+              return _context4.abrupt("return", this.httpManager.postAbsolute(action.url, params, emptyFunc).then(function (response) {
+                action.error = false;
+                return {
+                  response: response
                 };
+              }).catch(function (response) {
+                action.error = true;
+                console.error("Action error response:", response);
 
-                _this.alertManager.alert({
-                  text: error.message
+                _this3.alertManager.alert({
+                  text: "An issue occurred while processing this action. Please try again."
                 });
 
-                action.error = true;
-                customCallback(null, error);
-              });
-              return _context4.abrupt("break", 18);
+                return {
+                  response: response
+                };
+              }));
 
-            case 12:
+            case 7:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "handleShowAction",
+    value: function handleShowAction(action) {
+      var win;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function handleShowAction$(_context5) {
+        while (1) {
+          switch (_context5.prev = _context5.next) {
+            case 0:
               win = window.open(action.url, '_blank');
 
               if (win) {
                 win.focus();
               }
 
-              customCallback();
-              return _context4.abrupt("break", 18);
+              return _context5.abrupt("return", {
+                response: null
+              });
 
-            case 16:
-              this.outgoingParamsForItem(item, extension, decrypted).then(function (itemParams) {
-                var params = {
-                  items: [itemParams] // Wrap it in an array
+            case 3:
+            case "end":
+              return _context5.stop();
+          }
+        }
+      });
+    }
+  }, {
+    key: "handleGetAction",
+    value: function handleGetAction(action) {
+      var _this4 = this;
 
+      var emptyFunc, _onConfirm;
+
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function handleGetAction$(_context8) {
+        while (1) {
+          switch (_context8.prev = _context8.next) {
+            case 0:
+              emptyFunc = function emptyFunc() {};
+
+              _onConfirm = function onConfirm() {
+                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function onConfirm$(_context7) {
+                  while (1) {
+                    switch (_context7.prev = _context7.next) {
+                      case 0:
+                        return _context7.abrupt("return", _this4.httpManager.getAbsolute(action.url, {}, emptyFunc).then(function _callee(response) {
+                          var items, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, mappedItem;
+
+                          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function _callee$(_context6) {
+                            while (1) {
+                              switch (_context6.prev = _context6.next) {
+                                case 0:
+                                  action.error = false;
+                                  _context6.t0 = _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a;
+                                  _context6.t1 = _this4;
+                                  _context6.t2 = response;
+                                  _context6.next = 6;
+                                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this4.authManager.keys());
+
+                                case 6:
+                                  _context6.t3 = _context6.sent;
+                                  _context6.t4 = _context6.t1.decryptResponse.call(_context6.t1, _context6.t2, _context6.t3);
+                                  _context6.next = 10;
+                                  return _context6.t0.awrap.call(_context6.t0, _context6.t4);
+
+                                case 10:
+                                  _context6.next = 12;
+                                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this4.modelManager.mapResponseItemsToLocalModels([response.item], snjs__WEBPACK_IMPORTED_MODULE_5__["SFModelManager"].MappingSourceRemoteActionRetrieved));
+
+                                case 12:
+                                  items = _context6.sent;
+                                  _iteratorNormalCompletion2 = true;
+                                  _didIteratorError2 = false;
+                                  _iteratorError2 = undefined;
+                                  _context6.prev = 16;
+
+                                  for (_iterator2 = items[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                                    mappedItem = _step2.value;
+
+                                    _this4.modelManager.setItemDirty(mappedItem, true);
+                                  }
+
+                                  _context6.next = 24;
+                                  break;
+
+                                case 20:
+                                  _context6.prev = 20;
+                                  _context6.t5 = _context6["catch"](16);
+                                  _didIteratorError2 = true;
+                                  _iteratorError2 = _context6.t5;
+
+                                case 24:
+                                  _context6.prev = 24;
+                                  _context6.prev = 25;
+
+                                  if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                                    _iterator2.return();
+                                  }
+
+                                case 27:
+                                  _context6.prev = 27;
+
+                                  if (!_didIteratorError2) {
+                                    _context6.next = 30;
+                                    break;
+                                  }
+
+                                  throw _iteratorError2;
+
+                                case 30:
+                                  return _context6.finish(27);
+
+                                case 31:
+                                  return _context6.finish(24);
+
+                                case 32:
+                                  _this4.syncManager.sync();
+
+                                  return _context6.abrupt("return", {
+                                    response: response,
+                                    item: response.item
+                                  });
+
+                                case 34:
+                                case "end":
+                                  return _context6.stop();
+                              }
+                            }
+                          }, null, null, [[16, 20, 24, 32], [25,, 27, 31]]);
+                        }).catch(function (response) {
+                          var error = response && response.error || {
+                            message: "An issue occurred while processing this action. Please try again."
+                          };
+
+                          _this4.alertManager.alert({
+                            text: error.message
+                          });
+
+                          action.error = true;
+                          return {
+                            error: error
+                          };
+                        }));
+
+                      case 1:
+                      case "end":
+                        return _context7.stop();
+                    }
+                  }
+                });
+              };
+
+              return _context8.abrupt("return", new Promise(function (resolve, reject) {
+                _this4.alertManager.confirm({
+                  text: "Are you sure you want to replace the current note contents with this action's results?",
+                  onConfirm: function onConfirm() {
+                    _onConfirm().then(resolve);
+                  }
+                });
+              }));
+
+            case 3:
+            case "end":
+              return _context8.stop();
+          }
+        }
+      });
+    }
+  }, {
+    key: "handleRenderAction",
+    value: function handleRenderAction(action) {
+      var _this5 = this;
+
+      var emptyFunc;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function handleRenderAction$(_context10) {
+        while (1) {
+          switch (_context10.prev = _context10.next) {
+            case 0:
+              emptyFunc = function emptyFunc() {};
+
+              return _context10.abrupt("return", this.httpManager.getAbsolute(action.url, {}, emptyFunc).then(function _callee2(response) {
+                var result, item;
+                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function _callee2$(_context9) {
+                  while (1) {
+                    switch (_context9.prev = _context9.next) {
+                      case 0:
+                        action.error = false;
+                        _context9.t0 = _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a;
+                        _context9.t1 = _this5;
+                        _context9.t2 = response;
+                        _context9.next = 6;
+                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this5.authManager.keys());
+
+                      case 6:
+                        _context9.t3 = _context9.sent;
+                        _context9.t4 = _context9.t1.decryptResponse.call(_context9.t1, _context9.t2, _context9.t3);
+                        _context9.next = 10;
+                        return _context9.t0.awrap.call(_context9.t0, _context9.t4);
+
+                      case 10:
+                        result = _context9.sent;
+                        item = _this5.modelManager.createItem(result.item);
+                        return _context9.abrupt("return", {
+                          response: result.response,
+                          item: item
+                        });
+
+                      case 13:
+                      case "end":
+                        return _context9.stop();
+                    }
+                  }
+                });
+              }).catch(function (response) {
+                var error = response && response.error || {
+                  message: "An issue occurred while processing this action. Please try again."
                 };
 
-                _this.performPost(action, extension, params, function (response) {
-                  if (response && response.error) {
-                    _this.alertManager.alert({
-                      text: "An issue occurred while processing this action. Please try again."
-                    });
-                  }
-
-                  customCallback(response);
+                _this5.alertManager.alert({
+                  text: error.message
                 });
-              });
-              return _context4.abrupt("break", 18);
 
-            case 18:
-              action.lastExecuted = new Date();
+                action.error = true;
+                return {
+                  error: error
+                };
+              }));
 
-            case 19:
+            case 2:
             case "end":
-              return _context4.stop();
+              return _context10.stop();
           }
         }
       }, null, this);
@@ -9114,59 +9337,39 @@ function () {
       var decrypted,
           keys,
           itemParams,
-          _args5 = arguments;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function outgoingParamsForItem$(_context5) {
+          _args11 = arguments;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function outgoingParamsForItem$(_context11) {
         while (1) {
-          switch (_context5.prev = _context5.next) {
+          switch (_context11.prev = _context11.next) {
             case 0:
-              decrypted = _args5.length > 2 && _args5[2] !== undefined ? _args5[2] : false;
-              _context5.next = 3;
+              decrypted = _args11.length > 2 && _args11[2] !== undefined ? _args11[2] : false;
+              _context11.next = 3;
               return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.authManager.keys());
 
             case 3:
-              keys = _context5.sent;
+              keys = _context11.sent;
 
               if (decrypted) {
                 keys = null;
               }
 
-              _context5.t0 = snjs__WEBPACK_IMPORTED_MODULE_5__["SFItemParams"];
-              _context5.t1 = item;
-              _context5.t2 = keys;
-              _context5.next = 10;
+              _context11.t0 = snjs__WEBPACK_IMPORTED_MODULE_5__["SFItemParams"];
+              _context11.t1 = item;
+              _context11.t2 = keys;
+              _context11.next = 10;
               return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.authManager.getAuthParams());
 
             case 10:
-              _context5.t3 = _context5.sent;
-              itemParams = new _context5.t0(_context5.t1, _context5.t2, _context5.t3);
-              return _context5.abrupt("return", itemParams.paramsForExtension());
+              _context11.t3 = _context11.sent;
+              itemParams = new _context11.t0(_context11.t1, _context11.t2, _context11.t3);
+              return _context11.abrupt("return", itemParams.paramsForExtension());
 
             case 13:
             case "end":
-              return _context5.stop();
+              return _context11.stop();
           }
         }
       }, null, this);
-    }
-  }, {
-    key: "performPost",
-    value: function performPost(action, extension, params, callback) {
-      this.httpManager.postAbsolute(action.url, params, function (response) {
-        action.error = false;
-
-        if (callback) {
-          callback(response);
-        }
-      }.bind(this), function (response) {
-        action.error = true;
-        console.error("Action error response:", response);
-
-        if (callback) {
-          callback({
-            error: "Request error"
-          });
-        }
-      });
     }
   }, {
     key: "presentRevisionPreviewModal",
@@ -9174,7 +9377,7 @@ function () {
       var scope = this.$rootScope.$new(true);
       scope.uuid = uuid;
       scope.content = content;
-      var el = this.$compile("<revision-preview-modal uuid='uuid' content='content' class='sk-modal'></revision-preview-modal>")(scope);
+      var el = this.$compile("<revision-preview-modal uuid='uuid' content='content' \n      class='sk-modal'></revision-preview-modal>")(scope);
       angular__WEBPACK_IMPORTED_MODULE_4___default.a.element(document.body).append(el);
     }
   }, {
@@ -9183,15 +9386,15 @@ function () {
       var scope = this.$rootScope.$new(true);
       scope.type = "password";
       scope.title = "Decryption Assistance";
-      scope.message = "Unable to decrypt this item with your current keys. Please enter your account password at the time of this revision.";
+      scope.message = "Unable to decrypt this item with your current keys. \n                     Please enter your account password at the time of this revision.";
       scope.callback = callback;
-      var el = this.$compile("<input-modal type='type' message='message' title='title' callback='callback'></input-modal>")(scope);
+      var el = this.$compile("<input-modal type='type' message='message' \n     title='title' callback='callback'></input-modal>")(scope);
       angular__WEBPACK_IMPORTED_MODULE_4___default.a.element(document.body).append(el);
     }
   }, {
     key: "extensions",
     get: function get() {
-      return this.modelManager.validItemsForContentType("Extension");
+      return this.modelManager.validItemsForContentType('Extension');
     }
   }]);
 
@@ -68801,7 +69004,7 @@ module.exports = angular;
 
 var pug = __webpack_require__(/*! ../../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel\" id=\"account-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003EAccount\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"ctrl.close()\"\u003EClose\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section sk-panel-hero\" ng-if=\"!ctrl.user &amp;&amp; !ctrl.formData.showLogin &amp;&amp; !ctrl.formData.showRegister &amp;&amp; !ctrl.formData.mfa\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-h1\"\u003ESign in or register to enable sync and end-to-end encryption.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-button-group stretch\"\u003E\u003Cdiv class=\"sk-button info featured\" ng-click=\"ctrl.formData.showLogin = true\"\u003E\u003Cdiv class=\"sk-label\"\u003ESign In\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button info featured\" ng-click=\"ctrl.formData.showRegister = true\"\u003E\u003Cdiv class=\"sk-label\"\u003ERegister\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row sk-p\"\u003EStandard Notes is free on every platform, and comes \nstandard with sync and encryption.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section\" ng-if=\"ctrl.formData.showLogin || ctrl.formData.showRegister\"\u003E\u003Cdiv class=\"sk-panel-section-title\"\u003E{{ctrl.formData.showLogin ? \"Sign In\" : \"Register\"}}\u003C\u002Fdiv\u003E\u003Cform class=\"sk-panel-form\" ng-submit=\"ctrl.submitAuthForm()\"\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Cinput class=\"sk-input contrast\" name=\"email\" ng-model=\"ctrl.formData.email\" ng-model-options=\"{allowInvalid: true}\" placeholder=\"Email\" required=\"\" should-focus=\"true\" sn-autofocus=\"true\" spellcheck=\"false\" type=\"email\"\u003E\u003Cinput class=\"sk-input contrast\" name=\"password\" ng-model=\"ctrl.formData.user_password\" placeholder=\"Password\" required=\"\" sn-enter=\"ctrl.submitAuthForm()\" type=\"password\"\u003E\u003Cinput class=\"sk-input contrast\" name=\"password\" ng-if=\"ctrl.formData.showRegister\" ng-model=\"ctrl.formData.password_conf\" placeholder=\"Confirm Password\" required=\"\" sn-enter=\"ctrl.submitAuthForm()\" type=\"password\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Ca class=\"sk-panel-row sk-bold\" ng-click=\"ctrl.formData.showAdvanced = !ctrl.formData.showAdvanced\"\u003EAdvanced Options\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-notification unpadded contrast advanced-options sk-panel-row\" ng-if=\"ctrl.formData.showAdvanced\"\u003E\u003Cdiv class=\"sk-panel-column stretch\"\u003E\u003Cdiv class=\"sk-notification-title sk-panel-row padded-row\"\u003EAdvanced Options\u003C\u002Fdiv\u003E\u003Cdiv class=\"bordered-row padded-row\"\u003E\u003Clabel class=\"sk-label\"\u003ESync Server Domain\u003C\u002Flabel\u003E\u003Cinput class=\"sk-input mt-5 sk-base\" name=\"server\" ng-model=\"ctrl.formData.url\" placeholder=\"Server URL\" required=\"\" type=\"text\"\u003E\u003C\u002Fdiv\u003E\u003Clabel class=\"sk-label padded-row\" ng-if=\"ctrl.formData.showLogin\"\u003E\u003Cinput class=\"sk-input\" ng-model=\"ctrl.formData.strictSignin\" type=\"checkbox\"\u003EUse strict sign in\u003Cspan\u003E\u003Ca class=\"info\" href=\"https:\u002F\u002Fstandardnotes.org\u002Fhelp\u002Fsecurity\" rel=\"noopener\" target=\"_blank\"\u003E(Learn more)\u003C\u002Fa\u003E\u003C\u002Fspan\u003E\u003C\u002Flabel\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section form-submit\" ng-if=\"!ctrl.formData.authenticating\"\u003E\u003Cdiv class=\"sk-button-group stretch\"\u003E\u003Cdiv class=\"sk-button info featured\" ng-click=\"ctrl.submitAuthForm()\" ng-disabled=\"ctrl.formData.authenticating\"\u003E\u003Cdiv class=\"sk-label\"\u003E{{ctrl.formData.showLogin ? \"Sign In\" : \"Register\"}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-notification neutral\" ng-if=\"ctrl.formData.showRegister\"\u003E\u003Cdiv class=\"sk-notification-title\"\u003ENo Password Reset.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-notification-text\"\u003EBecause your notes are encrypted using your password, \nStandard Notes does not have a password reset option. \nYou cannot forget your password.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section no-bottom-pad\" ng-if=\"ctrl.formData.status\"\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Cdiv class=\"sk-spinner small neutral\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-label\"\u003E{{ctrl.formData.status}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section no-bottom-pad\" ng-if=\"!ctrl.formData.authenticating\"\u003E\u003Clabel class=\"sk-panel-row justify-left\"\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Cinput ng-false-value=\"true\" ng-model=\"ctrl.formData.ephemeral\" ng-true-value=\"false\" type=\"checkbox\"\u003EStay signed in\u003C\u002Fdiv\u003E\u003C\u002Flabel\u003E\u003Clabel class=\"sk-panel-row justify-left\" ng-if=\"ctrl.notesAndTagsCount() &gt; 0\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cinput ng-bind=\"true\" ng-change=\"ctrl.mergeLocalChanged()\" ng-model=\"ctrl.formData.mergeLocal\" type=\"checkbox\"\u003EMerge local data ({{ctrl.notesAndTagsCount()}} notes and tags)\u003C\u002Flabel\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section\" ng-if=\"formData.mfa\"\u003E\u003Cform class=\"sk-panel-form\" ng-submit=\"submitMfaForm()\"\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003E{{ctrl.formData.mfa.message}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cinput class=\"sk-input contrast\" autofocus=\"true\" name=\"mfa\" ng-model=\"ctrl.formData.userMfaCode\" placeholder=\"Enter Code\" required=\"\" should-focus=\"true\" sn-autofocus=\"true\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button-group stretch sk-panel-row form-submit\" ng-if=\"!ctrl.formData.status\"\u003E\u003Cbutton class=\"sk-button info featured\" type=\"submit\"\u003E\u003Cdiv class=\"sk-label\"\u003ESign In\u003C\u002Fdiv\u003E\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E\u003Cdiv class=\"sk-panel-section no-bottom-pad\" ng-if=\"ctrl.formData.status\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Cdiv class=\"sk-spinner small neutral\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-label\"\u003E{{ctrl.formData.status}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"!ctrl.formData.showLogin &amp;&amp; !ctrl.formData.showRegister &amp;&amp; !ctrl.formData.mfa\"\u003E\u003Cdiv class=\"sk-panel-section\" ng-if=\"ctrl.user\"\u003E\u003Cdiv class=\"sk-notification danger\" ng-if=\"ctrl.syncStatus.error\"\u003E\u003Cdiv class=\"sk-notification-title\"\u003ESync Unreachable\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-notification-text\"\u003EHmm...we can't seem to sync your account. \nThe reason: {{ctrl.syncStatus.error.message}}\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info-contrast sk-bold sk-panel-row\" href=\"https:\u002F\u002Fstandardnotes.org\u002Fhelp\" rel=\"noopener\" target=\"_blank\"\u003ENeed help?\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003Cdiv class=\"sk-h1 sk-bold wrap\"\u003E{{ctrl.user.email}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-subtitle subtle normal\"\u003E{{ctrl.server}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-horizontal-group\" delay=\"1000\" delay-hide=\"true\" show=\"ctrl.syncStatus.syncOpInProgress || ctrl.syncStatus.needsMoreSync\"\u003E\u003Cdiv class=\"sk-spinner small info\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-sublabel\"\u003E{{\"Syncing\" + (ctrl.syncStatus.total \u003E 0 ? \":\" : \"\")}}\u003Cspan ng-if=\"ctrl.syncStatus.total &gt; 0\"\u003E{{ctrl.syncStatus.current}}\u002F{{ctrl.syncStatus.total}}\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info sk-panel-row condensed\" ng-click=\"ctrl.openPasswordWizard('change-pw')\"\u003EChange Password\u003C\u002Fa\u003E\u003Ca class=\"sk-a info sk-panel-row condensed\" ng-click=\"ctrl.openPrivilegesModal('')\" ng-show=\"ctrl.user\"\u003EManage Privileges\u003C\u002Fa\u003E\u003Ca class=\"sk-panel-row justify-left condensed success\" ng-click=\"ctrl.openPasswordWizard('upgrade-security')\" ng-if=\"ctrl.securityUpdateAvailable\"\u003E\u003Cdiv class=\"inline sk-circle small success mr-8\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"inline\"\u003ESecurity Update Available\u003C\u002Fdiv\u003E\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Cdiv class=\"sk-panel-section-title\"\u003EEncryption\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section-subtitle info\" ng-if=\"ctrl.encryptionEnabled()\"\u003E{{ctrl.encryptionStatusForNotes()}}\u003C\u002Fdiv\u003E\u003Cp class=\"sk-p\"\u003E{{ctrl.encryptionStatusString()}}\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Cdiv class=\"sk-panel-section-title\"\u003EPasscode Lock\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"!ctrl.hasPasscode()\"\u003E\u003Cdiv ng-if=\"ctrl.canAddPasscode\"\u003E\u003Cdiv class=\"sk-panel-row\" ng-if=\"!ctrl.formData.showPasscodeForm\"\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"ctrl.addPasscodeClicked(); $event.stopPropagation();\"\u003E\u003Cdiv class=\"sk-label\"\u003EAdd Passcode\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cp class=\"sk-p\"\u003E Add a passcode to lock the application and \nencrypt on-device key storage.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"!ctrl.canAddPasscode\"\u003E\u003Cp class=\"sk-p\"\u003EAdding a passcode is not supported in temporary sessions. \nPlease sign out, then sign back in with the \"Stay signed in\" option checked.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cform class=\"sk-panel-form\" ng-if=\"ctrl.formData.showPasscodeForm\" ng-submit=\"ctrl.submitPasscodeForm()\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cinput class=\"sk-input contrast\" ng-model=\"ctrl.formData.passcode\" placeholder=\"Passcode\" should-focus=\"true\" sn-autofocus=\"true\" type=\"password\"\u003E\u003Cinput class=\"sk-input contrast\" ng-model=\"ctrl.formData.confirmPasscode\" placeholder=\"Confirm Passcode\" type=\"password\"\u003E\u003Cdiv class=\"sk-button-group stretch sk-panel-row form-submit\"\u003E\u003Cbutton class=\"sk-button info\" type=\"submit\"\u003E\u003Cdiv class=\"sk-label\"\u003ESet Passcode\u003C\u002Fdiv\u003E\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003Ca class=\"neutral sk-a sk-panel-row\" ng-click=\"ctrl.formData.showPasscodeForm = false\"\u003ECancel\u003C\u002Fa\u003E\u003C\u002Fform\u003E\u003Cdiv ng-if=\"ctrl.hasPasscode() &amp;&amp; !ctrl.formData.showPasscodeForm\"\u003E\u003Cdiv class=\"sk-p\"\u003EPasscode lock is enabled.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-notification contrast\"\u003E\u003Cdiv class=\"sk-notification-title\"\u003EOptions\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-notification-text\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Cdiv class=\"sk-h4 sk-bold\"\u003EAutolock\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info\" ng-class=\"{'boxed' : option.value == ctrl.selectedAutoLockInterval}\" ng-click=\"ctrl.selectAutoLockInterval(option.value)\" ng-repeat=\"option in ctrl.passcodeAutoLockOptions\"\u003E{{option.label}}\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-p\"\u003EThe autolock timer begins when the window or tab loses focus.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info sk-panel-row condensed\" ng-click=\"ctrl.openPrivilegesModal('')\" ng-show=\"!ctrl.user\"\u003EManage Privileges\u003C\u002Fa\u003E\u003Ca class=\"sk-a info sk-panel-row condensed\" ng-click=\"ctrl.changePasscodePressed()\"\u003EChange Passcode\u003C\u002Fa\u003E\u003Ca class=\"sk-a danger sk-panel-row condensed\" ng-click=\"ctrl.removePasscodePressed()\"\u003ERemove Passcode\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section\" ng-if=\"!ctrl.importData.loading\"\u003E\u003Cdiv class=\"sk-panel-section-title\"\u003EData Backups\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-p\"\u003EDownload a backup of all your data.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cform class=\"sk-panel-form sk-panel-row\" ng-if=\"ctrl.encryptedBackupsAvailable()\"\u003E\u003Cdiv class=\"sk-input-group\"\u003E\u003Clabel\u003E\u003Cinput ng-change=\"ctrl.archiveFormData.encrypted = true\" ng-model=\"ctrl.archiveFormData.encrypted\" ng-value=\"true\" type=\"radio\"\u003EEncrypted\u003C\u002Flabel\u003E\u003Clabel\u003E\u003Cinput ng-change=\"ctrl.archiveFormData.encrypted = false\" ng-model=\"ctrl.archiveFormData.encrypted\" ng-value=\"false\" type=\"radio\"\u003EDecrypted\u003C\u002Flabel\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E\u003Cdiv class=\"sk-button-group sk-panel-row justify-left\"\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"ctrl.downloadDataArchive()\"\u003E\u003Cdiv class=\"sk-label\"\u003EDownload Backup\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Clabel class=\"sk-button info\"\u003E\u003Cinput file-change=\"-&gt;\" handler=\"ctrl.importFileSelected(files)\" style=\"display: none;\" type=\"file\"\u003E\u003Cdiv class=\"sk-label\"\u003EImport Backup\u003C\u002Fdiv\u003E\u003C\u002Flabel\u003E\u003C\u002Fdiv\u003E\u003Cspan ng-if=\"ctrl.isDesktopApplication()\"\u003EBackups are automatically created on desktop and can be managed \nvia the \"Backups\" top-level menu.\u003C\u002Fspan\u003E\u003Cdiv id=\"import-password-request\" ng-if=\"ctrl.importData.requestPassword\"\u003E\u003Cform class=\"sk-panel-form stretch\" ng-submit=\"ctrl.submitImportPassword()\"\u003E\u003Cp\u003EEnter the account password associated with the import file.\u003C\u002Fp\u003E\u003Cinput class=\"sk-input contrast mt-5\" autofocus=\"true\" ng-model=\"ctrl.importData.password\" placeholder=\"Enter File Account Password\" type=\"password\"\u003E\u003Cdiv class=\"sk-button-group stretch sk-panel-row form-submit\"\u003E\u003Cbutton class=\"sk-button info\" type=\"submit\"\u003E\u003Cdiv class=\"sk-label\"\u003EDecrypt & Import\u003C\u002Fdiv\u003E\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003Cp\u003EImporting from backup will not overwrite existing data, \nbut instead create a duplicate of any differing data.\u003C\u002Fp\u003E\u003Cp\u003EIf you'd like to import only a selection of items instead of \nthe whole file, please use the Batch Manager extension.\u003C\u002Fp\u003E\u003C\u002Fform\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-spinner small info\" ng-if=\"ctrl.importData.loading\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-footer\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-p left neutral faded\"\u003E{{ctrl.appVersion}}\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a right\" ng-click=\"ctrl.formData.showLogin = false; ctrl.formData.showRegister = false;\" ng-if=\"ctrl.formData.showLogin || ctrl.formData.showRegister\"\u003ECancel\u003C\u002Fa\u003E\u003Ca class=\"sk-a right danger\" ng-click=\"ctrl.destroyLocalData()\" ng-if=\"!ctrl.formData.showLogin &amp;&amp; !ctrl.formData.showRegister\"\u003E{{ ctrl.user ? \"Sign out and clear local data\" : \"Clear all local data\" }}\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-panel\" id=\"account-panel\"\u003E\u003Cdiv class=\"sk-panel-header\"\u003E\u003Cdiv class=\"sk-panel-header-title\"\u003EAccount\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info close-button\" ng-click=\"ctrl.close()\"\u003EClose\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-content\"\u003E\u003Cdiv class=\"sk-panel-section sk-panel-hero\" ng-if=\"!ctrl.user &amp;&amp; !ctrl.formData.showLogin &amp;&amp; !ctrl.formData.showRegister &amp;&amp; !ctrl.formData.mfa\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-h1\"\u003ESign in or register to enable sync and end-to-end encryption.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-button-group stretch\"\u003E\u003Cdiv class=\"sk-button info featured\" ng-click=\"ctrl.formData.showLogin = true\"\u003E\u003Cdiv class=\"sk-label\"\u003ESign In\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button info featured\" ng-click=\"ctrl.formData.showRegister = true\"\u003E\u003Cdiv class=\"sk-label\"\u003ERegister\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row sk-p\"\u003EStandard Notes is free on every platform, and comes \nstandard with sync and encryption.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section\" ng-if=\"ctrl.formData.showLogin || ctrl.formData.showRegister\"\u003E\u003Cdiv class=\"sk-panel-section-title\"\u003E{{ctrl.formData.showLogin ? \"Sign In\" : \"Register\"}}\u003C\u002Fdiv\u003E\u003Cform class=\"sk-panel-form\" ng-submit=\"ctrl.submitAuthForm()\"\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Cinput class=\"sk-input contrast\" name=\"email\" ng-model=\"ctrl.formData.email\" ng-model-options=\"{allowInvalid: true}\" placeholder=\"Email\" required=\"\" should-focus=\"true\" sn-autofocus=\"true\" spellcheck=\"false\" type=\"email\"\u003E\u003Cinput class=\"sk-input contrast\" name=\"password\" ng-model=\"ctrl.formData.user_password\" placeholder=\"Password\" required=\"\" sn-enter=\"ctrl.submitAuthForm()\" type=\"password\"\u003E\u003Cinput class=\"sk-input contrast\" name=\"password\" ng-if=\"ctrl.formData.showRegister\" ng-model=\"ctrl.formData.password_conf\" placeholder=\"Confirm Password\" required=\"\" sn-enter=\"ctrl.submitAuthForm()\" type=\"password\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Ca class=\"sk-panel-row sk-bold\" ng-click=\"ctrl.formData.showAdvanced = !ctrl.formData.showAdvanced\"\u003EAdvanced Options\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-notification unpadded contrast advanced-options sk-panel-row\" ng-if=\"ctrl.formData.showAdvanced\"\u003E\u003Cdiv class=\"sk-panel-column stretch\"\u003E\u003Cdiv class=\"sk-notification-title sk-panel-row padded-row\"\u003EAdvanced Options\u003C\u002Fdiv\u003E\u003Cdiv class=\"bordered-row padded-row\"\u003E\u003Clabel class=\"sk-label\"\u003ESync Server Domain\u003C\u002Flabel\u003E\u003Cinput class=\"sk-input mt-5 sk-base\" name=\"server\" ng-model=\"ctrl.formData.url\" placeholder=\"Server URL\" required=\"\" type=\"text\"\u003E\u003C\u002Fdiv\u003E\u003Clabel class=\"sk-label padded-row\" ng-if=\"ctrl.formData.showLogin\"\u003E\u003Cinput class=\"sk-input\" ng-model=\"ctrl.formData.strictSignin\" type=\"checkbox\"\u003EUse strict sign in\u003Cspan\u003E\u003Ca class=\"info\" href=\"https:\u002F\u002Fstandardnotes.org\u002Fhelp\u002Fsecurity\" rel=\"noopener\" target=\"_blank\"\u003E(Learn more)\u003C\u002Fa\u003E\u003C\u002Fspan\u003E\u003C\u002Flabel\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section form-submit\" ng-if=\"!ctrl.formData.authenticating\"\u003E\u003Cdiv class=\"sk-button-group stretch\"\u003E\u003Cdiv class=\"sk-button info featured\" ng-click=\"ctrl.submitAuthForm()\" ng-disabled=\"ctrl.formData.authenticating\"\u003E\u003Cdiv class=\"sk-label\"\u003E{{ctrl.formData.showLogin ? \"Sign In\" : \"Register\"}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-notification neutral\" ng-if=\"ctrl.formData.showRegister\"\u003E\u003Cdiv class=\"sk-notification-title\"\u003ENo Password Reset.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-notification-text\"\u003EBecause your notes are encrypted using your password, \nStandard Notes does not have a password reset option. \nYou cannot forget your password.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section no-bottom-pad\" ng-if=\"ctrl.formData.status\"\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Cdiv class=\"sk-spinner small neutral\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-label\"\u003E{{ctrl.formData.status}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section no-bottom-pad\" ng-if=\"!ctrl.formData.authenticating\"\u003E\u003Clabel class=\"sk-panel-row justify-left\"\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Cinput ng-false-value=\"true\" ng-model=\"ctrl.formData.ephemeral\" ng-true-value=\"false\" type=\"checkbox\"\u003EStay signed in\u003C\u002Fdiv\u003E\u003C\u002Flabel\u003E\u003Clabel class=\"sk-panel-row justify-left\" ng-if=\"ctrl.notesAndTagsCount() &gt; 0\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cinput ng-bind=\"true\" ng-change=\"ctrl.mergeLocalChanged()\" ng-model=\"ctrl.formData.mergeLocal\" type=\"checkbox\"\u003EMerge local data ({{ctrl.notesAndTagsCount()}} notes and tags)\u003C\u002Flabel\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section\" ng-if=\"ctrl.formData.mfa\"\u003E\u003Cform class=\"sk-panel-form\" ng-submit=\"ctrl.submitMfaForm()\"\u003E\u003Cdiv class=\"sk-p sk-panel-row\"\u003E{{ctrl.formData.mfa.message}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cinput class=\"sk-input contrast\" autofocus=\"true\" name=\"mfa\" ng-model=\"ctrl.formData.userMfaCode\" placeholder=\"Enter Code\" required=\"\" should-focus=\"true\" sn-autofocus=\"true\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button-group stretch sk-panel-row form-submit\" ng-if=\"!ctrl.formData.status\"\u003E\u003Cbutton class=\"sk-button info featured\" type=\"submit\"\u003E\u003Cdiv class=\"sk-label\"\u003ESign In\u003C\u002Fdiv\u003E\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E\u003Cdiv class=\"sk-panel-section no-bottom-pad\" ng-if=\"ctrl.formData.status\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Cdiv class=\"sk-spinner small neutral\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-label\"\u003E{{ctrl.formData.status}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"!ctrl.formData.showLogin &amp;&amp; !ctrl.formData.showRegister &amp;&amp; !ctrl.formData.mfa\"\u003E\u003Cdiv class=\"sk-panel-section\" ng-if=\"ctrl.user\"\u003E\u003Cdiv class=\"sk-notification danger\" ng-if=\"ctrl.syncStatus.error\"\u003E\u003Cdiv class=\"sk-notification-title\"\u003ESync Unreachable\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-notification-text\"\u003EHmm...we can't seem to sync your account. \nThe reason: {{ctrl.syncStatus.error.message}}\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info-contrast sk-bold sk-panel-row\" href=\"https:\u002F\u002Fstandardnotes.org\u002Fhelp\" rel=\"noopener\" target=\"_blank\"\u003ENeed help?\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-panel-column\"\u003E\u003Cdiv class=\"sk-h1 sk-bold wrap\"\u003E{{ctrl.user.email}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-subtitle subtle normal\"\u003E{{ctrl.server}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-horizontal-group\" delay=\"1000\" delay-hide=\"true\" show=\"ctrl.syncStatus.syncOpInProgress || ctrl.syncStatus.needsMoreSync\"\u003E\u003Cdiv class=\"sk-spinner small info\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-sublabel\"\u003E{{\"Syncing\" + (ctrl.syncStatus.total \u003E 0 ? \":\" : \"\")}}\u003Cspan ng-if=\"ctrl.syncStatus.total &gt; 0\"\u003E{{ctrl.syncStatus.current}}\u002F{{ctrl.syncStatus.total}}\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info sk-panel-row condensed\" ng-click=\"ctrl.openPasswordWizard('change-pw')\"\u003EChange Password\u003C\u002Fa\u003E\u003Ca class=\"sk-a info sk-panel-row condensed\" ng-click=\"ctrl.openPrivilegesModal('')\" ng-show=\"ctrl.user\"\u003EManage Privileges\u003C\u002Fa\u003E\u003Ca class=\"sk-panel-row justify-left condensed success\" ng-click=\"ctrl.openPasswordWizard('upgrade-security')\" ng-if=\"ctrl.securityUpdateAvailable\"\u003E\u003Cdiv class=\"inline sk-circle small success mr-8\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"inline\"\u003ESecurity Update Available\u003C\u002Fdiv\u003E\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Cdiv class=\"sk-panel-section-title\"\u003EEncryption\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section-subtitle info\" ng-if=\"ctrl.encryptionEnabled()\"\u003E{{ctrl.encryptionStatusForNotes()}}\u003C\u002Fdiv\u003E\u003Cp class=\"sk-p\"\u003E{{ctrl.encryptionStatusString()}}\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section\"\u003E\u003Cdiv class=\"sk-panel-section-title\"\u003EPasscode Lock\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"!ctrl.hasPasscode()\"\u003E\u003Cdiv ng-if=\"ctrl.canAddPasscode\"\u003E\u003Cdiv class=\"sk-panel-row\" ng-if=\"!ctrl.formData.showPasscodeForm\"\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"ctrl.addPasscodeClicked(); $event.stopPropagation();\"\u003E\u003Cdiv class=\"sk-label\"\u003EAdd Passcode\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cp class=\"sk-p\"\u003E Add a passcode to lock the application and \nencrypt on-device key storage.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"!ctrl.canAddPasscode\"\u003E\u003Cp class=\"sk-p\"\u003EAdding a passcode is not supported in temporary sessions. \nPlease sign out, then sign back in with the \"Stay signed in\" option checked.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cform class=\"sk-panel-form\" ng-if=\"ctrl.formData.showPasscodeForm\" ng-submit=\"ctrl.submitPasscodeForm()\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cinput class=\"sk-input contrast\" ng-model=\"ctrl.formData.passcode\" placeholder=\"Passcode\" should-focus=\"true\" sn-autofocus=\"true\" type=\"password\"\u003E\u003Cinput class=\"sk-input contrast\" ng-model=\"ctrl.formData.confirmPasscode\" placeholder=\"Confirm Passcode\" type=\"password\"\u003E\u003Cdiv class=\"sk-button-group stretch sk-panel-row form-submit\"\u003E\u003Cbutton class=\"sk-button info\" type=\"submit\"\u003E\u003Cdiv class=\"sk-label\"\u003ESet Passcode\u003C\u002Fdiv\u003E\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003Ca class=\"neutral sk-a sk-panel-row\" ng-click=\"ctrl.formData.showPasscodeForm = false\"\u003ECancel\u003C\u002Fa\u003E\u003C\u002Fform\u003E\u003Cdiv ng-if=\"ctrl.hasPasscode() &amp;&amp; !ctrl.formData.showPasscodeForm\"\u003E\u003Cdiv class=\"sk-p\"\u003EPasscode lock is enabled.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-notification contrast\"\u003E\u003Cdiv class=\"sk-notification-title\"\u003EOptions\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-notification-text\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-horizontal-group\"\u003E\u003Cdiv class=\"sk-h4 sk-bold\"\u003EAutolock\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info\" ng-class=\"{'boxed' : option.value == ctrl.selectedAutoLockInterval}\" ng-click=\"ctrl.selectAutoLockInterval(option.value)\" ng-repeat=\"option in ctrl.passcodeAutoLockOptions\"\u003E{{option.label}}\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-p\"\u003EThe autolock timer begins when the window or tab loses focus.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a info sk-panel-row condensed\" ng-click=\"ctrl.openPrivilegesModal('')\" ng-show=\"!ctrl.user\"\u003EManage Privileges\u003C\u002Fa\u003E\u003Ca class=\"sk-a info sk-panel-row condensed\" ng-click=\"ctrl.changePasscodePressed()\"\u003EChange Passcode\u003C\u002Fa\u003E\u003Ca class=\"sk-a danger sk-panel-row condensed\" ng-click=\"ctrl.removePasscodePressed()\"\u003ERemove Passcode\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-section\" ng-if=\"!ctrl.importData.loading\"\u003E\u003Cdiv class=\"sk-panel-section-title\"\u003EData Backups\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-p\"\u003EDownload a backup of all your data.\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003C\u002Fdiv\u003E\u003Cform class=\"sk-panel-form sk-panel-row\" ng-if=\"ctrl.encryptedBackupsAvailable()\"\u003E\u003Cdiv class=\"sk-input-group\"\u003E\u003Clabel\u003E\u003Cinput ng-change=\"ctrl.archiveFormData.encrypted = true\" ng-model=\"ctrl.archiveFormData.encrypted\" ng-value=\"true\" type=\"radio\"\u003EEncrypted\u003C\u002Flabel\u003E\u003Clabel\u003E\u003Cinput ng-change=\"ctrl.archiveFormData.encrypted = false\" ng-model=\"ctrl.archiveFormData.encrypted\" ng-value=\"false\" type=\"radio\"\u003EDecrypted\u003C\u002Flabel\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E\u003Cdiv class=\"sk-button-group sk-panel-row justify-left\"\u003E\u003Cdiv class=\"sk-button info\" ng-click=\"ctrl.downloadDataArchive()\"\u003E\u003Cdiv class=\"sk-label\"\u003EDownload Backup\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Clabel class=\"sk-button info\"\u003E\u003Cinput file-change=\"-&gt;\" handler=\"ctrl.importFileSelected(files)\" style=\"display: none;\" type=\"file\"\u003E\u003Cdiv class=\"sk-label\"\u003EImport Backup\u003C\u002Fdiv\u003E\u003C\u002Flabel\u003E\u003C\u002Fdiv\u003E\u003Cspan ng-if=\"ctrl.isDesktopApplication()\"\u003EBackups are automatically created on desktop and can be managed \nvia the \"Backups\" top-level menu.\u003C\u002Fspan\u003E\u003Cdiv id=\"import-password-request\" ng-if=\"ctrl.importData.requestPassword\"\u003E\u003Cform class=\"sk-panel-form stretch\" ng-submit=\"ctrl.submitImportPassword()\"\u003E\u003Cp\u003EEnter the account password associated with the import file.\u003C\u002Fp\u003E\u003Cinput class=\"sk-input contrast mt-5\" autofocus=\"true\" ng-model=\"ctrl.importData.password\" placeholder=\"Enter File Account Password\" type=\"password\"\u003E\u003Cdiv class=\"sk-button-group stretch sk-panel-row form-submit\"\u003E\u003Cbutton class=\"sk-button info\" type=\"submit\"\u003E\u003Cdiv class=\"sk-label\"\u003EDecrypt & Import\u003C\u002Fdiv\u003E\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003Cp\u003EImporting from backup will not overwrite existing data, \nbut instead create a duplicate of any differing data.\u003C\u002Fp\u003E\u003Cp\u003EIf you'd like to import only a selection of items instead of \nthe whole file, please use the Batch Manager extension.\u003C\u002Fp\u003E\u003C\u002Fform\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-spinner small info\" ng-if=\"ctrl.importData.loading\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-panel-footer\"\u003E\u003Cdiv class=\"sk-panel-row\"\u003E\u003Cdiv class=\"sk-p left neutral faded\"\u003E{{ctrl.appVersion}}\u003C\u002Fdiv\u003E\u003Ca class=\"sk-a right\" ng-click=\"ctrl.formData.showLogin = false; ctrl.formData.showRegister = false;\" ng-if=\"ctrl.formData.showLogin || ctrl.formData.showRegister\"\u003ECancel\u003C\u002Fa\u003E\u003Ca class=\"sk-a right danger\" ng-click=\"ctrl.destroyLocalData()\" ng-if=\"!ctrl.formData.showLogin &amp;&amp; !ctrl.formData.showRegister\"\u003E{{ ctrl.user ? \"Sign out and clear local data\" : \"Clear all local data\" }}\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),
@@ -68899,7 +69102,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sk-menu-panel-row row\" ng-attr-title=\"{{ctrl.desc}}\" ng-click=\"ctrl.onClick($event)\"\u003E\u003Cdiv class=\"sk-menu-panel-column\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-menu-panel-column\" ng-if=\"\n              ctrl.circle &amp;&amp; \n              (!ctrl.circleAlign || ctrl.circleAlign == 'left')\n              \"\u003E\u003Cdiv class=\"sk-circle small\" ng-class=\"ctrl.circle\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel-column\" ng-class=\"{'faded' : ctrl.faded || ctrl.disabled}\"\u003E\u003Cdiv class=\"sk-label\" ng-class=\"ctrl.stylekitClass\"\u003E{{ctrl.label}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-sublabel\" ng-if=\"ctrl.subtitle\"\u003E{{ctrl.subtitle}}\u003C\u002Fdiv\u003E\u003Cng-transclude\u003E\u003C\u002Fng-transclude\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel-subrows\" ng-if=\"ctrl.subRows &amp;&amp; ctrl.subRows.length &gt; 0\"\u003E\u003Cmenu-row ng-repeat=\"row in subRows\" action=\"row.onClick()\" label=\"row.label\" spinner-class=\"row.spinnerClass\" subtitle=\"row.subtitle\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel-column\" ng-if=\"ctrl.circle &amp;&amp; ctrl.circleAlign == 'right'\"\u003E\u003Cdiv class=\"sk-circle small\" ng-class=\"ctrl.circle\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel-column\" ng-if=\"ctrl.hasButton\"\u003E\u003Cdiv class=\"sk-button\" ng-class=\"ctrl.buttonClass\" ng-click=\"ctrl.clickAccessoryButton($event)\"\u003E\u003Cdiv class=\"sk-label\"\u003E{{ctrl.buttonText}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel-column\" ng-if=\"ctrl.spinnerClass\"\u003E\u003Cdiv class=\"sk-spinner small\" ng-class=\"ctrl.spinnerClass\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sk-menu-panel-row row\" ng-attr-title=\"{{ctrl.desc}}\" ng-click=\"ctrl.onClick($event)\"\u003E\u003Cdiv class=\"sk-menu-panel-column\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-menu-panel-column\" ng-if=\"\n              ctrl.circle &amp;&amp; \n              (!ctrl.circleAlign || ctrl.circleAlign == 'left')\n              \"\u003E\u003Cdiv class=\"sk-circle small\" ng-class=\"ctrl.circle\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel-column\" ng-class=\"{'faded' : ctrl.faded || ctrl.disabled}\"\u003E\u003Cdiv class=\"sk-label\" ng-class=\"ctrl.stylekitClass\"\u003E{{ctrl.label}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-sublabel\" ng-if=\"ctrl.subtitle\"\u003E{{ctrl.subtitle}}\u003C\u002Fdiv\u003E\u003Cng-transclude\u003E\u003C\u002Fng-transclude\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel-subrows\" ng-if=\"ctrl.subRows &amp;&amp; ctrl.subRows.length &gt; 0\"\u003E\u003Cmenu-row ng-repeat=\"row in ctrl.subRows\" action=\"row.onClick()\" label=\"row.label\" spinner-class=\"row.spinnerClass\" subtitle=\"row.subtitle\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel-column\" ng-if=\"ctrl.circle &amp;&amp; ctrl.circleAlign == 'right'\"\u003E\u003Cdiv class=\"sk-circle small\" ng-class=\"ctrl.circle\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel-column\" ng-if=\"ctrl.hasButton\"\u003E\u003Cdiv class=\"sk-button\" ng-class=\"ctrl.buttonClass\" ng-click=\"ctrl.clickAccessoryButton($event)\"\u003E\u003Cdiv class=\"sk-label\"\u003E{{ctrl.buttonText}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel-column\" ng-if=\"ctrl.spinnerClass\"\u003E\u003Cdiv class=\"sk-spinner small\" ng-class=\"ctrl.spinnerClass\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),

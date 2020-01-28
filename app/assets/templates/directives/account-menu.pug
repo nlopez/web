@@ -32,7 +32,8 @@
               should-focus='true', 
               sn-autofocus='true', 
               spellcheck='false', 
-              type='email')
+              type='email'
+              )
             input.sk-input.contrast(
               name='password', 
               ng-model='ctrl.formData.user_password', 
@@ -117,8 +118,8 @@
                 type='checkbox'
                 )
               | Merge local data ({{ctrl.notesAndTagsCount()}} notes and tags)
-      .sk-panel-section(ng-if='formData.mfa')
-        form.sk-panel-form(ng-submit='submitMfaForm()')
+      .sk-panel-section(ng-if='ctrl.formData.mfa')
+        form.sk-panel-form(ng-submit='ctrl.submitMfaForm()')
           .sk-p.sk-panel-row {{ctrl.formData.mfa.message}}
           .sk-panel-row
             input.sk-input.contrast(

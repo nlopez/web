@@ -66,6 +66,7 @@ class EditorCtrl {
   ) {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
+    this.alertManager = alertManager;
     this.appState = appState;
     this.actionsManager = actionsManager;
     this.authManager = authManager;

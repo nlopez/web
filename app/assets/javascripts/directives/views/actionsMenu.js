@@ -10,55 +10,50 @@ class ActionsMenuCtrl {
     this.loadExtensions();
   };
 
-  loadExtensions() {
+  async loadExtensions() {
     this.extensions = this.actionsManager.extensions.sort((a, b) => {
       return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
     });
-    for(const extension of this.extensions) {
+    for (const extension of this.extensions) {
       extension.loading = true;
-      this.actionsManager.loadExtensionInContextOfItem(
+      await this.actionsManager.loadExtensionInContextOfItem(
         extension,
-        this.item,
-        (scopedExtension) => {
-          extension.loading = false;
-        }
+        this.item
       )
+      extension.loading = false;
     }
   }
 
-  executeAction(action, extension, parentAction) {
-    if(action.verb === 'nested') {
-      if(!action.subrows) {
+  async executeAction(action, extension) {
+    if (action.verb === 'nested') {
+      if (!action.subrows) {
         action.subrows = this.subRowsForAction(action, extension);
       } else {
         action.subrows = null;
       }
       return;
     }
-
     action.running = true;
-    this.actionsManager.executeAction(
+    const result = await this.actionsManager.executeAction(
       action,
       extension,
-      this.item,
-      (response, error) => {
-        if(error) {
-          return;
-        }
-        action.running = false;
-        this.handleActionResponse(action, response);
-        this.actionsManager.loadExtensionInContextOfItem(
-          extension,
-          this.item
-        );
-      }
-    )
+      this.item
+    );
+    if (action.error) {
+      return;
+    }
+    action.running = false;
+    this.handleActionResult(action, result);
+    await this.actionsManager.loadExtensionInContextOfItem(
+      extension,
+      this.item
+    );
   }
 
-  handleActionResponse(action, response) {
+  handleActionResult(action, result) {
     switch (action.verb) {
       case 'render': {
-        const item = response.item;
+        const item = result.item;
         this.actionsManager.presentRevisionPreviewModal(
           item.uuid,
           item.content
@@ -68,7 +63,7 @@ class ActionsMenuCtrl {
   }
 
   subRowsForAction(parentAction, extension) {
-    if(!parentAction.subactions) {
+    if (!parentAction.subactions) {
       return null;
     }
     return parentAction.subactions.map((subaction) => {

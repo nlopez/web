@@ -21,7 +21,7 @@
         ng-transclude
     .sk-menu-panel-subrows(ng-if='ctrl.subRows && ctrl.subRows.length > 0')
       menu-row(
-        ng-repeat='row in subRows', 
+        ng-repeat='row in ctrl.subRows', 
         action='row.onClick()', 
         label='row.label', 
         spinner-class='row.spinnerClass', 
