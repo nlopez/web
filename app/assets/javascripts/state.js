@@ -1,3 +1,5 @@
+import { PrivilegesManager } from '@/services/privilegesManager';
+
 export const APP_STATE_EVENT_TAG_CHANGED                 = 1;
 export const APP_STATE_EVENT_NOTE_CHANGED                = 2;
 export const APP_STATE_EVENT_PREFERENCES_CHANGED         = 3;
@@ -10,8 +12,9 @@ export const APP_STATE_EVENT_DESKTOP_EXTS_READY          = 8;
 export class AppState {
 
   /* @ngInject */
-  constructor($timeout) {
+  constructor($timeout, privilegesManager) {
     this.$timeout = $timeout;
+    this.privilegesManager = privilegesManager;
     this.observers = [];
   }
 
@@ -48,12 +51,25 @@ export class AppState {
   }
 
   async setSelectedNote(note) {
-    const previousNote = this.selectedNote;
-    this.selectedNote = note;
-    await this.notifyEvent(
-      APP_STATE_EVENT_NOTE_CHANGED,
-      {previousNote: previousNote}
-    );
+    const run = async () => {
+      const previousNote = this.selectedNote;
+      this.selectedNote = note;
+      await this.notifyEvent(
+        APP_STATE_EVENT_NOTE_CHANGED,
+        { previousNote: previousNote }
+      );
+    }
+    if (note.content.protected &&
+      await this.privilegesManager.actionRequiresPrivilege(
+        PrivilegesManager.ActionViewProtectedNotes
+      )) {
+      this.privilegesManager.presentPrivilegesModal(
+        PrivilegesManager.ActionViewProtectedNotes,
+        run
+      );
+    } else {
+      run();
+    }
   }
 
   getSelectedTag() {
@@ -65,6 +81,7 @@ export class AppState {
   }
 
   setUserPreferences(preferences) {
+    this.userPreferences = preferences;
     this.notifyEvent(
       APP_STATE_EVENT_PREFERENCES_CHANGED
     );

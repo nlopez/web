@@ -2,7 +2,6 @@ import _ from 'lodash';
 import angular from 'angular';
 import template from '%/notes.pug';
 import { SFAuthManager } from 'snjs';
-import { PrivilegesManager } from '@/services/privilegesManager';
 import { KeyboardManager } from '@/services/keyboardManager';
 import { PureCtrl } from '@Controllers';
 import {
@@ -120,7 +119,7 @@ class NotesCtrl extends PureCtrl {
         /** Delete dummy note if applicable */
         if (this.state.selectedNote && this.state.selectedNote.dummy) {
           this.modelManager.removeItemLocally(this.state.selectedNote);
-          this.appState.setSelectedNote(null).then(() => {
+          this.selectNote(null).then(() => {
             this.reloadNotes();
           })
           /**
@@ -182,7 +181,7 @@ class NotesCtrl extends PureCtrl {
       if (previousTag) {
         _.remove(previousTag.notes, this.state.selectedNote);
       }
-      await this.appState.setSelectedNote(null);
+      await this.selectNote(null);
     }
 
     await this.setState({
@@ -207,7 +206,7 @@ class NotesCtrl extends PureCtrl {
         this.state.selectedNote &&
         !this.state.notes.includes(this.state.selectedNote)
       ) {
-        this.appState.setSelectedNote(null);
+        this.selectNote(null);
       }
     }
   }
@@ -220,8 +219,11 @@ class NotesCtrl extends PureCtrl {
     }
   }
 
-  /** @template */
-  selectNote(note) {
+  /** 
+   * @template
+   * @internal 
+   */
+  async selectNote(note) {
     this.appState.setSelectedNote(note);
   }
 
@@ -281,27 +283,15 @@ class NotesCtrl extends PureCtrl {
     if (!note) {
       return;
     }
-    const run = () => {
-      this.selectedIndex = Math.max(0, this.displayableNotes().indexOf(note));
-      if (note.content.conflict_of) {
-        note.content.conflict_of = null;
-        this.modelManager.setItemDirty(note);
-        this.syncManager.sync();
-      }
-      if (this.isFiltering()) {
-        this.desktopManager.searchText(this.state.noteFilter.text);
-      }
+
+    this.selectedIndex = Math.max(0, this.displayableNotes().indexOf(note));
+    if (note.content.conflict_of) {
+      note.content.conflict_of = null;
+      this.modelManager.setItemDirty(note);
+      this.syncManager.sync();
     }
-    if (note.content.protected &&
-      await this.privilegesManager.actionRequiresPrivilege(
-        PrivilegesManager.ActionViewProtectedNotes
-      )) {
-      this.privilegesManager.presentPrivilegesModal(
-        PrivilegesManager.ActionViewProtectedNotes,
-        run
-      );
-    } else {
-      run();
+    if (this.isFiltering()) {
+      this.desktopManager.searchText(this.state.noteFilter.text);
     }
   }
 
@@ -504,7 +494,7 @@ class NotesCtrl extends PureCtrl {
   selectFirstNote() {
     const note = this.getFirstNonProtectedNote();
     if (note) {
-      this.appState.setSelectedNote(note);
+      this.selectNote(note);
     }
   }
 
@@ -512,18 +502,18 @@ class NotesCtrl extends PureCtrl {
     const displayableNotes = this.displayableNotes();
     const currentIndex = displayableNotes.indexOf(this.state.selectedNote);
     if (currentIndex + 1 < displayableNotes.length) {
-      this.appState.setSelectedNote(displayableNotes[currentIndex + 1]);
+      this.selectNote(displayableNotes[currentIndex + 1]);
     }
   }
 
   selectNextOrCreateNew() {
     const note = this.getFirstNonProtectedNote();
     if (note) {
-      this.appState.setSelectedNote(note);
+      this.selectNote(note);
     } else if (!this.state.tag || !this.state.tag.isSmartTag()) {
       this.createNewNote();
     } else {
-      this.appState.setSelectedNote(null);
+      this.selectNote(null);
     }
   }
 
@@ -531,7 +521,7 @@ class NotesCtrl extends PureCtrl {
     const displayableNotes = this.displayableNotes();
     const currentIndex = displayableNotes.indexOf(this.state.selectedNote);
     if (currentIndex - 1 >= 0) {
-      this.appState.setSelectedNote(displayableNotes[currentIndex - 1]);
+      this.selectNote(displayableNotes[currentIndex - 1]);
       return true;
     } else {
       return false;
@@ -559,7 +549,7 @@ class NotesCtrl extends PureCtrl {
       selectedTag.addItemAsRelationship(newNote);
       this.modelManager.setItemDirty(selectedTag);
     }
-    this.appState.setSelectedNote(newNote);
+    this.selectNote(newNote);
   }
 
   isFiltering() {

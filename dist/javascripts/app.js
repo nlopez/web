@@ -2308,12 +2308,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _notes_pug__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(_notes_pug__WEBPACK_IMPORTED_MODULE_10__);
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
 /* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_11__);
-/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/services/privilegesManager.js");
-/* harmony import */ var _services_keyboardManager__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @/services/keyboardManager */ "./app/assets/javascripts/services/keyboardManager.js");
-/* harmony import */ var _Controllers__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Controllers */ "./app/assets/javascripts/controllers/index.js");
-/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
-/* harmony import */ var _services_preferencesManager__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @/services/preferencesManager */ "./app/assets/javascripts/services/preferencesManager.js");
-/* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/controllers/constants.js");
+/* harmony import */ var _services_keyboardManager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @/services/keyboardManager */ "./app/assets/javascripts/services/keyboardManager.js");
+/* harmony import */ var _Controllers__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @Controllers */ "./app/assets/javascripts/controllers/index.js");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
+/* harmony import */ var _services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @/services/preferencesManager */ "./app/assets/javascripts/services/preferencesManager.js");
+/* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/controllers/constants.js");
 
 
 
@@ -2326,7 +2325,6 @@ __webpack_require__.r(__webpack_exports__);
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_7___default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
 
 
 
@@ -2367,12 +2365,12 @@ function (_PureCtrl) {
     _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(NotesCtrl).call(this, $timeout));
 
     _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_7___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5___default()(_this), "onPanelResize", function (newWidth, lastLeft, isAtMaxWidth, isCollapsed) {
-      _this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_16__["PREF_NOTES_PANEL_WIDTH"], newWidth);
+      _this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_NOTES_PANEL_WIDTH"], newWidth);
 
       _this.preferencesManager.syncUserPreferences();
 
       _this.appState.panelDidResize({
-        name: _controllers_constants__WEBPACK_IMPORTED_MODULE_17__["PANEL_NAME_NOTES"],
+        name: _controllers_constants__WEBPACK_IMPORTED_MODULE_16__["PANEL_NAME_NOTES"],
         collapsed: isCollapsed
       });
     });
@@ -2437,15 +2435,15 @@ function (_PureCtrl) {
       var _this2 = this;
 
       this.appState.addObserver(function (eventName, data) {
-        if (eventName === _state__WEBPACK_IMPORTED_MODULE_15__["APP_STATE_EVENT_TAG_CHANGED"]) {
+        if (eventName === _state__WEBPACK_IMPORTED_MODULE_14__["APP_STATE_EVENT_TAG_CHANGED"]) {
           _this2.handleTagChange(_this2.appState.getSelectedTag(), data.previousTag);
-        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_15__["APP_STATE_EVENT_NOTE_CHANGED"]) {
+        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_14__["APP_STATE_EVENT_NOTE_CHANGED"]) {
           _this2.handleNoteSelection(_this2.appState.getSelectedNote());
-        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_15__["APP_STATE_EVENT_PREFERENCES_CHANGED"]) {
+        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_14__["APP_STATE_EVENT_PREFERENCES_CHANGED"]) {
           _this2.loadPreferences();
 
           _this2.reloadNotes();
-        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_15__["APP_STATE_EVENT_EDITOR_FOCUSED"]) {
+        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_14__["APP_STATE_EVENT_EDITOR_FOCUSED"]) {
           _this2.setShowMenuFalse();
         }
       });
@@ -2461,7 +2459,7 @@ function (_PureCtrl) {
           if (_this3.state.selectedNote && _this3.state.selectedNote.dummy) {
             _this3.modelManager.removeItemLocally(_this3.state.selectedNote);
 
-            _this3.appState.setSelectedNote(null).then(function () {
+            _this3.selectNote(null).then(function () {
               _this3.reloadNotes();
             });
             /**
@@ -2603,7 +2601,7 @@ function (_PureCtrl) {
               }
 
               _context2.next = 5;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.appState.setSelectedNote(null));
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.selectNote(null));
 
             case 5:
               _context2.next = 7;
@@ -2630,7 +2628,7 @@ function (_PureCtrl) {
                 if (!tag.isSmartTag() || tag.content.isAllTag) {
                   this.createNewNote();
                 } else if (this.state.selectedNote && !this.state.notes.includes(this.state.selectedNote)) {
-                  this.appState.setSelectedNote(null);
+                  this.selectNote(null);
                 }
               }
 
@@ -2651,26 +2649,40 @@ function (_PureCtrl) {
         scrollable.scrollLeft = 0;
       }
     }
-    /** @template */
+    /** 
+     * @template
+     * @internal 
+     */
 
   }, {
     key: "selectNote",
     value: function selectNote(note) {
-      this.appState.setSelectedNote(note);
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function selectNote$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              this.appState.setSelectedNote(note);
+
+            case 1:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, null, this);
     }
   }, {
     key: "removeNoteFromList",
     value: function removeNoteFromList(note) {
       var notes;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function removeNoteFromList$(_context3) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function removeNoteFromList$(_context4) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
               notes = this.state.notes;
 
               lodash__WEBPACK_IMPORTED_MODULE_8___default.a.pull(notes, note);
 
-              _context3.next = 4;
+              _context4.next = 4;
               return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.setState({
                 notes: notes,
                 renderedNotes: notes.slice(0, this.notesToDisplay)
@@ -2678,7 +2690,7 @@ function (_PureCtrl) {
 
             case 4:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
         }
       }, null, this);
@@ -2688,16 +2700,16 @@ function (_PureCtrl) {
     value: function reloadNotes() {
       var tagNotes, notes, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, note;
 
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function reloadNotes$(_context4) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function reloadNotes$(_context5) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context5.prev = _context5.next) {
             case 0:
               if (this.state.tag) {
-                _context4.next = 2;
+                _context5.next = 2;
                 break;
               }
 
-              return _context4.abrupt("return");
+              return _context5.abrupt("return");
 
             case 2:
               tagNotes = this.state.tag.notes;
@@ -2705,7 +2717,7 @@ function (_PureCtrl) {
               _iteratorNormalCompletion2 = true;
               _didIteratorError2 = false;
               _iteratorError2 = undefined;
-              _context4.prev = 7;
+              _context5.prev = 7;
 
               for (_iterator2 = notes[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                 note = _step2.value;
@@ -2717,41 +2729,41 @@ function (_PureCtrl) {
                 note.shouldShowTags = this.shouldShowTagsForNote(note);
               }
 
-              _context4.next = 15;
+              _context5.next = 15;
               break;
 
             case 11:
-              _context4.prev = 11;
-              _context4.t0 = _context4["catch"](7);
+              _context5.prev = 11;
+              _context5.t0 = _context5["catch"](7);
               _didIteratorError2 = true;
-              _iteratorError2 = _context4.t0;
+              _iteratorError2 = _context5.t0;
 
             case 15:
-              _context4.prev = 15;
-              _context4.prev = 16;
+              _context5.prev = 15;
+              _context5.prev = 16;
 
               if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
                 _iterator2.return();
               }
 
             case 18:
-              _context4.prev = 18;
+              _context5.prev = 18;
 
               if (!_didIteratorError2) {
-                _context4.next = 21;
+                _context5.next = 21;
                 break;
               }
 
               throw _iteratorError2;
 
             case 21:
-              return _context4.finish(18);
+              return _context5.finish(18);
 
             case 22:
-              return _context4.finish(15);
+              return _context5.finish(15);
 
             case 23:
-              _context4.next = 25;
+              _context5.next = 25;
               return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.setState({
                 notes: notes,
                 renderedNotes: notes.slice(0, this.notesToDisplay)
@@ -2762,7 +2774,7 @@ function (_PureCtrl) {
 
             case 26:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
         }
       }, null, this, [[7, 11, 15, 23], [16,, 18, 22]]);
@@ -2779,19 +2791,17 @@ function (_PureCtrl) {
   }, {
     key: "handleNoteSelection",
     value: function handleNoteSelection(note) {
-      var _this6 = this;
-
-      var previousNote, run;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function handleNoteSelection$(_context5) {
+      var previousNote;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function handleNoteSelection$(_context6) {
         while (1) {
-          switch (_context5.prev = _context5.next) {
+          switch (_context6.prev = _context6.next) {
             case 0:
               if (!(this.state.selectedNote === note)) {
-                _context5.next = 2;
+                _context6.next = 2;
                 break;
               }
 
-              return _context5.abrupt("return");
+              return _context6.abrupt("return");
 
             case 2:
               previousNote = this.state.selectedNote;
@@ -2801,65 +2811,35 @@ function (_PureCtrl) {
                 this.removeNoteFromList(previousNote);
               }
 
-              _context5.next = 6;
+              _context6.next = 6;
               return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.setState({
                 selectedNote: note
               }));
 
             case 6:
               if (note) {
-                _context5.next = 8;
+                _context6.next = 8;
                 break;
               }
 
-              return _context5.abrupt("return");
+              return _context6.abrupt("return");
 
             case 8:
-              run = function run() {
-                _this6.selectedIndex = Math.max(0, _this6.displayableNotes().indexOf(note));
+              this.selectedIndex = Math.max(0, this.displayableNotes().indexOf(note));
 
-                if (note.content.conflict_of) {
-                  note.content.conflict_of = null;
-
-                  _this6.modelManager.setItemDirty(note);
-
-                  _this6.syncManager.sync();
-                }
-
-                if (_this6.isFiltering()) {
-                  _this6.desktopManager.searchText(_this6.state.noteFilter.text);
-                }
-              };
-
-              _context5.t0 = note.content.protected;
-
-              if (!_context5.t0) {
-                _context5.next = 14;
-                break;
+              if (note.content.conflict_of) {
+                note.content.conflict_of = null;
+                this.modelManager.setItemDirty(note);
+                this.syncManager.sync();
               }
 
-              _context5.next = 13;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_12__["PrivilegesManager"].ActionViewProtectedNotes));
-
-            case 13:
-              _context5.t0 = _context5.sent;
-
-            case 14:
-              if (!_context5.t0) {
-                _context5.next = 18;
-                break;
+              if (this.isFiltering()) {
+                this.desktopManager.searchText(this.state.noteFilter.text);
               }
 
-              this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_12__["PrivilegesManager"].ActionViewProtectedNotes, run);
-              _context5.next = 19;
-              break;
-
-            case 18:
-              run();
-
-            case 19:
+            case 11:
             case "end":
-              return _context5.stop();
+              return _context6.stop();
           }
         }
       }, null, this);
@@ -2869,7 +2849,7 @@ function (_PureCtrl) {
     value: function loadPreferences() {
       var viewOptions = {};
       var prevSortValue = this.state.sortBy;
-      var sortBy = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_16__["PREF_SORT_NOTES_BY"], SORT_KEY_CREATED_AT);
+      var sortBy = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_SORT_NOTES_BY"], SORT_KEY_CREATED_AT);
 
       if (sortBy === SORT_KEY_UPDATED_AT) {
         /** Use client_updated_at instead */
@@ -2877,26 +2857,26 @@ function (_PureCtrl) {
       }
 
       viewOptions.sortBy = sortBy;
-      viewOptions.sortReverse = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_16__["PREF_SORT_NOTES_REVERSE"], false);
-      viewOptions.showArchived = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_16__["PREF_NOTES_SHOW_ARCHIVED"], false);
-      viewOptions.hidePinned = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_16__["PREF_NOTES_HIDE_PINNED"], false);
-      viewOptions.hideNotePreview = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_16__["PREF_NOTES_HIDE_NOTE_PREVIEW"], false);
-      viewOptions.hideDate = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_16__["PREF_NOTES_HIDE_DATE"], false);
-      viewOptions.hideTags = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_16__["PREF_NOTES_HIDE_TAGS"], false);
+      viewOptions.sortReverse = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_SORT_NOTES_REVERSE"], false);
+      viewOptions.showArchived = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_NOTES_SHOW_ARCHIVED"], false);
+      viewOptions.hidePinned = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_NOTES_HIDE_PINNED"], false);
+      viewOptions.hideNotePreview = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_NOTES_HIDE_NOTE_PREVIEW"], false);
+      viewOptions.hideDate = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_NOTES_HIDE_DATE"], false);
+      viewOptions.hideTags = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_NOTES_HIDE_TAGS"], false);
       this.setState(_objectSpread({}, viewOptions));
 
       if (prevSortValue && prevSortValue !== sortBy) {
         this.selectFirstNote();
       }
 
-      var width = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_16__["PREF_NOTES_PANEL_WIDTH"]);
+      var width = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_NOTES_PANEL_WIDTH"]);
 
       if (width) {
         this.panelController.setWidth(width);
 
         if (this.panelController.isCollapsed()) {
           this.appState.panelDidResize({
-            name: _controllers_constants__WEBPACK_IMPORTED_MODULE_17__["PANEL_NAME_NOTES"],
+            name: _controllers_constants__WEBPACK_IMPORTED_MODULE_16__["PANEL_NAME_NOTES"],
             collapsed: this.panelController.isCollapsed()
           });
         }
@@ -3072,7 +3052,7 @@ function (_PureCtrl) {
       var note = this.getFirstNonProtectedNote();
 
       if (note) {
-        this.appState.setSelectedNote(note);
+        this.selectNote(note);
       }
     }
   }, {
@@ -3082,7 +3062,7 @@ function (_PureCtrl) {
       var currentIndex = displayableNotes.indexOf(this.state.selectedNote);
 
       if (currentIndex + 1 < displayableNotes.length) {
-        this.appState.setSelectedNote(displayableNotes[currentIndex + 1]);
+        this.selectNote(displayableNotes[currentIndex + 1]);
       }
     }
   }, {
@@ -3091,11 +3071,11 @@ function (_PureCtrl) {
       var note = this.getFirstNonProtectedNote();
 
       if (note) {
-        this.appState.setSelectedNote(note);
+        this.selectNote(note);
       } else if (!this.state.tag || !this.state.tag.isSmartTag()) {
         this.createNewNote();
       } else {
-        this.appState.setSelectedNote(null);
+        this.selectNote(null);
       }
     }
   }, {
@@ -3105,7 +3085,7 @@ function (_PureCtrl) {
       var currentIndex = displayableNotes.indexOf(this.state.selectedNote);
 
       if (currentIndex - 1 >= 0) {
-        this.appState.setSelectedNote(displayableNotes[currentIndex - 1]);
+        this.selectNote(displayableNotes[currentIndex - 1]);
         return true;
       } else {
         return false;
@@ -3137,7 +3117,7 @@ function (_PureCtrl) {
         this.modelManager.setItemDirty(selectedTag);
       }
 
-      this.appState.setSelectedNote(newNote);
+      this.selectNote(newNote);
     }
   }, {
     key: "isFiltering",
@@ -3164,15 +3144,15 @@ function (_PureCtrl) {
   }, {
     key: "filterTextChanged",
     value: function filterTextChanged() {
-      var _this7 = this;
+      var _this6 = this;
 
       if (this.searchSubmitted) {
         this.searchSubmitted = false;
       }
 
       this.reloadNotes().then(function () {
-        if (!_this7.state.selectedNote.visible) {
-          _this7.selectFirstNote();
+        if (!_this6.state.selectedNote.visible) {
+          _this6.selectFirstNote();
         }
       });
     }
@@ -3223,7 +3203,7 @@ function (_PureCtrl) {
         sortReverse: !this.state.sortReverse
       });
       this.reloadNotes();
-      this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_16__["PREF_SORT_NOTES_REVERSE"], this.state.sortReverse);
+      this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_SORT_NOTES_REVERSE"], this.state.sortReverse);
       this.preferencesManager.syncUserPreferences();
     }
   }, {
@@ -3233,7 +3213,7 @@ function (_PureCtrl) {
         sortBy: type
       });
       this.reloadNotes();
-      this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_16__["PREF_SORT_NOTES_BY"], this.state.sortBy);
+      this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_SORT_NOTES_BY"], this.state.sortBy);
       this.preferencesManager.syncUserPreferences();
     }
   }, {
@@ -3261,22 +3241,22 @@ function (_PureCtrl) {
   }, {
     key: "filterNotes",
     value: function filterNotes(notes) {
-      var _this8 = this;
+      var _this7 = this;
 
       return notes.filter(function (note) {
-        var canShowArchived = _this8.state.showArchived;
-        var canShowPinned = !_this8.state.hidePinned;
-        var isTrash = _this8.state.tag.content.isTrashTag;
+        var canShowArchived = _this7.state.showArchived;
+        var canShowPinned = !_this7.state.hidePinned;
+        var isTrash = _this7.state.tag.content.isTrashTag;
 
         if (!isTrash && note.content.trashed) {
           note.visible = false;
           return note.visible;
         }
 
-        var isSmartTag = _this8.state.tag.isSmartTag();
+        var isSmartTag = _this7.state.tag.isSmartTag();
 
         if (isSmartTag) {
-          canShowArchived = canShowArchived || _this8.state.tag.content.isArchiveTag || isTrash;
+          canShowArchived = canShowArchived || _this7.state.tag.content.isArchiveTag || isTrash;
         }
 
         if (note.archived && !canShowArchived || note.pinned && !canShowPinned) {
@@ -3284,7 +3264,7 @@ function (_PureCtrl) {
           return note.visible;
         }
 
-        var filterText = _this8.state.noteFilter.text.toLowerCase();
+        var filterText = _this7.state.noteFilter.text.toLowerCase();
 
         if (filterText.length === 0) {
           note.visible = true;
@@ -3376,7 +3356,7 @@ function (_PureCtrl) {
   }, {
     key: "registerKeyboardShortcuts",
     value: function registerKeyboardShortcuts() {
-      var _this9 = this;
+      var _this8 = this;
 
       /**
        * In the browser we're not allowed to override cmd/ctrl + n, so we have to
@@ -3385,38 +3365,38 @@ function (_PureCtrl) {
        */
       this.newNoteKeyObserver = this.keyboardManager.addKeyObserver({
         key: 'n',
-        modifiers: [_services_keyboardManager__WEBPACK_IMPORTED_MODULE_13__["KeyboardManager"].KeyModifierMeta, _services_keyboardManager__WEBPACK_IMPORTED_MODULE_13__["KeyboardManager"].KeyModifierCtrl],
+        modifiers: [_services_keyboardManager__WEBPACK_IMPORTED_MODULE_12__["KeyboardManager"].KeyModifierMeta, _services_keyboardManager__WEBPACK_IMPORTED_MODULE_12__["KeyboardManager"].KeyModifierCtrl],
         onKeyDown: function onKeyDown(event) {
           event.preventDefault();
 
-          _this9.createNewNote();
+          _this8.createNewNote();
         }
       });
       this.nextNoteKeyObserver = this.keyboardManager.addKeyObserver({
-        key: _services_keyboardManager__WEBPACK_IMPORTED_MODULE_13__["KeyboardManager"].KeyDown,
+        key: _services_keyboardManager__WEBPACK_IMPORTED_MODULE_12__["KeyboardManager"].KeyDown,
         elements: [document.body, this.getSearchBar()],
         onKeyDown: function onKeyDown(event) {
-          var searchBar = _this9.getSearchBar();
+          var searchBar = _this8.getSearchBar();
 
           if (searchBar === document.activeElement) {
             searchBar.blur();
           }
 
-          _this9.selectNextNote();
+          _this8.selectNextNote();
         }
       });
       this.nextNoteKeyObserver = this.keyboardManager.addKeyObserver({
-        key: _services_keyboardManager__WEBPACK_IMPORTED_MODULE_13__["KeyboardManager"].KeyUp,
+        key: _services_keyboardManager__WEBPACK_IMPORTED_MODULE_12__["KeyboardManager"].KeyUp,
         element: document.body,
         onKeyDown: function onKeyDown(event) {
-          _this9.selectPreviousNote();
+          _this8.selectPreviousNote();
         }
       });
       this.searchKeyObserver = this.keyboardManager.addKeyObserver({
         key: "f",
-        modifiers: [_services_keyboardManager__WEBPACK_IMPORTED_MODULE_13__["KeyboardManager"].KeyModifierMeta, _services_keyboardManager__WEBPACK_IMPORTED_MODULE_13__["KeyboardManager"].KeyModifierShift],
+        modifiers: [_services_keyboardManager__WEBPACK_IMPORTED_MODULE_12__["KeyboardManager"].KeyModifierMeta, _services_keyboardManager__WEBPACK_IMPORTED_MODULE_12__["KeyboardManager"].KeyModifierShift],
         onKeyDown: function onKeyDown(event) {
-          var searchBar = _this9.getSearchBar();
+          var searchBar = _this8.getSearchBar();
 
           if (searchBar) {
             searchBar.focus();
@@ -3429,7 +3409,7 @@ function (_PureCtrl) {
   }]);
 
   return NotesCtrl;
-}(_Controllers__WEBPACK_IMPORTED_MODULE_14__["PureCtrl"]);
+}(_Controllers__WEBPACK_IMPORTED_MODULE_13__["PureCtrl"]);
 
 var NotesPanel = function NotesPanel() {
   _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, NotesPanel);
@@ -13740,28 +13720,86 @@ function (_SFPrivilegesManager) {
     value: function presentPrivilegesModal(action, onSuccess, onCancel) {
       var _this2 = this;
 
-      if (this.authenticationInProgress()) {
-        onCancel && onCancel();
-        return;
-      }
+      var customSuccess, customCancel, scope, el;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function presentPrivilegesModal$(_context9) {
+        while (1) {
+          switch (_context9.prev = _context9.next) {
+            case 0:
+              if (!this.authenticationInProgress()) {
+                _context9.next = 3;
+                break;
+              }
 
-      var customSuccess = function customSuccess() {
-        onSuccess && onSuccess();
-        _this2.currentAuthenticationElement = null;
-      };
+              onCancel && onCancel();
+              return _context9.abrupt("return");
 
-      var customCancel = function customCancel() {
-        onCancel && onCancel();
-        _this2.currentAuthenticationElement = null;
-      };
+            case 3:
+              customSuccess = function customSuccess() {
+                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function customSuccess$(_context7) {
+                  while (1) {
+                    switch (_context7.prev = _context7.next) {
+                      case 0:
+                        _context7.t0 = onSuccess;
 
-      var scope = this.$rootScope.$new(true);
-      scope.action = action;
-      scope.onSuccess = customSuccess;
-      scope.onCancel = customCancel;
-      var el = this.$compile("\n      <privileges-auth-modal action='action' on-success='onSuccess' \n      on-cancel='onCancel' class='sk-modal'></privileges-auth-modal>\n    ")(scope);
-      angular__WEBPACK_IMPORTED_MODULE_6___default.a.element(document.body).append(el);
-      this.currentAuthenticationElement = el;
+                        if (!_context7.t0) {
+                          _context7.next = 4;
+                          break;
+                        }
+
+                        _context7.next = 4;
+                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(onSuccess());
+
+                      case 4:
+                        _this2.currentAuthenticationElement = null;
+
+                      case 5:
+                      case "end":
+                        return _context7.stop();
+                    }
+                  }
+                });
+              };
+
+              customCancel = function customCancel() {
+                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function customCancel$(_context8) {
+                  while (1) {
+                    switch (_context8.prev = _context8.next) {
+                      case 0:
+                        _context8.t0 = onCancel;
+
+                        if (!_context8.t0) {
+                          _context8.next = 4;
+                          break;
+                        }
+
+                        _context8.next = 4;
+                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(onCancel());
+
+                      case 4:
+                        _this2.currentAuthenticationElement = null;
+
+                      case 5:
+                      case "end":
+                        return _context8.stop();
+                    }
+                  }
+                });
+              };
+
+              scope = this.$rootScope.$new(true);
+              scope.action = action;
+              scope.onSuccess = customSuccess;
+              scope.onCancel = customCancel;
+              el = this.$compile("\n      <privileges-auth-modal action='action' on-success='onSuccess' \n      on-cancel='onCancel' class='sk-modal'></privileges-auth-modal>\n    ")(scope);
+              angular__WEBPACK_IMPORTED_MODULE_6___default.a.element(document.body).append(el);
+              this.currentAuthenticationElement = el;
+
+            case 12:
+            case "end":
+              return _context9.stop();
+          }
+        }
+      }, null, this);
     }
   }, {
     key: "presentPrivilegesManagementModal",
@@ -14927,6 +14965,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/services/privilegesManager.js");
+
 
 
 
@@ -14941,13 +14981,14 @@ var APP_STATE_EVENT_DESKTOP_EXTS_READY = 8;
 var AppState =
 /*#__PURE__*/
 function () {
-  AppState.$inject = ["$timeout"];
+  AppState.$inject = ["$timeout", "privilegesManager"];
 
   /* @ngInject */
-  function AppState($timeout) {
+  function AppState($timeout, privilegesManager) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, AppState);
 
     this.$timeout = $timeout;
+    this.privilegesManager = privilegesManager;
     this.observers = [];
   }
 
@@ -15064,21 +15105,63 @@ function () {
   }, {
     key: "setSelectedNote",
     value: function setSelectedNote(note) {
-      var previousNote;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function setSelectedNote$(_context3) {
-        while (1) {
-          switch (_context3.prev = _context3.next) {
-            case 0:
-              previousNote = this.selectedNote;
-              this.selectedNote = note;
-              _context3.next = 4;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.notifyEvent(APP_STATE_EVENT_NOTE_CHANGED, {
-                previousNote: previousNote
-              }));
+      var _this2 = this;
 
-            case 4:
+      var run;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function setSelectedNote$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              run = function run() {
+                var previousNote;
+                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function run$(_context3) {
+                  while (1) {
+                    switch (_context3.prev = _context3.next) {
+                      case 0:
+                        previousNote = _this2.selectedNote;
+                        _this2.selectedNote = note;
+                        _context3.next = 4;
+                        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(_this2.notifyEvent(APP_STATE_EVENT_NOTE_CHANGED, {
+                          previousNote: previousNote
+                        }));
+
+                      case 4:
+                      case "end":
+                        return _context3.stop();
+                    }
+                  }
+                });
+              };
+
+              _context4.t0 = note.content.protected;
+
+              if (!_context4.t0) {
+                _context4.next = 6;
+                break;
+              }
+
+              _context4.next = 5;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__["PrivilegesManager"].ActionViewProtectedNotes));
+
+            case 5:
+              _context4.t0 = _context4.sent;
+
+            case 6:
+              if (!_context4.t0) {
+                _context4.next = 10;
+                break;
+              }
+
+              this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_3__["PrivilegesManager"].ActionViewProtectedNotes, run);
+              _context4.next = 11;
+              break;
+
+            case 10:
+              run();
+
+            case 11:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
         }
       }, null, this);
@@ -15096,6 +15179,7 @@ function () {
   }, {
     key: "setUserPreferences",
     value: function setUserPreferences(preferences) {
+      this.userPreferences = preferences;
       this.notifyEvent(APP_STATE_EVENT_PREFERENCES_CHANGED);
     }
   }, {

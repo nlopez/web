@@ -41,18 +41,18 @@ export class PrivilegesManager extends SFPrivilegesManager {
     });
   }
 
-  presentPrivilegesModal(action, onSuccess, onCancel) {
+  async presentPrivilegesModal(action, onSuccess, onCancel) {
     if (this.authenticationInProgress()) {
       onCancel && onCancel();
       return;
     }
 
-    const customSuccess = () => {
-      onSuccess && onSuccess();
+    const customSuccess = async () => {
+      onSuccess && await onSuccess();
       this.currentAuthenticationElement = null;
     }
-    const customCancel = () => {
-      onCancel && onCancel();
+    const customCancel = async () => {
+      onCancel && await onCancel();
       this.currentAuthenticationElement = null;
     }
 
