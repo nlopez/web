@@ -1,6 +1,9 @@
 import { SNNote, SNSmartTag } from 'snjs';
 import template from '%/tags.pug';
-import { APP_STATE_EVENT_PREFERENCES_CHANGED } from '@/state';
+import {
+  APP_STATE_EVENT_PREFERENCES_CHANGED,
+  APP_STATE_EVENT_TAG_CHANGED
+} from '@/state';
 import { PANEL_NAME_TAGS } from '@/controllers/constants';
 import { PREF_TAGS_PANEL_WIDTH } from '@/services/preferencesManager';
 import { STRING_DELETE_TAG } from '@/strings';
@@ -33,25 +36,27 @@ class TagsPanelCtrl extends PureCtrl {
     this.loadPreferences();
     this.registerComponentHandler();
     this.state = {
-      smartTags: this.modelManager.getSmartTags()
+      smartTags: this.modelManager.getSmartTags(),
+      noteCounts: {}
     }
   }
-  
+
   $onInit() {
     this.selectTag(this.state.smartTags[0]);
   }
 
   addSyncEventHandler() {
-    this.syncManager.addEventHandler((syncEvent, data) => {
+    this.syncManager.addEventHandler(async (syncEvent, data) => {
       if (
         syncEvent === 'local-data-loaded' ||
         syncEvent === 'sync:completed' ||
         syncEvent === 'local-data-incremental-load'
       ) {
-        this.setState({
+        await this.setState({
           tags: this.modelManager.tags,
           smartTags: this.modelManager.getSmartTags()
-        })
+        });
+        this.reloadNoteCounts();
       }
     });
   }
@@ -60,6 +65,10 @@ class TagsPanelCtrl extends PureCtrl {
     this.appState.addObserver((eventName, data) => {
       if (eventName === APP_STATE_EVENT_PREFERENCES_CHANGED) {
         this.loadPreferences();
+      } else if (eventName === APP_STATE_EVENT_TAG_CHANGED) {
+        this.setState({
+          selectedTag: this.appState.getSelectedTag()
+        })
       }
     })
   }
@@ -87,15 +96,22 @@ class TagsPanelCtrl extends PureCtrl {
 
   reloadNoteCounts() {
     let allTags = [];
-    if (this.state.tags) { allTags = allTags.concat(this.state.tags); }
-    if (this.state.smartTags) { allTags = allTags.concat(this.state.smartTags); }
-
+    if (this.state.tags) {
+      allTags = allTags.concat(this.state.tags);
+    }
+    if (this.state.smartTags) {
+      allTags = allTags.concat(this.state.smartTags);
+    }
+    const noteCounts = {};
     for (const tag of allTags) {
       const validNotes = SNNote.filterDummyNotes(tag.notes).filter((note) => {
         return !note.archived && !note.content.trashed;
       });
-      tag.cachedNoteCount = validNotes.length;
+      noteCounts[tag.uuid] = validNotes.length;
     }
+    this.setState({
+      noteCounts: noteCounts
+    })
   }
 
   loadPreferences() {
@@ -164,9 +180,6 @@ class TagsPanelCtrl extends PureCtrl {
       this.modelManager.setItemDirty(tag);
       this.syncManager.sync();
     }
-    this.setState({
-      selectedTag: tag
-    })
     this.appState.setSelectedTag(tag);
   }
 

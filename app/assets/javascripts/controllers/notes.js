@@ -4,6 +4,7 @@ import template from '%/notes.pug';
 import { SFAuthManager } from 'snjs';
 import { PrivilegesManager } from '@/services/privilegesManager';
 import { KeyboardManager } from '@/services/keyboardManager';
+import { PureCtrl } from '@Controllers';
 import {
   APP_STATE_EVENT_NOTE_CHANGED,
   APP_STATE_EVENT_TAG_CHANGED,
@@ -37,36 +38,48 @@ const SORT_KEY_CLIENT_UPDATED_AT = 'client_updated_at';
 const SORT_KEY_TITLE = 'title';
 
 const ELEMENT_ID_SEARCH_BAR = 'search-bar';
+const ELEMENT_ID_SCROLL_CONTAINER = 'notes-scrollable';
 
-class NotesCtrl {
+class NotesCtrl extends PureCtrl {
 
   /* @ngInject */
   constructor(
     $timeout,
     $rootScope,
-    authManager,
-    modelManager,
-    syncManager,
-    desktopManager,
-    privilegesManager,
-    keyboardManager,
     appState,
-    preferencesManager
+    authManager,
+    desktopManager,
+    keyboardManager,
+    modelManager,
+    preferencesManager,
+    privilegesManager,
+    syncManager,
   ) {
-    this.modelManager = modelManager;
-    this.syncManager = syncManager;
-    this.appState = appState;
-    this.preferencesManager = preferencesManager;
-    this.keyboardManager = keyboardManager;
-    this.privilegesManager = privilegesManager;
-    this.desktopManager = desktopManager;
-    this.authManager = authManager;
+    super($timeout);
     this.$rootScope = $rootScope;
-    this.$timeout = $timeout;
+    this.appState = appState;
+    this.authManager = authManager;
+    this.desktopManager = desktopManager;
+    this.keyboardManager = keyboardManager;
+    this.modelManager = modelManager;
+    this.preferencesManager = preferencesManager;
+    this.privilegesManager = privilegesManager;
+    this.syncManager = syncManager;
 
-    this.notes = [];
-    this.searchSubmitted = false;
-    this.noteFilter = { text: '' };
+    this.state = {
+      notes: [],
+      renderedNotes: [],
+      selectedNote: null,
+      tag: null,
+      sortBy: null,
+      showArchived: null,
+      hidePinned: null,
+      sortReverse: null,
+      panelTitle: null,
+      mutable: { showMenu: false },
+      noteFilter: { text: '' },
+    }
+
     this.panelController = {};
     window.onresize = (event) => {
       this.resetPagination({
@@ -89,17 +102,14 @@ class NotesCtrl {
   addAppStateObserver() {
     this.appState.addObserver((eventName, data) => {
       if (eventName === APP_STATE_EVENT_TAG_CHANGED) {
-        this.tagDidChange(this.appState.getSelectedTag(), data.previousTag);
+        this.handleTagChange(this.appState.getSelectedTag(), data.previousTag);
       } else if (eventName === APP_STATE_EVENT_NOTE_CHANGED) {
-        this.selectedNote = this.appState.getSelectedNote();
-        if (!this.selectedNote) {
-          this.selectNextOrCreateNew();
-        }
+        this.handleNoteSelection(this.appState.getSelectedNote());
       } else if (eventName === APP_STATE_EVENT_PREFERENCES_CHANGED) {
         this.loadPreferences();
         this.reloadNotes();
       } else if (eventName === APP_STATE_EVENT_EDITOR_FOCUSED) {
-        this.showMenu = false;
+        this.setShowMenuFalse();
       }
     })
   }
@@ -108,11 +118,11 @@ class NotesCtrl {
     this.authManager.addEventHandler((event) => {
       if (event === SFAuthManager.DidSignInEvent) {
         /** Delete dummy note if applicable */
-        if (this.selectedNote && this.selectedNote.dummy) {
-          this.modelManager.removeItemLocally(this.selectedNote);
-          _.pull(this.notes, this.selectedNote);
-          this.selectedNote = null;
-          this.selectNote(null);
+        if (this.state.selectedNote && this.state.selectedNote.dummy) {
+          this.modelManager.removeItemLocally(this.state.selectedNote);
+          this.appState.setSelectedNote(null).then(() => {
+            this.reloadNotes();
+          })
           /**
            * We want to see if the user will download any items from the server.
            * If the next sync completes and our notes are still 0,
@@ -127,16 +137,14 @@ class NotesCtrl {
   addSyncEventHandler() {
     this.syncManager.addEventHandler((syncEvent, data) => {
       if (syncEvent === 'local-data-loaded') {
-        if (this.notes.length === 0) {
+        if (this.state.notes.length === 0) {
           this.createNewNote();
         }
       } else if (syncEvent === 'sync:completed') {
-        this.$timeout(() => {
-          if (this.createDummyOnSynCompletionIfNoNotes && this.notes.length === 0) {
-            this.createDummyOnSynCompletionIfNoNotes = false;
-            this.createNewNote();
-          }
-        })
+        if (this.createDummyOnSynCompletionIfNoNotes && this.state.notes.length === 0) {
+          this.createDummyOnSynCompletionIfNoNotes = false;
+          this.createNewNote();
+        }
       }
     });
   }
@@ -145,17 +153,17 @@ class NotesCtrl {
     this.modelManager.addItemSyncObserver(
       'note-list',
       '*',
-      (allItems, validItems, deletedItems, source, sourceKey) => {
-        if (
-          this.selectedNote &&
-          (this.selectedNote.deleted || this.selectedNote.content.trashed)
-        ) {
-          this.selectNextOrCreateNew();
-        }
-
-        this.reloadNotes();
-        if (!this.notes.includes(this.selectedNote)) {
-          this.selectNextOrCreateNew();
+      async (allItems, validItems, deletedItems, source, sourceKey) => {
+        await this.reloadNotes();
+        const selectedNote = this.state.selectedNote;
+        if (selectedNote) {
+          const discarded = selectedNote.deleted || selectedNote.content.trashed;
+          const notIncluded = !this.state.notes.includes(selectedNote);
+          if (notIncluded || discarded) {
+            this.selectNextOrCreateNew();
+          }
+        } else {
+          this.selectFirstNote();
         }
 
         /** Note has changed values, reset its flags */
@@ -165,26 +173,76 @@ class NotesCtrl {
           note.cachedCreatedAtString = note.createdAtString();
           note.cachedUpdatedAtString = note.updatedAtString();
         }
-
-        /** Select first note if none is selected */
-        if (!this.selectedNote) {
-          this.$timeout(() => {
-            /** Required to be in timeout since selecting notes depends on rendered notes */
-            this.selectFirstNote();
-          })
-        }
       });
   }
 
-  reloadNotes() {
-    if (!this.tag) {
+  async handleTagChange(tag, previousTag) {
+    if (this.state.selectedNote && this.state.selectedNote.dummy) {
+      this.modelManager.removeItemLocally(this.state.selectedNote);
+      if (previousTag) {
+        _.remove(previousTag.notes, this.state.selectedNote);
+      }
+      await this.appState.setSelectedNote(null);
+    }
+
+    await this.setState({
+      tag: tag
+    });
+
+    this.resetScrollPosition();
+    this.setShowMenuFalse();
+    this.setNoteFilterText('');
+    this.desktopManager.searchText();
+    this.resetPagination();
+
+    await this.reloadNotes();
+
+    if (this.state.notes.length > 0) {
+      this.state.notes.forEach((note) => { note.visible = true; })
+      this.selectFirstNote();
+    } else if (this.syncManager.initialDataLoaded()) {
+      if (!tag.isSmartTag() || tag.content.isAllTag) {
+        this.createNewNote();
+      } else if (
+        this.state.selectedNote &&
+        !this.state.notes.includes(this.state.selectedNote)
+      ) {
+        this.appState.setSelectedNote(null);
+      }
+    }
+  }
+
+  resetScrollPosition() {
+    const scrollable = document.getElementById(ELEMENT_ID_SCROLL_CONTAINER);
+    if (scrollable) {
+      scrollable.scrollTop = 0;
+      scrollable.scrollLeft = 0;
+    }
+  }
+
+  /** @template */
+  selectNote(note) {
+    this.appState.setSelectedNote(note);
+  }
+
+  async removeNoteFromList(note) {
+    const notes = this.state.notes;
+    _.pull(notes, note);
+    await this.setState({
+      notes: notes,
+      renderedNotes: notes.slice(0, this.notesToDisplay)
+    });
+  }
+
+  async reloadNotes() {
+    if (!this.state.tag) {
       return;
     }
-    const tagNotes = this.tag.notes;
+    const tagNotes = this.state.tag.notes;
     const notes = this.sortNotes(
       this.filterNotes(tagNotes),
-      this.sortBy,
-      this.sortReverse
+      this.state.sortBy,
+      this.state.sortReverse
     );
     for (const note of notes) {
       if (note.errorDecrypting) {
@@ -192,50 +250,103 @@ class NotesCtrl {
       }
       note.shouldShowTags = this.shouldShowTagsForNote(note);
     }
-    this.notes = notes;
+    await this.setState({
+      notes: notes,
+      renderedNotes: notes.slice(0, this.notesToDisplay)
+    });
     this.reloadPanelTitle();
   }
 
+  setShowMenuFalse() {
+    this.setState({
+      mutable: {
+        ...this.state.mutable,
+        showMenu: false
+      }
+    })
+  }
+
+  async handleNoteSelection(note) {
+    if (this.state.selectedNote === note) {
+      return;
+    }
+    const previousNote = this.state.selectedNote;
+    if (previousNote && previousNote.dummy) {
+      this.modelManager.removeItemLocally(previousNote);
+      this.removeNoteFromList(previousNote);
+    }
+    await this.setState({
+      selectedNote: note
+    })
+    if (!note) {
+      return;
+    }
+    const run = () => {
+      this.selectedIndex = Math.max(0, this.displayableNotes().indexOf(note));
+      if (note.content.conflict_of) {
+        note.content.conflict_of = null;
+        this.modelManager.setItemDirty(note);
+        this.syncManager.sync();
+      }
+      if (this.isFiltering()) {
+        this.desktopManager.searchText(this.state.noteFilter.text);
+      }
+    }
+    if (note.content.protected &&
+      await this.privilegesManager.actionRequiresPrivilege(
+        PrivilegesManager.ActionViewProtectedNotes
+      )) {
+      this.privilegesManager.presentPrivilegesModal(
+        PrivilegesManager.ActionViewProtectedNotes,
+        run
+      );
+    } else {
+      run();
+    }
+  }
+
   loadPreferences() {
-    const prevSortValue = this.sortBy;
-    this.sortBy = this.preferencesManager.getValue(
+    const viewOptions = {};
+    const prevSortValue = this.state.sortBy;
+    let sortBy = this.preferencesManager.getValue(
       PREF_SORT_NOTES_BY,
       SORT_KEY_CREATED_AT
     );
-    this.sortReverse = this.preferencesManager.getValue(
+    if (sortBy === SORT_KEY_UPDATED_AT) {
+      /** Use client_updated_at instead */
+      sortBy = SORT_KEY_CLIENT_UPDATED_AT;
+    }
+    viewOptions.sortBy = sortBy;
+    viewOptions.sortReverse = this.preferencesManager.getValue(
       PREF_SORT_NOTES_REVERSE,
       false
     );
-    if (this.sortBy === SORT_KEY_UPDATED_AT) {
-      /** Use client_updated_at instead */
-      this.sortBy = SORT_KEY_CLIENT_UPDATED_AT;
-    }
-    if (prevSortValue && prevSortValue !== this.sortBy) {
-      this.$timeout(() => {
-        this.selectFirstNote();
-      })
-    }
-    this.showArchived = this.preferencesManager.getValue(
+    viewOptions.showArchived = this.preferencesManager.getValue(
       PREF_NOTES_SHOW_ARCHIVED,
       false
     );
-    this.hidePinned = this.preferencesManager.getValue(
+    viewOptions.hidePinned = this.preferencesManager.getValue(
       PREF_NOTES_HIDE_PINNED,
       false
     );
-    this.hideNotePreview = this.preferencesManager.getValue(
+    viewOptions.hideNotePreview = this.preferencesManager.getValue(
       PREF_NOTES_HIDE_NOTE_PREVIEW,
       false
     );
-    this.hideDate = this.preferencesManager.getValue(
+    viewOptions.hideDate = this.preferencesManager.getValue(
       PREF_NOTES_HIDE_DATE,
       false
     );
-    this.hideTags = this.preferencesManager.getValue(
+    viewOptions.hideTags = this.preferencesManager.getValue(
       PREF_NOTES_HIDE_TAGS,
       false
     );
-
+    this.setState({
+      ...viewOptions
+    });
+    if (prevSortValue && prevSortValue !== sortBy) {
+      this.selectFirstNote();
+    }
     const width = this.preferencesManager.getValue(
       PREF_NOTES_PANEL_WIDTH
     );
@@ -263,9 +374,10 @@ class NotesCtrl {
   }
 
   paginate() {
-    this.notesToDisplay += this.pageSize
+    this.notesToDisplay += this.pageSize;
+    this.reloadNotes();
     if (this.searchSubmitted) {
-      this.desktopManager.searchText(this.noteFilter.text);
+      this.desktopManager.searchText(this.state.noteFilter.text);
     }
   }
 
@@ -282,30 +394,34 @@ class NotesCtrl {
   }
 
   reloadPanelTitle() {
+    let title;
     if (this.isFiltering()) {
-      const resultCount = this.notes.filter((i) => i.visible).length
-      this.panelTitle = `${resultCount} search results`;
-    } else if (this.tag) {
-      this.panelTitle = `${this.tag.title}`;
+      const resultCount = this.state.notes.filter((i) => i.visible).length
+      title = `${resultCount} search results`;
+    } else if (this.state.tag) {
+      title = `${this.state.tag.title}`;
     }
+    this.setState({
+      panelTitle: title
+    })
   }
 
   optionsSubtitle() {
     let base = "";
-    if (this.sortBy === 'created_at') {
+    if (this.state.sortBy === 'created_at') {
       base += " Date Added";
-    } else if (this.sortBy === 'client_updated_at') {
+    } else if (this.state.sortBy === 'client_updated_at') {
       base += " Date Modified";
-    } else if (this.sortBy === 'title') {
+    } else if (this.state.sortBy === 'title') {
       base += " Title";
     }
-    if (this.showArchived) {
+    if (this.state.showArchived) {
       base += " | + Archived"
     }
-    if (this.hidePinned) {
+    if (this.state.hidePinned) {
       base += " | – Pinned"
     }
-    if (this.sortReverse) {
+    if (this.state.sortReverse) {
       base += " | Reversed"
     }
     return base;
@@ -365,43 +481,8 @@ class NotesCtrl {
     return flags;
   }
 
-  async tagDidChange(tag, previousTag) {
-    if (this.selectedNote && this.selectedNote.dummy) {
-      this.modelManager.removeItemLocally(this.selectedNote);
-    }
-
-    this.tag = tag;
-
-    const scrollable = document.getElementById('notes-scrollable');
-    if (scrollable) {
-      scrollable.scrollTop = 0;
-      scrollable.scrollLeft = 0;
-    }
-    this.resetPagination();
-    this.showMenu = false;
-    if (this.selectedNote && this.selectedNote.dummy) {
-      if (previousTag) {
-        _.remove(previousTag.notes, this.selectedNote);
-      }
-    }
-
-    this.noteFilter.text = '';
-    this.desktopManager.searchText();
-    this.reloadNotes();
-    if (this.notes.length > 0) {
-      this.notes.forEach((note) => { note.visible = true; })
-      this.selectFirstNote();
-    } else if (this.syncManager.initialDataLoaded()) {
-      if (!tag.isSmartTag() || tag.content.isAllTag) {
-        this.createNewNote();
-      } else if (this.selectedNote && !this.notes.includes(this.selectedNote)) {
-        this.selectNote(null);
-      }
-    }
-  }
-
   displayableNotes() {
-    return this.renderedNotes.filter((note) => {
+    return this.state.notes.filter((note) => {
       return note.visible;
     });
   }
@@ -423,113 +504,45 @@ class NotesCtrl {
   selectFirstNote() {
     const note = this.getFirstNonProtectedNote();
     if (note) {
-      this.selectNote(note);
+      this.appState.setSelectedNote(note);
     }
   }
 
   selectNextNote() {
     const displayableNotes = this.displayableNotes();
-    const currentIndex = displayableNotes.indexOf(this.selectedNote);
+    const currentIndex = displayableNotes.indexOf(this.state.selectedNote);
     if (currentIndex + 1 < displayableNotes.length) {
-      this.selectNote(displayableNotes[currentIndex + 1]);
+      this.appState.setSelectedNote(displayableNotes[currentIndex + 1]);
     }
   }
 
   selectNextOrCreateNew() {
     const note = this.getFirstNonProtectedNote();
     if (note) {
-      this.selectNote(note);
-    } else if (!this.tag || !this.tag.isSmartTag()) {
+      this.appState.setSelectedNote(note);
+    } else if (!this.state.tag || !this.state.tag.isSmartTag()) {
       this.createNewNote();
     } else {
-      this.selectNote(null);
+      this.appState.setSelectedNote(null);
     }
   }
 
   selectPreviousNote() {
     const displayableNotes = this.displayableNotes();
-    const currentIndex = displayableNotes.indexOf(this.selectedNote);
+    const currentIndex = displayableNotes.indexOf(this.state.selectedNote);
     if (currentIndex - 1 >= 0) {
-      this.selectNote(displayableNotes[currentIndex - 1]);
+      this.appState.setSelectedNote(displayableNotes[currentIndex - 1]);
       return true;
     } else {
       return false;
     }
   }
 
-  async selectNote(note, viaClick = false) {
-    if (this.selectedNote === note) {
-      return;
-    }
-    if (!note) {
-      this.appState.setSelectedNote(null);
-      return;
-    }
-    const run = () => {
-      this.$timeout(() => {
-        let dummyNote;
-        if (this.selectedNote
-          && this.selectedNote !== note
-          && this.selectedNote.dummy
-        ) {
-          /** Set this dummy to be removed */
-          dummyNote = this.selectedNote;
-        }
-
-        this.appState.setSelectedNote(note);
-        this.selectedIndex = Math.max(
-          0,
-          this.displayableNotes().indexOf(note),
-        );
-
-        if (note.content.conflict_of) {
-          note.content.conflict_of = null;
-          this.modelManager.setItemDirty(note);
-          this.syncManager.sync();
-        }
-
-        /**
-         * There needs to be a long timeout after setting selection before
-         * removing the dummy. Otherwise, you'll click a note, remove this one,
-         * and strangely, the click event registers for a lower cell.
-         */
-        if (dummyNote && dummyNote.dummy === true) {
-          this.$timeout(() => {
-            this.modelManager.removeItemLocally(dummyNote);
-            _.pull(this.notes, dummyNote);
-          }, 250)
-        }
-
-        if (viaClick && this.isFiltering()) {
-          this.desktopManager.searchText(this.noteFilter.text);
-        }
-      })
-    }
-
-    if (note.content.protected &&
-      await this.privilegesManager.actionRequiresPrivilege(
-        PrivilegesManager.ActionViewProtectedNotes
-      )) {
-      this.privilegesManager.presentPrivilegesModal(
-        PrivilegesManager.ActionViewProtectedNotes,
-        () => {
-          run();
-        }
-      );
-    } else {
-      run();
-    }
-  }
-
-  isFiltering() {
-    return this.noteFilter.text && this.noteFilter.text.length > 0;
-  }
-
   createNewNote() {
-    if (this.selectedNote && this.selectedNote.dummy) {
+    if (this.state.selectedNote && this.state.selectedNote.dummy) {
       return;
     }
-    const title = "Note" + (this.notes ? (" " + (this.notes.length + 1)) : "");
+    const title = "Note" + (this.state.notes ? (" " + (this.state.notes.length + 1)) : "");
     const newNote = this.modelManager.createItem({
       content_type: 'Note',
       content: {
@@ -539,22 +552,31 @@ class NotesCtrl {
     });
     newNote.client_updated_at = new Date();
     newNote.dummy = true;
-    this.addNew(newNote);
-    this.selectNote(newNote);
-  }
-
-  addNew(note) {
-    this.modelManager.addItem(note);
-    this.modelManager.setItemDirty(note);
+    this.modelManager.addItem(newNote);
+    this.modelManager.setItemDirty(newNote);
     const selectedTag = this.appState.getSelectedTag();
     if (!selectedTag.isSmartTag()) {
-      selectedTag.addItemAsRelationship(note);
+      selectedTag.addItemAsRelationship(newNote);
       this.modelManager.setItemDirty(selectedTag);
     }
+    this.appState.setSelectedNote(newNote);
+  }
+
+  isFiltering() {
+    return this.state.noteFilter.text && this.state.noteFilter.text.length > 0;
+  }
+
+  setNoteFilterText(text) {
+    this.setState({
+      noteFilter: {
+        ...this.state.noteFilter,
+        text: text
+      }
+    })
   }
 
   clearFilterText() {
-    this.noteFilter.text = '';
+    this.setNoteFilterText('');
     this.onFilterEnter();
     this.filterTextChanged();
     this.resetPagination();
@@ -565,7 +587,7 @@ class NotesCtrl {
       this.searchSubmitted = false;
     }
     this.reloadNotes().then(() => {
-      if (!this.selectedNote.visible) {
+      if (!this.state.selectedNote.visible) {
         this.selectFirstNote();
       }
     })
@@ -578,11 +600,11 @@ class NotesCtrl {
      * enter before highlighting desktop search results.
      */
     this.searchSubmitted = true;
-    this.desktopManager.searchText(this.noteFilter.text);
+    this.desktopManager.searchText(this.state.noteFilter.text);
   }
 
   selectedMenuItem() {
-    this.showMenu = false;
+    this.setShowMenuFalse();
   }
 
   togglePrefKey(key) {
@@ -606,21 +628,25 @@ class NotesCtrl {
 
   toggleReverseSort() {
     this.selectedMenuItem();
-    this.sortReverse = !this.sortReverse;
+    this.setState({
+      sortReverse: !this.state.sortReverse
+    })
     this.reloadNotes();
     this.preferencesManager.setUserPrefValue(
       PREF_SORT_NOTES_REVERSE,
-      this.sortReverse
+      this.state.sortReverse
     );
     this.preferencesManager.syncUserPreferences();
   }
 
   setSortBy(type) {
-    this.sortBy = type;
+    this.setState({
+      sortBy: type
+    })
     this.reloadNotes();
     this.preferencesManager.setUserPrefValue(
       PREF_SORT_NOTES_BY,
-      this.sortBy
+      this.state.sortBy
     );
     this.preferencesManager.syncUserPreferences();
   }
@@ -629,33 +655,33 @@ class NotesCtrl {
     if (this.hideTags || note.content.protected) {
       return false;
     }
-    if (this.tag.content.isAllTag) {
+    if (this.state.tag.content.isAllTag) {
       return note.tags && note.tags.length > 0;
     }
-    if (this.tag.isSmartTag()) {
+    if (this.state.tag.isSmartTag()) {
       return true;
     }
     /**
      * Inside a tag, only show tags string if
-     * note contains tags other than this.tag
+     * note contains tags other than this.state.tag
      */
     return note.tags && note.tags.length > 1;
   }
 
   filterNotes(notes) {
     return notes.filter((note) => {
-      let canShowArchived = this.showArchived;
-      const canShowPinned = !this.hidePinned;
-      const isTrash = this.tag.content.isTrashTag;
+      let canShowArchived = this.state.showArchived;
+      const canShowPinned = !this.state.hidePinned;
+      const isTrash = this.state.tag.content.isTrashTag;
       if (!isTrash && note.content.trashed) {
         note.visible = false;
         return note.visible;
       }
-      const isSmartTag = this.tag.isSmartTag();
+      const isSmartTag = this.state.tag.isSmartTag();
       if (isSmartTag) {
         canShowArchived = (
           canShowArchived ||
-          this.tag.content.isArchiveTag ||
+          this.state.tag.content.isArchiveTag ||
           isTrash
         );
       }
@@ -666,7 +692,7 @@ class NotesCtrl {
         note.visible = false;
         return note.visible;
       }
-      const filterText = this.noteFilter.text.toLowerCase();
+      const filterText = this.state.noteFilter.text.toLowerCase();
       if (filterText.length === 0) {
         note.visible = true;
       } else {
@@ -744,9 +770,7 @@ class NotesCtrl {
       ],
       onKeyDown: (event) => {
         event.preventDefault();
-        this.$timeout(() => {
-          this.createNewNote();
-        });
+        this.createNewNote();
       }
     })
 
@@ -761,9 +785,7 @@ class NotesCtrl {
         if (searchBar === document.activeElement) {
           searchBar.blur()
         }
-        this.$timeout(() => {
-          this.selectNextNote();
-        });
+        this.selectNextNote();
       }
     })
 
@@ -771,9 +793,7 @@ class NotesCtrl {
       key: KeyboardManager.KeyUp,
       element: document.body,
       onKeyDown: (event) => {
-        this.$timeout(() => {
-          this.selectPreviousNote();
-        });
+        this.selectPreviousNote();
       }
     });
 
@@ -797,7 +817,7 @@ export class NotesPanel {
     this.template = template;
     this.replace = true;
     this.controller = NotesCtrl;
-    this.controllerAs = 'ctrl';
+    this.controllerAs = 'self';
     this.bindToController = true;
   }
 }

@@ -20,15 +20,18 @@ export class AppState {
     return callback;
   }
 
-  notifyEvent(eventName, data) {
+  async notifyEvent(eventName, data) {
     /** 
      * Timeout is particullary important so we can give all initial 
      * controllers a chance to construct before propogting any events *
      */
-    this.$timeout(() => {
-      for(const callback of this.observers) {
-        callback(eventName, data);
-      }
+    return new Promise((resolve) => {
+      this.$timeout(async () => {
+        for(const callback of this.observers) {
+          await callback(eventName, data);
+        }
+        resolve();
+      })
     })
   }
 
@@ -44,10 +47,10 @@ export class AppState {
     );
   }
 
-  setSelectedNote(note) {
+  async setSelectedNote(note) {
     const previousNote = this.selectedNote;
     this.selectedNote = note;
-    this.notifyEvent(
+    await this.notifyEvent(
       APP_STATE_EVENT_NOTE_CHANGED,
       {previousNote: previousNote}
     );
