@@ -9,7 +9,9 @@ export const APP_STATE_EVENT_DESKTOP_EXTS_READY          = 8;
 
 export class AppState {
 
-  constructor() {
+  /* @ngInject */
+  constructor($timeout) {
+    this.$timeout = $timeout;
     this.observers = [];
   }
 
@@ -19,9 +21,15 @@ export class AppState {
   }
 
   notifyEvent(eventName, data) {
-    for(const callback of this.observers) {
-      callback(eventName, data);
-    }
+    /** 
+     * Timeout is particullary important so we can give all initial 
+     * controllers a chance to construct before propogting any events *
+     */
+    this.$timeout(() => {
+      for(const callback of this.observers) {
+        callback(eventName, data);
+      }
+    })
   }
 
   setSelectedTag(tag) {

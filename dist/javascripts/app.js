@@ -2014,31 +2014,31 @@ var Footer = function Footer() {
 /*!*****************************************************!*\
   !*** ./app/assets/javascripts/controllers/index.js ***!
   \*****************************************************/
-/*! exports provided: EditorPanel, Footer, NotesPanel, TagsPanel, Root, LockScreen, PureCtrl */
+/*! exports provided: PureCtrl, EditorPanel, Footer, NotesPanel, TagsPanel, Root, LockScreen */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _editor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./editor */ "./app/assets/javascripts/controllers/editor.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EditorPanel", function() { return _editor__WEBPACK_IMPORTED_MODULE_0__["EditorPanel"]; });
+/* harmony import */ var _pure_ctrl__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./pure_ctrl */ "./app/assets/javascripts/controllers/pure_ctrl.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PureCtrl", function() { return _pure_ctrl__WEBPACK_IMPORTED_MODULE_0__["PureCtrl"]; });
 
-/* harmony import */ var _footer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./footer */ "./app/assets/javascripts/controllers/footer.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Footer", function() { return _footer__WEBPACK_IMPORTED_MODULE_1__["Footer"]; });
+/* harmony import */ var _editor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./editor */ "./app/assets/javascripts/controllers/editor.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EditorPanel", function() { return _editor__WEBPACK_IMPORTED_MODULE_1__["EditorPanel"]; });
 
-/* harmony import */ var _notes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./notes */ "./app/assets/javascripts/controllers/notes.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "NotesPanel", function() { return _notes__WEBPACK_IMPORTED_MODULE_2__["NotesPanel"]; });
+/* harmony import */ var _footer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./footer */ "./app/assets/javascripts/controllers/footer.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Footer", function() { return _footer__WEBPACK_IMPORTED_MODULE_2__["Footer"]; });
 
-/* harmony import */ var _tags__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./tags */ "./app/assets/javascripts/controllers/tags.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "TagsPanel", function() { return _tags__WEBPACK_IMPORTED_MODULE_3__["TagsPanel"]; });
+/* harmony import */ var _notes__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./notes */ "./app/assets/javascripts/controllers/notes.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "NotesPanel", function() { return _notes__WEBPACK_IMPORTED_MODULE_3__["NotesPanel"]; });
 
-/* harmony import */ var _root__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./root */ "./app/assets/javascripts/controllers/root.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Root", function() { return _root__WEBPACK_IMPORTED_MODULE_4__["Root"]; });
+/* harmony import */ var _tags__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./tags */ "./app/assets/javascripts/controllers/tags.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "TagsPanel", function() { return _tags__WEBPACK_IMPORTED_MODULE_4__["TagsPanel"]; });
 
-/* harmony import */ var _lockScreen__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./lockScreen */ "./app/assets/javascripts/controllers/lockScreen.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "LockScreen", function() { return _lockScreen__WEBPACK_IMPORTED_MODULE_5__["LockScreen"]; });
+/* harmony import */ var _root__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./root */ "./app/assets/javascripts/controllers/root.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Root", function() { return _root__WEBPACK_IMPORTED_MODULE_5__["Root"]; });
 
-/* harmony import */ var _pure_ctrl__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./pure_ctrl */ "./app/assets/javascripts/controllers/pure_ctrl.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PureCtrl", function() { return _pure_ctrl__WEBPACK_IMPORTED_MODULE_6__["PureCtrl"]; });
+/* harmony import */ var _lockScreen__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./lockScreen */ "./app/assets/javascripts/controllers/lockScreen.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "LockScreen", function() { return _lockScreen__WEBPACK_IMPORTED_MODULE_6__["LockScreen"]; });
 
 
 
@@ -2270,6 +2270,7 @@ function () {
     this.authManager = authManager;
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
+    this.notes = [];
     this.searchSubmitted = false;
     this.noteFilter = {
       text: ''
@@ -2301,22 +2302,12 @@ function () {
 
       this.appState.addObserver(function (eventName, data) {
         if (eventName === _state__WEBPACK_IMPORTED_MODULE_10__["APP_STATE_EVENT_TAG_CHANGED"]) {
-          if (_this2.selectedNote && _this2.selectedNote.dummy) {
-            _this2.modelManager.removeItemLocally(_this2.selectedNote);
-
-            _this2.selectNote(null);
-          }
-
-          _this2.tag = _this2.appState.getSelectedTag();
-
-          _this2.tagDidChange(_this2.tag, data.previousTag);
+          _this2.tagDidChange(_this2.appState.getSelectedTag(), data.previousTag);
         } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_10__["APP_STATE_EVENT_NOTE_CHANGED"]) {
           _this2.selectedNote = _this2.appState.getSelectedNote();
 
           if (!_this2.selectedNote) {
-            _this2.reloadNotes().then(function () {
-              _this2.selectNextOrCreateNew();
-            });
+            _this2.selectNextOrCreateNew();
           }
         } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_10__["APP_STATE_EVENT_PREFERENCES_CHANGED"]) {
           _this2.loadPreferences();
@@ -2362,12 +2353,12 @@ function () {
 
       this.syncManager.addEventHandler(function (syncEvent, data) {
         if (syncEvent === 'local-data-loaded') {
-          if (_this4.notes.length == 0) {
+          if (_this4.notes.length === 0) {
             _this4.createNewNote();
           }
         } else if (syncEvent === 'sync:completed') {
           _this4.$timeout(function () {
-            if (_this4.createDummyOnSynCompletionIfNoNotes && _this4.notes.length == 0) {
+            if (_this4.createDummyOnSynCompletionIfNoNotes && _this4.notes.length === 0) {
               _this4.createDummyOnSynCompletionIfNoNotes = false;
 
               _this4.createNewNote();
@@ -2387,6 +2378,10 @@ function () {
         }
 
         _this5.reloadNotes();
+
+        if (!_this5.notes.includes(_this5.selectedNote)) {
+          _this5.selectNextOrCreateNew();
+        }
         /** Note has changed values, reset its flags */
 
 
@@ -2432,151 +2427,50 @@ function () {
       });
     }
   }, {
-    key: "setNotes",
-    value: function setNotes(notes) {
-      var _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, note;
-
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function setNotes$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              notes = this.filterNotes(notes);
-              notes = this.sortNotes(notes, this.sortBy, this.sortReverse);
-              _iteratorNormalCompletion2 = true;
-              _didIteratorError2 = false;
-              _iteratorError2 = undefined;
-              _context.prev = 5;
-
-              for (_iterator2 = notes[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                note = _step2.value;
-                note.shouldShowTags = this.shouldShowTagsForNote(note);
-              }
-
-              _context.next = 13;
-              break;
-
-            case 9:
-              _context.prev = 9;
-              _context.t0 = _context["catch"](5);
-              _didIteratorError2 = true;
-              _iteratorError2 = _context.t0;
-
-            case 13:
-              _context.prev = 13;
-              _context.prev = 14;
-
-              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                _iterator2.return();
-              }
-
-            case 16:
-              _context.prev = 16;
-
-              if (!_didIteratorError2) {
-                _context.next = 19;
-                break;
-              }
-
-              throw _iteratorError2;
-
-            case 19:
-              return _context.finish(16);
-
-            case 20:
-              return _context.finish(13);
-
-            case 21:
-              this.notes = notes;
-              this.reloadPanelTitle();
-
-            case 23:
-            case "end":
-              return _context.stop();
-          }
-        }
-      }, null, this, [[5, 9, 13, 21], [14,, 16, 20]]);
-    }
-  }, {
     key: "reloadNotes",
     value: function reloadNotes() {
-      var _this6 = this;
+      if (!this.tag) {
+        return;
+      }
 
-      var notes, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, note;
+      var tagNotes = this.tag.notes;
+      var notes = this.sortNotes(this.filterNotes(tagNotes), this.sortBy, this.sortReverse);
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
 
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function reloadNotes$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              notes = this.tag.notes;
-              _iteratorNormalCompletion3 = true;
-              _didIteratorError3 = false;
-              _iteratorError3 = undefined;
-              _context2.prev = 4;
+      try {
+        for (var _iterator2 = notes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var note = _step2.value;
 
-              for (_iterator3 = notes[Symbol.iterator](); !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                note = _step3.value;
+          if (note.errorDecrypting) {
+            this.loadFlagsForNote(note);
+          }
 
-                if (note.errorDecrypting) {
-                  this.loadFlagsForNote(note);
-                }
-              }
-
-              _context2.next = 12;
-              break;
-
-            case 8:
-              _context2.prev = 8;
-              _context2.t0 = _context2["catch"](4);
-              _didIteratorError3 = true;
-              _iteratorError3 = _context2.t0;
-
-            case 12:
-              _context2.prev = 12;
-              _context2.prev = 13;
-
-              if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-                _iterator3.return();
-              }
-
-            case 15:
-              _context2.prev = 15;
-
-              if (!_didIteratorError3) {
-                _context2.next = 18;
-                break;
-              }
-
-              throw _iteratorError3;
-
-            case 18:
-              return _context2.finish(15);
-
-            case 19:
-              return _context2.finish(12);
-
-            case 20:
-              this.setNotes(notes).then(function () {
-                if (!_this6.notes.includes(_this6.selectedNote)) {
-                  _this6.selectNextOrCreateNew();
-                }
-              });
-
-            case 21:
-            case "end":
-              return _context2.stop();
+          note.shouldShowTags = this.shouldShowTagsForNote(note);
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
           }
         }
-      }, null, this, [[4, 8, 12, 20], [13,, 15, 19]]);
-    }
-  }, {
-    key: "reorderNotes",
-    value: function reorderNotes() {
-      this.reloadNotes();
+      }
+
+      this.notes = notes;
+      this.reloadPanelTitle();
     }
   }, {
     key: "loadPreferences",
     value: function loadPreferences() {
-      var _this7 = this;
+      var _this6 = this;
 
       var prevSortValue = this.sortBy;
       this.sortBy = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_11__["PREF_SORT_NOTES_BY"], SORT_KEY_CREATED_AT);
@@ -2587,9 +2481,9 @@ function () {
         this.sortBy = SORT_KEY_CLIENT_UPDATED_AT;
       }
 
-      if (prevSortValue && prevSortValue != this.sortBy) {
+      if (prevSortValue && prevSortValue !== this.sortBy) {
         this.$timeout(function () {
-          _this7.selectFirstNote();
+          _this6.selectFirstNote();
         });
       }
 
@@ -2609,39 +2503,6 @@ function () {
             collapsed: this.panelController.isCollapsed()
           });
         }
-      }
-    }
-  }, {
-    key: "selectNextOrCreateNew",
-    value: function selectNextOrCreateNew() {
-      var displayableNotes = this.displayableNotes();
-      var index;
-
-      if (this.selectedIndex < displayableNotes.length) {
-        index = Math.max(this.selectedIndex, 0);
-      } else {
-        index = 0;
-      }
-
-      var note = displayableNotes[index];
-      /** Dont auto-select protected notes */
-
-      while (note && note.content.protected) {
-        index++;
-
-        if (index >= displayableNotes.length) {
-          break;
-        }
-
-        note = displayableNotes[index];
-      }
-
-      if (note) {
-        this.selectNote(note);
-      } else if (!this.tag || !this.tag.isSmartTag()) {
-        this.createNewNote();
-      } else {
-        this.selectNote(null);
       }
     }
   }, {
@@ -2689,11 +2550,11 @@ function () {
     value: function optionsSubtitle() {
       var base = "";
 
-      if (this.sortBy == 'created_at') {
+      if (this.sortBy === 'created_at') {
         base += " Date Added";
-      } else if (this.sortBy == 'client_updated_at') {
+      } else if (this.sortBy === 'client_updated_at') {
         base += " Date Modified";
-      } else if (this.sortBy == 'title') {
+      } else if (this.sortBy === 'title') {
         base += " Title";
       }
 
@@ -2777,46 +2638,56 @@ function () {
     }
   }, {
     key: "tagDidChange",
-    value: function tagDidChange(tag, oldTag) {
-      var _this8 = this;
+    value: function tagDidChange(tag, previousTag) {
+      var scrollable;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function tagDidChange$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              if (this.selectedNote && this.selectedNote.dummy) {
+                this.modelManager.removeItemLocally(this.selectedNote);
+              }
 
-      var scrollable = document.getElementById('notes-scrollable');
+              this.tag = tag;
+              scrollable = document.getElementById('notes-scrollable');
 
-      if (scrollable) {
-        scrollable.scrollTop = 0;
-        scrollable.scrollLeft = 0;
-      }
+              if (scrollable) {
+                scrollable.scrollTop = 0;
+                scrollable.scrollLeft = 0;
+              }
 
-      this.resetPagination();
-      this.showMenu = false;
+              this.resetPagination();
+              this.showMenu = false;
 
-      if (this.selectedNote) {
-        if (this.selectedNote.dummy && oldTag) {
-          lodash__WEBPACK_IMPORTED_MODULE_4___default.a.remove(oldTag.notes, this.selectedNote);
-        }
+              if (this.selectedNote && this.selectedNote.dummy) {
+                if (previousTag) {
+                  lodash__WEBPACK_IMPORTED_MODULE_4___default.a.remove(previousTag.notes, this.selectedNote);
+                }
+              }
 
-        this.selectNote(null);
-      }
+              this.noteFilter.text = '';
+              this.desktopManager.searchText();
+              this.reloadNotes();
 
-      this.noteFilter.text = '';
-      this.desktopManager.searchText();
-      this.reloadNotes().then(function () {
-        if (_this8.notes.length > 0) {
-          _this8.notes.forEach(function (note) {
-            note.visible = true;
-          });
+              if (this.notes.length > 0) {
+                this.notes.forEach(function (note) {
+                  note.visible = true;
+                });
+                this.selectFirstNote();
+              } else if (this.syncManager.initialDataLoaded()) {
+                if (!tag.isSmartTag() || tag.content.isAllTag) {
+                  this.createNewNote();
+                } else if (this.selectedNote && !this.notes.includes(this.selectedNote)) {
+                  this.selectNote(null);
+                }
+              }
 
-          _this8.selectFirstNote();
-        } else if (_this8.syncManager.initialDataLoaded()) {
-          if (!tag.isSmartTag() || tag.content.isAllTag) {
-            _this8.createNewNote();
-          } else {
-            if (_this8.selectedNote && !_this8.notes.includes(_this8.selectedNote)) {
-              _this8.selectNote(null);
-            }
+            case 11:
+            case "end":
+              return _context.stop();
           }
         }
-      });
+      }, null, this);
     }
   }, {
     key: "displayableNotes",
@@ -2826,12 +2697,31 @@ function () {
       });
     }
   }, {
+    key: "getFirstNonProtectedNote",
+    value: function getFirstNonProtectedNote() {
+      var displayableNotes = this.displayableNotes();
+      var index = 0;
+      var note = displayableNotes[index];
+
+      while (note && note.content.protected) {
+        index++;
+
+        if (index >= displayableNotes.length) {
+          break;
+        }
+
+        note = displayableNotes[index];
+      }
+
+      return note;
+    }
+  }, {
     key: "selectFirstNote",
     value: function selectFirstNote() {
-      var displayableNotes = this.displayableNotes();
+      var note = this.getFirstNonProtectedNote();
 
-      if (displayableNotes.length > 0) {
-        this.selectNote(displayableNotes[0]);
+      if (note) {
+        this.selectNote(note);
       }
     }
   }, {
@@ -2842,6 +2732,19 @@ function () {
 
       if (currentIndex + 1 < displayableNotes.length) {
         this.selectNote(displayableNotes[currentIndex + 1]);
+      }
+    }
+  }, {
+    key: "selectNextOrCreateNew",
+    value: function selectNextOrCreateNew() {
+      var note = this.getFirstNonProtectedNote();
+
+      if (note) {
+        this.selectNote(note);
+      } else if (!this.tag || !this.tag.isSmartTag()) {
+        this.createNewNote();
+      } else {
+        this.selectNote(null);
       }
     }
   }, {
@@ -2860,53 +2763,53 @@ function () {
   }, {
     key: "selectNote",
     value: function selectNote(note) {
-      var _this9 = this;
+      var _this7 = this;
 
       var viaClick,
           run,
-          _args3 = arguments;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function selectNote$(_context3) {
+          _args2 = arguments;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function selectNote$(_context2) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context2.prev = _context2.next) {
             case 0:
-              viaClick = _args3.length > 1 && _args3[1] !== undefined ? _args3[1] : false;
+              viaClick = _args2.length > 1 && _args2[1] !== undefined ? _args2[1] : false;
 
               if (!(this.selectedNote === note)) {
-                _context3.next = 3;
+                _context2.next = 3;
                 break;
               }
 
-              return _context3.abrupt("return");
+              return _context2.abrupt("return");
 
             case 3:
               if (note) {
-                _context3.next = 6;
+                _context2.next = 6;
                 break;
               }
 
               this.appState.setSelectedNote(null);
-              return _context3.abrupt("return");
+              return _context2.abrupt("return");
 
             case 6:
               run = function run() {
-                _this9.$timeout(function () {
+                _this7.$timeout(function () {
                   var dummyNote;
 
-                  if (_this9.selectedNote && _this9.selectedNote !== note && _this9.selectedNote.dummy) {
+                  if (_this7.selectedNote && _this7.selectedNote !== note && _this7.selectedNote.dummy) {
                     /** Set this dummy to be removed */
-                    dummyNote = _this9.selectedNote;
+                    dummyNote = _this7.selectedNote;
                   }
 
-                  _this9.appState.setSelectedNote(note);
+                  _this7.appState.setSelectedNote(note);
 
-                  _this9.selectedIndex = Math.max(0, _this9.displayableNotes().indexOf(note));
+                  _this7.selectedIndex = Math.max(0, _this7.displayableNotes().indexOf(note));
 
                   if (note.content.conflict_of) {
                     note.content.conflict_of = null;
 
-                    _this9.modelManager.setItemDirty(note);
+                    _this7.modelManager.setItemDirty(note);
 
-                    _this9.syncManager.sync();
+                    _this7.syncManager.sync();
                   }
                   /**
                    * There needs to be a long timeout after setting selection before
@@ -2915,43 +2818,43 @@ function () {
                    */
 
 
-                  if (dummyNote && dummyNote.dummy == true) {
-                    _this9.$timeout(function () {
-                      _this9.modelManager.removeItemLocally(dummyNote);
+                  if (dummyNote && dummyNote.dummy === true) {
+                    _this7.$timeout(function () {
+                      _this7.modelManager.removeItemLocally(dummyNote);
 
-                      lodash__WEBPACK_IMPORTED_MODULE_4___default.a.pull(_this9.notes, dummyNote);
+                      lodash__WEBPACK_IMPORTED_MODULE_4___default.a.pull(_this7.notes, dummyNote);
                     }, 250);
                   }
 
-                  if (viaClick && _this9.isFiltering()) {
-                    _this9.desktopManager.searchText(_this9.noteFilter.text);
+                  if (viaClick && _this7.isFiltering()) {
+                    _this7.desktopManager.searchText(_this7.noteFilter.text);
                   }
                 });
               };
 
-              _context3.t0 = note.content.protected;
+              _context2.t0 = note.content.protected;
 
-              if (!_context3.t0) {
-                _context3.next = 12;
+              if (!_context2.t0) {
+                _context2.next = 12;
                 break;
               }
 
-              _context3.next = 11;
+              _context2.next = 11;
               return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_8__["PrivilegesManager"].ActionViewProtectedNotes));
 
             case 11:
-              _context3.t0 = _context3.sent;
+              _context2.t0 = _context2.sent;
 
             case 12:
-              if (!_context3.t0) {
-                _context3.next = 16;
+              if (!_context2.t0) {
+                _context2.next = 16;
                 break;
               }
 
               this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_8__["PrivilegesManager"].ActionViewProtectedNotes, function () {
                 run();
               });
-              _context3.next = 17;
+              _context2.next = 17;
               break;
 
             case 16:
@@ -2959,7 +2862,7 @@ function () {
 
             case 17:
             case "end":
-              return _context3.stop();
+              return _context2.stop();
           }
         }
       }, null, this);
@@ -3012,15 +2915,15 @@ function () {
   }, {
     key: "filterTextChanged",
     value: function filterTextChanged() {
-      var _this10 = this;
+      var _this8 = this;
 
       if (this.searchSubmitted) {
         this.searchSubmitted = false;
       }
 
       this.reloadNotes().then(function () {
-        if (!_this10.selectedNote.visible) {
-          _this10.selectFirstNote();
+        if (!_this8.selectedNote.visible) {
+          _this8.selectFirstNote();
         }
       });
     }
@@ -3068,7 +2971,7 @@ function () {
     value: function toggleReverseSort() {
       this.selectedMenuItem();
       this.sortReverse = !this.sortReverse;
-      this.reorderNotes();
+      this.reloadNotes();
       this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_11__["PREF_SORT_NOTES_REVERSE"], this.sortReverse);
       this.preferencesManager.syncUserPreferences();
     }
@@ -3076,7 +2979,7 @@ function () {
     key: "setSortBy",
     value: function setSortBy(type) {
       this.sortBy = type;
-      this.reorderNotes();
+      this.reloadNotes();
       this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_11__["PREF_SORT_NOTES_BY"], this.sortBy);
       this.preferencesManager.syncUserPreferences();
     }
@@ -3105,22 +3008,22 @@ function () {
   }, {
     key: "filterNotes",
     value: function filterNotes(notes) {
-      var _this11 = this;
+      var _this9 = this;
 
       return notes.filter(function (note) {
-        var canShowArchived = _this11.showArchived,
-            canShowPinned = !_this11.hidePinned;
-        var isTrash = _this11.tag.content.isTrashTag;
+        var canShowArchived = _this9.showArchived;
+        var canShowPinned = !_this9.hidePinned;
+        var isTrash = _this9.tag.content.isTrashTag;
 
         if (!isTrash && note.content.trashed) {
           note.visible = false;
           return note.visible;
         }
 
-        var isSmartTag = _this11.tag.isSmartTag();
+        var isSmartTag = _this9.tag.isSmartTag();
 
         if (isSmartTag) {
-          canShowArchived = canShowArchived || _this11.tag.content.isArchiveTag || isTrash;
+          canShowArchived = canShowArchived || _this9.tag.content.isArchiveTag || isTrash;
         }
 
         if (note.archived && !canShowArchived || note.pinned && !canShowPinned) {
@@ -3128,9 +3031,9 @@ function () {
           return note.visible;
         }
 
-        var filterText = _this11.noteFilter.text.toLowerCase();
+        var filterText = _this9.noteFilter.text.toLowerCase();
 
-        if (filterText.length == 0) {
+        if (filterText.length === 0) {
           note.visible = true;
         } else {
           var words = filterText.split(" ");
@@ -3186,11 +3089,11 @@ function () {
           aValue = aValue.toLowerCase();
           bValue = bValue.toLowerCase();
 
-          if (aValue.length == 0 && bValue.length == 0) {
+          if (aValue.length === 0 && bValue.length === 0) {
             return 0;
-          } else if (aValue.length == 0 && bValue.length != 0) {
+          } else if (aValue.length === 0 && bValue.length !== 0) {
             return 1 * vector;
-          } else if (aValue.length != 0 && bValue.length == 0) {
+          } else if (aValue.length !== 0 && bValue.length === 0) {
             return -1 * vector;
           } else {
             vector *= -1;
@@ -3220,7 +3123,7 @@ function () {
   }, {
     key: "registerKeyboardShortcuts",
     value: function registerKeyboardShortcuts() {
-      var _this12 = this;
+      var _this10 = this;
 
       /**
        * In the browser we're not allowed to override cmd/ctrl + n, so we have to
@@ -3233,8 +3136,8 @@ function () {
         onKeyDown: function onKeyDown(event) {
           event.preventDefault();
 
-          _this12.$timeout(function () {
-            _this12.createNewNote();
+          _this10.$timeout(function () {
+            _this10.createNewNote();
           });
         }
       });
@@ -3242,14 +3145,14 @@ function () {
         key: _services_keyboardManager__WEBPACK_IMPORTED_MODULE_9__["KeyboardManager"].KeyDown,
         elements: [document.body, this.getSearchBar()],
         onKeyDown: function onKeyDown(event) {
-          var searchBar = _this12.getSearchBar();
+          var searchBar = _this10.getSearchBar();
 
           if (searchBar === document.activeElement) {
             searchBar.blur();
           }
 
-          _this12.$timeout(function () {
-            _this12.selectNextNote();
+          _this10.$timeout(function () {
+            _this10.selectNextNote();
           });
         }
       });
@@ -3257,8 +3160,8 @@ function () {
         key: _services_keyboardManager__WEBPACK_IMPORTED_MODULE_9__["KeyboardManager"].KeyUp,
         element: document.body,
         onKeyDown: function onKeyDown(event) {
-          _this12.$timeout(function () {
-            _this12.selectPreviousNote();
+          _this10.$timeout(function () {
+            _this10.selectPreviousNote();
           });
         }
       });
@@ -3266,7 +3169,7 @@ function () {
         key: "f",
         modifiers: [_services_keyboardManager__WEBPACK_IMPORTED_MODULE_9__["KeyboardManager"].KeyModifierMeta, _services_keyboardManager__WEBPACK_IMPORTED_MODULE_9__["KeyboardManager"].KeyModifierShift],
         onKeyDown: function onKeyDown(event) {
-          var searchBar = _this12.getSearchBar();
+          var searchBar = _this10.getSearchBar();
 
           if (searchBar) {
             searchBar.focus();
@@ -3836,20 +3739,37 @@ var Root = function Root() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TagsPanel", function() { return TagsPanel; });
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/defineProperty.js");
-/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
-/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _tags_pug__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! %/tags.pug */ "./app/assets/templates/tags.pug");
-/* harmony import */ var _tags_pug__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_tags_pug__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
-/* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/controllers/constants.js");
-/* harmony import */ var _services_preferencesManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/services/preferencesManager */ "./app/assets/javascripts/services/preferencesManager.js");
-/* harmony import */ var _strings__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/strings */ "./app/assets/javascripts/strings.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @babel/runtime/helpers/assertThisInitialized */ "./node_modules/@babel/runtime/helpers/assertThisInitialized.js");
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/defineProperty.js");
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
+/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var _tags_pug__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! %/tags.pug */ "./app/assets/templates/tags.pug");
+/* harmony import */ var _tags_pug__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(_tags_pug__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
+/* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/controllers/constants.js");
+/* harmony import */ var _services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @/services/preferencesManager */ "./app/assets/javascripts/services/preferencesManager.js");
+/* harmony import */ var _strings__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @/strings */ "./app/assets/javascripts/strings.js");
+/* harmony import */ var _Controllers__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Controllers */ "./app/assets/javascripts/controllers/index.js");
+
+
+
+
+
+
 
 
 
@@ -3862,52 +3782,69 @@ __webpack_require__.r(__webpack_exports__);
 
 var TagsPanelCtrl =
 /*#__PURE__*/
-function () {
-  TagsPanelCtrl.$inject = ["$rootScope", "$timeout", "modelManager", "syncManager", "componentManager", "appState", "alertManager", "preferencesManager"];
+function (_PureCtrl) {
+  TagsPanelCtrl.$inject = ["$rootScope", "$timeout", "alertManager", "appState", "componentManager", "modelManager", "preferencesManager", "syncManager"];
+
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6___default()(TagsPanelCtrl, _PureCtrl);
 
   /* @ngInject */
-  function TagsPanelCtrl($rootScope, $timeout, modelManager, syncManager, componentManager, appState, alertManager, preferencesManager) {
-    var _this = this;
+  function TagsPanelCtrl($rootScope, $timeout, alertManager, appState, componentManager, modelManager, preferencesManager, syncManager) {
+    var _this;
 
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, TagsPanelCtrl);
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, TagsPanelCtrl);
 
-    _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_2___default()(this, "onPanelResize", function (newWidth, lastLeft, isAtMaxWidth, isCollapsed) {
-      _this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_7__["PREF_TAGS_PANEL_WIDTH"], newWidth, true);
+    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(TagsPanelCtrl).call(this, $timeout));
+
+    _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_7___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5___default()(_this), "onPanelResize", function (newWidth, lastLeft, isAtMaxWidth, isCollapsed) {
+      _this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__["PREF_TAGS_PANEL_WIDTH"], newWidth, true);
 
       _this.appState.panelDidResize({
-        name: _controllers_constants__WEBPACK_IMPORTED_MODULE_6__["PANEL_NAME_TAGS"],
+        name: _controllers_constants__WEBPACK_IMPORTED_MODULE_11__["PANEL_NAME_TAGS"],
         collapsed: isCollapsed
       });
     });
 
-    this.componentManager = componentManager;
-    this.modelManager = modelManager;
-    this.syncManager = syncManager;
-    this.appState = appState;
-    this.alertManager = alertManager;
-    this.preferencesManager = preferencesManager;
-    this.$rootScope = $rootScope;
-    this.$timeout = $timeout;
-    this.panelController = {};
-    $timeout(function () {
-      _this.selectDefaultTag();
-    });
-    this.addSyncEventHandler();
-    this.addAppStateObserver();
-    this.addMappingObserver();
-    this.loadPreferences();
-    this.registerComponentHandler();
+    _this.$rootScope = $rootScope;
+    _this.alertManager = alertManager;
+    _this.appState = appState;
+    _this.componentManager = componentManager;
+    _this.modelManager = modelManager;
+    _this.preferencesManager = preferencesManager;
+    _this.syncManager = syncManager;
+    _this.panelController = {};
+
+    _this.addSyncEventHandler();
+
+    _this.addAppStateObserver();
+
+    _this.addMappingObserver();
+
+    _this.loadPreferences();
+
+    _this.registerComponentHandler();
+
+    _this.state = {
+      smartTags: _this.modelManager.getSmartTags()
+    };
+    return _this;
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(TagsPanelCtrl, [{
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(TagsPanelCtrl, [{
+    key: "$onInit",
+    value: function $onInit() {
+      this.selectTag(this.state.smartTags[0]);
+    }
+  }, {
     key: "addSyncEventHandler",
     value: function addSyncEventHandler() {
       var _this2 = this;
 
       this.syncManager.addEventHandler(function (syncEvent, data) {
         if (syncEvent === 'local-data-loaded' || syncEvent === 'sync:completed' || syncEvent === 'local-data-incremental-load') {
-          _this2.tags = _this2.modelManager.tags;
-          _this2.smartTags = _this2.modelManager.getSmartTags();
+          _this2.setState({
+            tags: _this2.modelManager.tags,
+            smartTags: _this2.modelManager.getSmartTags()
+          });
         }
       });
     }
@@ -3917,7 +3854,7 @@ function () {
       var _this3 = this;
 
       this.appState.addObserver(function (eventName, data) {
-        if (eventName === _state__WEBPACK_IMPORTED_MODULE_5__["APP_STATE_EVENT_PREFERENCES_CHANGED"]) {
+        if (eventName === _state__WEBPACK_IMPORTED_MODULE_10__["APP_STATE_EVENT_PREFERENCES_CHANGED"]) {
           _this3.loadPreferences();
         }
       });
@@ -3930,18 +3867,18 @@ function () {
       this.modelManager.addItemSyncObserver('tags-list-tags', 'Tag', function (allItems, validItems, deletedItems, source, sourceKey) {
         _this4.reloadNoteCounts();
 
-        if (!_this4.selectedTag) {
+        if (!_this4.state.selectedTag) {
           return;
         }
         /** If the selected tag has been deleted, revert to All view. */
 
 
         var selectedTag = allItems.find(function (tag) {
-          return tag.uuid === _this4.selectedTag.uuid;
+          return tag.uuid === _this4.state.selectedTag.uuid;
         });
 
         if (selectedTag && selectedTag.deleted) {
-          _this4.selectTag(_this4.smartTags[0]);
+          _this4.selectTag(_this4.state.smartTags[0]);
         }
       });
     }
@@ -3950,12 +3887,12 @@ function () {
     value: function reloadNoteCounts() {
       var allTags = [];
 
-      if (this.tags) {
-        allTags = allTags.concat(this.tags);
+      if (this.state.tags) {
+        allTags = allTags.concat(this.state.tags);
       }
 
-      if (this.smartTags) {
-        allTags = allTags.concat(this.smartTags);
+      if (this.state.smartTags) {
+        allTags = allTags.concat(this.state.smartTags);
       }
 
       var _iteratorNormalCompletion = true;
@@ -3965,7 +3902,7 @@ function () {
       try {
         for (var _iterator = allTags[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
           var tag = _step.value;
-          var validNotes = snjs__WEBPACK_IMPORTED_MODULE_3__["SNNote"].filterDummyNotes(tag.notes).filter(function (note) {
+          var validNotes = snjs__WEBPACK_IMPORTED_MODULE_8__["SNNote"].filterDummyNotes(tag.notes).filter(function (note) {
             return !note.archived && !note.content.trashed;
           });
           tag.cachedNoteCount = validNotes.length;
@@ -3988,14 +3925,14 @@ function () {
   }, {
     key: "loadPreferences",
     value: function loadPreferences() {
-      var width = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_7__["PREF_TAGS_PANEL_WIDTH"]);
+      var width = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__["PREF_TAGS_PANEL_WIDTH"]);
 
       if (width) {
         this.panelController.setWidth(width);
 
         if (this.panelController.isCollapsed()) {
-          appState.panelDidResize({
-            name: _controllers_constants__WEBPACK_IMPORTED_MODULE_6__["PANEL_NAME_TAGS"],
+          this.appState.panelDidResize({
+            name: _controllers_constants__WEBPACK_IMPORTED_MODULE_11__["PANEL_NAME_TAGS"],
             collapsed: this.panelController.isCollapsed()
           });
         }
@@ -4024,12 +3961,12 @@ function () {
                 _this5.selectTag(tag);
               }
             } else if (data.item.content_type === 'SN|SmartTag') {
-              var smartTag = new snjs__WEBPACK_IMPORTED_MODULE_3__["SNSmartTag"](data.item);
+              var smartTag = new snjs__WEBPACK_IMPORTED_MODULE_8__["SNSmartTag"](data.item);
 
               _this5.selectTag(smartTag);
             }
           } else if (action === 'clear-selection') {
-            _this5.selectTag(_this5.smartTags[0]);
+            _this5.selectTag(_this5.state.smartTags[0]);
           }
         }
       });
@@ -4039,48 +3976,67 @@ function () {
     value: function selectTag(tag) {
       var _this6 = this;
 
-      if (tag.isSmartTag()) {
-        Object.defineProperty(tag, 'notes', {
-          get: function get() {
-            return _this6.modelManager.notesMatchingSmartTag(tag);
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function selectTag$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              if (tag.isSmartTag()) {
+                Object.defineProperty(tag, 'notes', {
+                  get: function get() {
+                    return _this6.modelManager.notesMatchingSmartTag(tag);
+                  }
+                });
+              }
+
+              if (tag.content.conflict_of) {
+                tag.content.conflict_of = null;
+                this.modelManager.setItemDirty(tag);
+                this.syncManager.sync();
+              }
+
+              this.setState({
+                selectedTag: tag
+              });
+              this.appState.setSelectedTag(tag);
+
+            case 4:
+            case "end":
+              return _context.stop();
           }
-        });
-      }
-
-      this.selectedTag = tag;
-
-      if (tag.content.conflict_of) {
-        tag.content.conflict_of = null;
-        this.modelManager.setItemDirty(tag);
-        this.syncManager.sync();
-      }
-
-      this.appState.setSelectedTag(tag);
+        }
+      }, null, this);
     }
   }, {
     key: "clickedAddNewTag",
     value: function clickedAddNewTag() {
-      if (this.editingTag) {
+      if (this.state.editingTag) {
         return;
       }
 
-      this.newTag = this.modelManager.createItem({
+      var newTag = this.modelManager.createItem({
         content_type: 'Tag'
       });
-      this.selectedTag = this.newTag;
-      this.editingTag = this.newTag;
-      this.modelManager.addItem(this.newTag);
+      this.setState({
+        selectedTag: newTag,
+        editingTag: newTag,
+        newTag: newTag
+      });
+      this.modelManager.addItem(newTag);
     }
   }, {
     key: "tagTitleDidChange",
     value: function tagTitleDidChange(tag) {
-      this.editingTag = tag;
+      this.setState({
+        editingTag: tag
+      });
     }
   }, {
     key: "saveTag",
     value: function saveTag($event, tag) {
       $event.target.blur();
-      this.editingTag = null;
+      this.setState({
+        editingTag: null
+      });
 
       if (!tag.title || tag.title.length === 0) {
         if (this.editingOriginalName) {
@@ -4103,14 +4059,18 @@ function () {
       this.syncManager.sync();
       this.modelManager.resortTag(tag);
       this.selectTag(tag);
-      this.newTag = null;
+      this.setState({
+        newTag: null
+      });
     }
   }, {
     key: "selectedRenameTag",
     value: function selectedRenameTag($event, tag) {
       this.editingOriginalName = tag.title;
-      this.editingTag = tag;
-      $timeout(function () {
+      this.setState({
+        editingTag: tag
+      });
+      this.$timeout(function () {
         document.getElementById('tag-' + tag.uuid).focus();
       });
     }
@@ -4118,7 +4078,7 @@ function () {
     key: "selectedDeleteTag",
     value: function selectedDeleteTag(tag) {
       this.removeTag(tag);
-      this.selectTag(this.smartTags[0]);
+      this.selectTag(this.state.smartTags[0]);
     }
   }, {
     key: "removeTag",
@@ -4126,7 +4086,7 @@ function () {
       var _this7 = this;
 
       this.alertManager.confirm({
-        text: _strings__WEBPACK_IMPORTED_MODULE_8__["STRING_DELETE_TAG"],
+        text: _strings__WEBPACK_IMPORTED_MODULE_13__["STRING_DELETE_TAG"],
         destructive: true,
         onConfirm: function onConfirm() {
           _this7.modelManager.setItemToBeDeleted(tag);
@@ -4137,26 +4097,20 @@ function () {
         }
       });
     }
-  }, {
-    key: "selectDefaultTag",
-    value: function selectDefaultTag() {
-      this.smartTags = this.modelManager.getSmartTags();
-      this.selectTag(this.smartTags[0]);
-    }
   }]);
 
   return TagsPanelCtrl;
-}();
+}(_Controllers__WEBPACK_IMPORTED_MODULE_14__["PureCtrl"]);
 
 var TagsPanel = function TagsPanel() {
-  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, TagsPanel);
+  _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, TagsPanel);
 
   this.restrict = 'E';
   this.scope = {};
-  this.template = _tags_pug__WEBPACK_IMPORTED_MODULE_4___default.a;
+  this.template = _tags_pug__WEBPACK_IMPORTED_MODULE_9___default.a;
   this.replace = true;
   this.controller = TagsPanelCtrl;
-  this.controllerAs = 'ctrl';
+  this.controllerAs = 'self';
   this.bindToController = true;
 };
 
@@ -14712,9 +14666,13 @@ var APP_STATE_EVENT_DESKTOP_EXTS_READY = 8;
 var AppState =
 /*#__PURE__*/
 function () {
-  function AppState() {
+  AppState.$inject = ["$timeout"];
+
+  /* @ngInject */
+  function AppState($timeout) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, AppState);
 
+    this.$timeout = $timeout;
     this.observers = [];
   }
 
@@ -14727,29 +14685,37 @@ function () {
   }, {
     key: "notifyEvent",
     value: function notifyEvent(eventName, data) {
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
+      var _this = this;
 
-      try {
-        for (var _iterator = this.observers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var callback = _step.value;
-          callback(eventName, data);
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
+      /** 
+       * Timeout is particullary important so we can give all initial 
+       * controllers a chance to construct before propogting any events *
+       */
+      this.$timeout(function () {
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
         try {
-          if (!_iteratorNormalCompletion && _iterator.return != null) {
-            _iterator.return();
+          for (var _iterator = _this.observers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var callback = _step.value;
+            callback(eventName, data);
           }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
         } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return != null) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
           }
         }
-      }
+      });
     }
   }, {
     key: "setSelectedTag",
@@ -69485,7 +69451,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component section tags\" id=\"tags-column\" aria-label=\"Tags\"\u003E\u003Cdiv class=\"component-view-container\" ng-if=\"ctrl.component.active\"\u003E\u003Ccomponent-view class=\"component-view\" component=\"ctrl.component\"\u003E\u003C\u002Fcomponent-view\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"content\" id=\"tags-content\" ng-if=\"!(ctrl.component &amp;&amp; ctrl.component.active)\"\u003E\u003Cdiv class=\"tags-title-section section-title-bar\"\u003E\u003Cdiv class=\"section-title-bar-header\"\u003E\u003Cdiv class=\"sk-h3 title\"\u003E\u003Cspan class=\"sk-bold\"\u003EViews\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button sk-secondary-contrast wide\" ng-click=\"ctrl.clickedAddNewTag()\" title=\"Create a new tag\"\u003E\u003Cdiv class=\"sk-label\"\u003E\u003Ci class=\"icon ion-plus add-button\"\u003E\u003C\u002Fi\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"scrollable\"\u003E\u003Cdiv class=\"infinite-scroll\"\u003E\u003Cdiv class=\"tag\" ng-class=\"{'selected' : ctrl.selectedTag == tag, 'faded' : !tag.content.isAllTag}\" ng-click=\"ctrl.selectTag(tag)\" ng-repeat=\"tag in ctrl.smartTags\"\u003E\u003Cdiv class=\"tag-info\"\u003E\u003Cinput class=\"title\" ng-disabled=\"true\" ng-model=\"tag.title\"\u003E\u003Cdiv class=\"count\" ng-show=\"tag.content.isAllTag\"\u003E{{tag.cachedNoteCount}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"tags-title-section section-title-bar\"\u003E\u003Cdiv class=\"section-title-bar-header\"\u003E\u003Cdiv class=\"sk-h3 title\"\u003E\u003Cspan class=\"sk-bold\"\u003ETags\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"tag\" ng-class=\"{'selected' : ctrl.selectedTag == tag}\" ng-click=\"ctrl.selectTag(tag)\" ng-repeat=\"tag in ctrl.tags track by tag.uuid\"\u003E\u003Cdiv class=\"tag-info\"\u003E\u003Cdiv class=\"tag-icon\"\u003E#\u003C\u002Fdiv\u003E\u003Cinput class=\"title\" ng-attr-id=\"tag-{{tag.uuid}}\" ng-blur=\"ctrl.saveTag($event, tag)\" ng-change=\"ctrl.tagTitleDidChange(tag)\" ng-class=\"{'editing' : ctrl.editingTag == tag}\" ng-click=\"ctrl.selectTag(tag)\" ng-keyup=\"$event.keyCode == 13 &amp;&amp; $event.target.blur()\" ng-model=\"tag.title\" should-focus=\"ctrl.newTag || ctrl.editingTag == tag\" sn-autofocus=\"true\" spellcheck=\"false\"\u003E\u003Cdiv class=\"count\"\u003E{{tag.cachedNoteCount}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"danger small-text bold\" ng-show=\"tag.content.conflict_of\"\u003EConflicted Copy\u003C\u002Fdiv\u003E\u003Cdiv class=\"danger small-text bold\" ng-show=\"tag.errorDecrypting\"\u003EMissing Keys\u003C\u002Fdiv\u003E\u003Cdiv class=\"menu\" ng-show=\"ctrl.selectedTag == tag\"\u003E\u003Ca class=\"item\" ng-click=\"ctrl.selectedRenameTag($event, tag)\" ng-show=\"!ctrl.editingTag\"\u003ERename\u003C\u002Fa\u003E\u003Ca class=\"item\" ng-click=\"ctrl.saveTag($event, tag)\" ng-show=\"ctrl.editingTag\"\u003ESave\u003C\u002Fa\u003E\u003Ca class=\"item\" ng-click=\"ctrl.selectedDeleteTag(tag)\"\u003EDelete\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"no-tags-placeholder\" ng-show=\"ctrl.tags.length == 0\"\u003ENo tags. Create one using the add button above.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cpanel-resizer collapsable=\"true\" control=\"ctrl.panelController\" default-width=\"150\" hoverable=\"true\" on-resize-finish=\"ctrl.onPanelResize\" panel-id=\"'tags-column'\"\u003E\u003C\u002Fpanel-resizer\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component section tags\" id=\"tags-column\" aria-label=\"Tags\"\u003E\u003Cdiv class=\"component-view-container\" ng-if=\"self.component.active\"\u003E\u003Ccomponent-view class=\"component-view\" component=\"self.component\"\u003E\u003C\u002Fcomponent-view\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"content\" id=\"tags-content\" ng-if=\"!(self.component &amp;&amp; self.component.active)\"\u003E\u003Cdiv class=\"tags-title-section section-title-bar\"\u003E\u003Cdiv class=\"section-title-bar-header\"\u003E\u003Cdiv class=\"sk-h3 title\"\u003E\u003Cspan class=\"sk-bold\"\u003EViews\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button sk-secondary-contrast wide\" ng-click=\"self.clickedAddNewTag()\" title=\"Create a new tag\"\u003E\u003Cdiv class=\"sk-label\"\u003E\u003Ci class=\"icon ion-plus add-button\"\u003E\u003C\u002Fi\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"scrollable\"\u003E\u003Cdiv class=\"infinite-scroll\"\u003E\u003Cdiv class=\"tag\" ng-class=\"{'selected' : self.state.selectedTag == tag, 'faded' : !tag.content.isAllTag}\" ng-click=\"self.selectTag(tag)\" ng-repeat=\"tag in self.state.smartTags\"\u003E\u003Cdiv class=\"tag-info\"\u003E\u003Cinput class=\"title\" ng-disabled=\"true\" ng-model=\"tag.title\"\u003E\u003Cdiv class=\"count\" ng-show=\"tag.content.isAllTag\"\u003E{{tag.cachedNoteCount}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"tags-title-section section-title-bar\"\u003E\u003Cdiv class=\"section-title-bar-header\"\u003E\u003Cdiv class=\"sk-h3 title\"\u003E\u003Cspan class=\"sk-bold\"\u003ETags\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"tag\" ng-class=\"{'selected' : self.state.selectedTag == tag}\" ng-click=\"self.selectTag(tag)\" ng-repeat=\"tag in self.state.tags track by tag.uuid\"\u003E\u003Cdiv class=\"tag-info\"\u003E\u003Cdiv class=\"tag-icon\"\u003E#\u003C\u002Fdiv\u003E\u003Cinput class=\"title\" ng-attr-id=\"tag-{{tag.uuid}}\" ng-blur=\"self.saveTag($event, tag)\" ng-change=\"self.tagTitleDidChange(tag)\" ng-class=\"{'editing' : self.state.editingTag == tag}\" ng-click=\"self.selectTag(tag)\" ng-keyup=\"$event.keyCode == 13 &amp;&amp; $event.target.blur()\" ng-model=\"tag.title\" should-focus=\"self.state.newTag || self.state.editingTag == tag\" sn-autofocus=\"true\" spellcheck=\"false\"\u003E\u003Cdiv class=\"count\"\u003E{{tag.cachedNoteCount}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"danger small-text bold\" ng-show=\"tag.content.conflict_of\"\u003EConflicted Copy\u003C\u002Fdiv\u003E\u003Cdiv class=\"danger small-text bold\" ng-show=\"tag.errorDecrypting\"\u003EMissing Keys\u003C\u002Fdiv\u003E\u003Cdiv class=\"menu\" ng-show=\"self.state.selectedTag == tag\"\u003E\u003Ca class=\"item\" ng-click=\"self.selectedRenameTag($event, tag)\" ng-show=\"!self.state.editingTag\"\u003ERename\u003C\u002Fa\u003E\u003Ca class=\"item\" ng-click=\"self.saveTag($event, tag)\" ng-show=\"self.state.editingTag\"\u003ESave\u003C\u002Fa\u003E\u003Ca class=\"item\" ng-click=\"self.selectedDeleteTag(tag)\"\u003EDelete\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"no-tags-placeholder\" ng-show=\"self.state.tags.length == 0\"\u003ENo tags. Create one using the add button above.\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cpanel-resizer collapsable=\"true\" control=\"self.panelController\" default-width=\"150\" hoverable=\"true\" on-resize-finish=\"self.onPanelResize\" panel-id=\"'tags-column'\"\u003E\u003C\u002Fpanel-resizer\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),

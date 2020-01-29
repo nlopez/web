@@ -28,15 +28,15 @@ import {
  * This is the height of a note cell with nothing but the title,
  * which *is* a display option
  */
-const MIN_NOTE_CELL_HEIGHT   = 51.0;
+const MIN_NOTE_CELL_HEIGHT = 51.0;
 const DEFAULT_LIST_NUM_NOTES = 20;
 
-const SORT_KEY_CREATED_AT        = 'created_at';
-const SORT_KEY_UPDATED_AT        = 'updated_at';
+const SORT_KEY_CREATED_AT = 'created_at';
+const SORT_KEY_UPDATED_AT = 'updated_at';
 const SORT_KEY_CLIENT_UPDATED_AT = 'client_updated_at';
-const SORT_KEY_TITLE             = 'title';
+const SORT_KEY_TITLE = 'title';
 
-const ELEMENT_ID_SEARCH_BAR      = 'search-bar';
+const ELEMENT_ID_SEARCH_BAR = 'search-bar';
 
 class NotesCtrl {
 
@@ -64,10 +64,11 @@ class NotesCtrl {
     this.$rootScope = $rootScope;
     this.$timeout = $timeout;
 
+    this.notes = [];
     this.searchSubmitted = false;
-    this.noteFilter = { text : '' };
+    this.noteFilter = { text: '' };
     this.panelController = {};
-    window.onresize = (event) =>   {
+    window.onresize = (event) => {
       this.resetPagination({
         keepCurrentIfLarger: true
       });
@@ -87,24 +88,17 @@ class NotesCtrl {
 
   addAppStateObserver() {
     this.appState.addObserver((eventName, data) => {
-      if(eventName === APP_STATE_EVENT_TAG_CHANGED) {
-        if(this.selectedNote && this.selectedNote.dummy) {
-          this.modelManager.removeItemLocally(this.selectedNote);
-          this.selectNote(null);
-        }
-        this.tag = this.appState.getSelectedTag();
-        this.tagDidChange(this.tag, data.previousTag);
-      } else if(eventName === APP_STATE_EVENT_NOTE_CHANGED) {
+      if (eventName === APP_STATE_EVENT_TAG_CHANGED) {
+        this.tagDidChange(this.appState.getSelectedTag(), data.previousTag);
+      } else if (eventName === APP_STATE_EVENT_NOTE_CHANGED) {
         this.selectedNote = this.appState.getSelectedNote();
-        if(!this.selectedNote) {
-          this.reloadNotes().then(() => {
-            this.selectNextOrCreateNew();
-          });
+        if (!this.selectedNote) {
+          this.selectNextOrCreateNew();
         }
-      } else if(eventName === APP_STATE_EVENT_PREFERENCES_CHANGED) {
+      } else if (eventName === APP_STATE_EVENT_PREFERENCES_CHANGED) {
         this.loadPreferences();
         this.reloadNotes();
-      } else if(eventName === APP_STATE_EVENT_EDITOR_FOCUSED) {
+      } else if (eventName === APP_STATE_EVENT_EDITOR_FOCUSED) {
         this.showMenu = false;
       }
     })
@@ -112,9 +106,9 @@ class NotesCtrl {
 
   addSignInObserver() {
     this.authManager.addEventHandler((event) => {
-      if(event === SFAuthManager.DidSignInEvent) {
+      if (event === SFAuthManager.DidSignInEvent) {
         /** Delete dummy note if applicable */
-        if(this.selectedNote && this.selectedNote.dummy) {
+        if (this.selectedNote && this.selectedNote.dummy) {
           this.modelManager.removeItemLocally(this.selectedNote);
           _.pull(this.notes, this.selectedNote);
           this.selectedNote = null;
@@ -132,13 +126,13 @@ class NotesCtrl {
 
   addSyncEventHandler() {
     this.syncManager.addEventHandler((syncEvent, data) => {
-      if(syncEvent === 'local-data-loaded') {
-        if(this.notes.length == 0) {
+      if (syncEvent === 'local-data-loaded') {
+        if (this.notes.length === 0) {
           this.createNewNote();
         }
-      } else if(syncEvent === 'sync:completed') {
+      } else if (syncEvent === 'sync:completed') {
         this.$timeout(() => {
-          if(this.createDummyOnSynCompletionIfNoNotes && this.notes.length == 0) {
+          if (this.createDummyOnSynCompletionIfNoNotes && this.notes.length === 0) {
             this.createDummyOnSynCompletionIfNoNotes = false;
             this.createNewNote();
           }
@@ -152,62 +146,54 @@ class NotesCtrl {
       'note-list',
       '*',
       (allItems, validItems, deletedItems, source, sourceKey) => {
-        if(
+        if (
           this.selectedNote &&
           (this.selectedNote.deleted || this.selectedNote.content.trashed)
         ) {
           this.selectNextOrCreateNew();
         }
+
         this.reloadNotes();
+        if (!this.notes.includes(this.selectedNote)) {
+          this.selectNextOrCreateNew();
+        }
 
         /** Note has changed values, reset its flags */
         const notes = allItems.filter((item) => item.content_type === 'Note');
-        for(const note of notes) {
+        for (const note of notes) {
           this.loadFlagsForNote(note);
           note.cachedCreatedAtString = note.createdAtString();
           note.cachedUpdatedAtString = note.updatedAtString();
         }
 
         /** Select first note if none is selected */
-        if(!this.selectedNote) {
+        if (!this.selectedNote) {
           this.$timeout(() => {
             /** Required to be in timeout since selecting notes depends on rendered notes */
             this.selectFirstNote();
           })
         }
-    });
+      });
   }
 
-  async setNotes(notes) {
-    notes = this.filterNotes(notes);
-    notes = this.sortNotes(
-      notes,
+  reloadNotes() {
+    if (!this.tag) {
+      return;
+    }
+    const tagNotes = this.tag.notes;
+    const notes = this.sortNotes(
+      this.filterNotes(tagNotes),
       this.sortBy,
       this.sortReverse
     );
-    for(let note of notes) {
+    for (const note of notes) {
+      if (note.errorDecrypting) {
+        this.loadFlagsForNote(note);
+      }
       note.shouldShowTags = this.shouldShowTagsForNote(note);
     }
     this.notes = notes;
     this.reloadPanelTitle();
-  }
-
-  async reloadNotes() {
-    const notes = this.tag.notes;
-    for(const note of notes) {
-      if(note.errorDecrypting) {
-        this.loadFlagsForNote(note);
-      }
-    }
-    this.setNotes(notes).then(() => {
-      if(!this.notes.includes(this.selectedNote)) {
-        this.selectNextOrCreateNew();
-      }
-    })
-  }
-
-  reorderNotes() {
-    this.reloadNotes();
   }
 
   loadPreferences() {
@@ -220,11 +206,11 @@ class NotesCtrl {
       PREF_SORT_NOTES_REVERSE,
       false
     );
-    if(this.sortBy === SORT_KEY_UPDATED_AT) {
+    if (this.sortBy === SORT_KEY_UPDATED_AT) {
       /** Use client_updated_at instead */
       this.sortBy = SORT_KEY_CLIENT_UPDATED_AT;
     }
-    if(prevSortValue && prevSortValue != this.sortBy) {
+    if (prevSortValue && prevSortValue !== this.sortBy) {
       this.$timeout(() => {
         this.selectFirstNote();
       })
@@ -253,9 +239,9 @@ class NotesCtrl {
     const width = this.preferencesManager.getValue(
       PREF_NOTES_PANEL_WIDTH
     );
-    if(width) {
+    if (width) {
       this.panelController.setWidth(width);
-      if(this.panelController.isCollapsed()) {
+      if (this.panelController.isCollapsed()) {
         this.appState.panelDidResize({
           name: PANEL_NAME_NOTES,
           collapsed: this.panelController.isCollapsed()
@@ -276,78 +262,50 @@ class NotesCtrl {
     });
   }
 
-  selectNextOrCreateNew() {
-    const displayableNotes = this.displayableNotes();
-    let index;
-    if(this.selectedIndex < displayableNotes.length) {
-      index = Math.max(this.selectedIndex, 0);
-    } else {
-      index = 0;
-    }
-
-    let note = displayableNotes[index];
-    /** Dont auto-select protected notes */
-    while(note && note.content.protected) {
-      index++;
-      if(index >= displayableNotes.length) {
-        break;
-      }
-      note = displayableNotes[index];
-    }
-
-    if(note) {
-      this.selectNote(note);
-    } else if(!this.tag || !this.tag.isSmartTag()) {
-      this.createNewNote();
-    } else {
-      this.selectNote(null);
-    }
-  }
-
   paginate() {
     this.notesToDisplay += this.pageSize
-    if(this.searchSubmitted) {
+    if (this.searchSubmitted) {
       this.desktopManager.searchText(this.noteFilter.text);
     }
   }
 
-  resetPagination({keepCurrentIfLarger} = {}) {
+  resetPagination({ keepCurrentIfLarger } = {}) {
     const clientHeight = document.documentElement.clientHeight;
     this.pageSize = clientHeight / MIN_NOTE_CELL_HEIGHT;
-    if(this.pageSize === 0) {
+    if (this.pageSize === 0) {
       this.pageSize = DEFAULT_LIST_NUM_NOTES;
     }
-    if(keepCurrentIfLarger && this.notesToDisplay > this.pageSize) {
+    if (keepCurrentIfLarger && this.notesToDisplay > this.pageSize) {
       return;
     }
     this.notesToDisplay = this.pageSize;
   }
 
   reloadPanelTitle() {
-    if(this.isFiltering()) {
+    if (this.isFiltering()) {
       const resultCount = this.notes.filter((i) => i.visible).length
       this.panelTitle = `${resultCount} search results`;
-    } else if(this.tag) {
+    } else if (this.tag) {
       this.panelTitle = `${this.tag.title}`;
     }
   }
 
   optionsSubtitle() {
     let base = "";
-    if(this.sortBy == 'created_at') {
+    if (this.sortBy === 'created_at') {
       base += " Date Added";
-    } else if(this.sortBy == 'client_updated_at') {
+    } else if (this.sortBy === 'client_updated_at') {
       base += " Date Modified";
-    } else if(this.sortBy == 'title') {
+    } else if (this.sortBy === 'title') {
       base += " Title";
     }
-    if(this.showArchived) {
+    if (this.showArchived) {
       base += " | + Archived"
     }
-    if(this.hidePinned) {
+    if (this.hidePinned) {
       base += " | – Pinned"
     }
-    if(this.sortReverse) {
+    if (this.sortReverse) {
       base += " | Reversed"
     }
     return base;
@@ -355,49 +313,49 @@ class NotesCtrl {
 
   loadFlagsForNote(note) {
     const flags = [];
-    if(note.pinned) {
+    if (note.pinned) {
       flags.push({
         text: "Pinned",
         class: 'info'
       })
     }
-    if(note.archived) {
+    if (note.archived) {
       flags.push({
         text: "Archived",
         class: 'warning'
       })
     }
-    if(note.content.protected) {
+    if (note.content.protected) {
       flags.push({
         text: "Protected",
         class: 'success'
       })
     }
-    if(note.locked) {
+    if (note.locked) {
       flags.push({
         text: "Locked",
         class: 'neutral'
       })
     }
-    if(note.content.trashed) {
+    if (note.content.trashed) {
       flags.push({
         text: "Deleted",
         class: 'danger'
       })
     }
-    if(note.content.conflict_of) {
+    if (note.content.conflict_of) {
       flags.push({
         text: "Conflicted Copy",
         class: 'danger'
       })
     }
-    if(note.errorDecrypting) {
+    if (note.errorDecrypting) {
       flags.push({
         text: "Missing Keys",
         class: 'danger'
       })
     }
-    if(note.deleted) {
+    if (note.deleted) {
       flags.push({
         text: "Deletion Pending Sync",
         class: 'danger'
@@ -407,37 +365,39 @@ class NotesCtrl {
     return flags;
   }
 
-  tagDidChange(tag, oldTag) {
+  async tagDidChange(tag, previousTag) {
+    if (this.selectedNote && this.selectedNote.dummy) {
+      this.modelManager.removeItemLocally(this.selectedNote);
+    }
+
+    this.tag = tag;
+
     const scrollable = document.getElementById('notes-scrollable');
-    if(scrollable) {
+    if (scrollable) {
       scrollable.scrollTop = 0;
       scrollable.scrollLeft = 0;
     }
     this.resetPagination();
     this.showMenu = false;
-    if(this.selectedNote) {
-      if(this.selectedNote.dummy && oldTag) {
-        _.remove(oldTag.notes, this.selectedNote);
+    if (this.selectedNote && this.selectedNote.dummy) {
+      if (previousTag) {
+        _.remove(previousTag.notes, this.selectedNote);
       }
-      this.selectNote(null);
     }
 
     this.noteFilter.text = '';
     this.desktopManager.searchText();
-    this.reloadNotes().then(() => {
-      if(this.notes.length > 0) {
-        this.notes.forEach((note) => { note.visible = true; })
-        this.selectFirstNote();
-      } else if(this.syncManager.initialDataLoaded()) {
-        if(!tag.isSmartTag() || tag.content.isAllTag) {
-          this.createNewNote();
-        } else {
-          if(this.selectedNote && !this.notes.includes(this.selectedNote)) {
-            this.selectNote(null);
-          }
-        }
+    this.reloadNotes();
+    if (this.notes.length > 0) {
+      this.notes.forEach((note) => { note.visible = true; })
+      this.selectFirstNote();
+    } else if (this.syncManager.initialDataLoaded()) {
+      if (!tag.isSmartTag() || tag.content.isAllTag) {
+        this.createNewNote();
+      } else if (this.selectedNote && !this.notes.includes(this.selectedNote)) {
+        this.selectNote(null);
       }
-    })
+    }
   }
 
   displayableNotes() {
@@ -446,25 +406,50 @@ class NotesCtrl {
     });
   }
 
-  selectFirstNote() {
+  getFirstNonProtectedNote() {
     const displayableNotes = this.displayableNotes();
-    if(displayableNotes.length > 0) {
-      this.selectNote(displayableNotes[0]);
+    let index = 0;
+    let note = displayableNotes[index];
+    while (note && note.content.protected) {
+      index++;
+      if (index >= displayableNotes.length) {
+        break;
+      }
+      note = displayableNotes[index];
+    }
+    return note;
+  }
+
+  selectFirstNote() {
+    const note = this.getFirstNonProtectedNote();
+    if (note) {
+      this.selectNote(note);
     }
   }
 
   selectNextNote() {
     const displayableNotes = this.displayableNotes();
     const currentIndex = displayableNotes.indexOf(this.selectedNote);
-    if(currentIndex + 1 < displayableNotes.length) {
+    if (currentIndex + 1 < displayableNotes.length) {
       this.selectNote(displayableNotes[currentIndex + 1]);
+    }
+  }
+
+  selectNextOrCreateNew() {
+    const note = this.getFirstNonProtectedNote();
+    if (note) {
+      this.selectNote(note);
+    } else if (!this.tag || !this.tag.isSmartTag()) {
+      this.createNewNote();
+    } else {
+      this.selectNote(null);
     }
   }
 
   selectPreviousNote() {
     const displayableNotes = this.displayableNotes();
     const currentIndex = displayableNotes.indexOf(this.selectedNote);
-    if(currentIndex - 1 >= 0) {
+    if (currentIndex - 1 >= 0) {
       this.selectNote(displayableNotes[currentIndex - 1]);
       return true;
     } else {
@@ -473,17 +458,17 @@ class NotesCtrl {
   }
 
   async selectNote(note, viaClick = false) {
-    if(this.selectedNote === note) {
+    if (this.selectedNote === note) {
       return;
     }
-    if(!note) {
+    if (!note) {
       this.appState.setSelectedNote(null);
       return;
     }
     const run = () => {
       this.$timeout(() => {
         let dummyNote;
-        if(this.selectedNote
+        if (this.selectedNote
           && this.selectedNote !== note
           && this.selectedNote.dummy
         ) {
@@ -497,7 +482,7 @@ class NotesCtrl {
           this.displayableNotes().indexOf(note),
         );
 
-        if(note.content.conflict_of) {
+        if (note.content.conflict_of) {
           note.content.conflict_of = null;
           this.modelManager.setItemDirty(note);
           this.syncManager.sync();
@@ -508,20 +493,20 @@ class NotesCtrl {
          * removing the dummy. Otherwise, you'll click a note, remove this one,
          * and strangely, the click event registers for a lower cell.
          */
-        if(dummyNote && dummyNote.dummy == true) {
+        if (dummyNote && dummyNote.dummy === true) {
           this.$timeout(() => {
             this.modelManager.removeItemLocally(dummyNote);
             _.pull(this.notes, dummyNote);
           }, 250)
         }
 
-        if(viaClick && this.isFiltering()) {
+        if (viaClick && this.isFiltering()) {
           this.desktopManager.searchText(this.noteFilter.text);
         }
       })
     }
 
-    if(note.content.protected &&
+    if (note.content.protected &&
       await this.privilegesManager.actionRequiresPrivilege(
         PrivilegesManager.ActionViewProtectedNotes
       )) {
@@ -541,7 +526,7 @@ class NotesCtrl {
   }
 
   createNewNote() {
-    if(this.selectedNote && this.selectedNote.dummy) {
+    if (this.selectedNote && this.selectedNote.dummy) {
       return;
     }
     const title = "Note" + (this.notes ? (" " + (this.notes.length + 1)) : "");
@@ -562,7 +547,7 @@ class NotesCtrl {
     this.modelManager.addItem(note);
     this.modelManager.setItemDirty(note);
     const selectedTag = this.appState.getSelectedTag();
-    if(!selectedTag.isSmartTag()) {
+    if (!selectedTag.isSmartTag()) {
       selectedTag.addItemAsRelationship(note);
       this.modelManager.setItemDirty(selectedTag);
     }
@@ -576,11 +561,11 @@ class NotesCtrl {
   }
 
   filterTextChanged() {
-    if(this.searchSubmitted) {
+    if (this.searchSubmitted) {
       this.searchSubmitted = false;
     }
     this.reloadNotes().then(() => {
-      if(!this.selectedNote.visible) {
+      if (!this.selectedNote.visible) {
         this.selectFirstNote();
       }
     })
@@ -622,7 +607,7 @@ class NotesCtrl {
   toggleReverseSort() {
     this.selectedMenuItem();
     this.sortReverse = !this.sortReverse;
-    this.reorderNotes();
+    this.reloadNotes();
     this.preferencesManager.setUserPrefValue(
       PREF_SORT_NOTES_REVERSE,
       this.sortReverse
@@ -632,7 +617,7 @@ class NotesCtrl {
 
   setSortBy(type) {
     this.sortBy = type;
-    this.reorderNotes();
+    this.reloadNotes();
     this.preferencesManager.setUserPrefValue(
       PREF_SORT_NOTES_BY,
       this.sortBy
@@ -641,13 +626,13 @@ class NotesCtrl {
   }
 
   shouldShowTagsForNote(note) {
-    if(this.hideTags || note.content.protected) {
+    if (this.hideTags || note.content.protected) {
       return false;
     }
-    if(this.tag.content.isAllTag) {
+    if (this.tag.content.isAllTag) {
       return note.tags && note.tags.length > 0;
     }
-    if(this.tag.isSmartTag()) {
+    if (this.tag.isSmartTag()) {
       return true;
     }
     /**
@@ -659,21 +644,22 @@ class NotesCtrl {
 
   filterNotes(notes) {
     return notes.filter((note) => {
-      let canShowArchived = this.showArchived, canShowPinned = !this.hidePinned;
+      let canShowArchived = this.showArchived;
+      const canShowPinned = !this.hidePinned;
       const isTrash = this.tag.content.isTrashTag;
-      if(!isTrash && note.content.trashed) {
+      if (!isTrash && note.content.trashed) {
         note.visible = false;
         return note.visible;
       }
       const isSmartTag = this.tag.isSmartTag();
-      if(isSmartTag) {
+      if (isSmartTag) {
         canShowArchived = (
           canShowArchived ||
           this.tag.content.isArchiveTag ||
           isTrash
         );
       }
-      if(
+      if (
         (note.archived && !canShowArchived) ||
         (note.pinned && !canShowPinned)
       ) {
@@ -681,14 +667,14 @@ class NotesCtrl {
         return note.visible;
       }
       const filterText = this.noteFilter.text.toLowerCase();
-      if(filterText.length == 0) {
+      if (filterText.length === 0) {
         note.visible = true;
       } else {
         const words = filterText.split(" ");
-        const matchesTitle = words.every(function(word) {
+        const matchesTitle = words.every(function (word) {
           return note.safeTitle().toLowerCase().indexOf(word) >= 0;
         });
-        const matchesBody = words.every(function(word) {
+        const matchesBody = words.every(function (word) {
           return note.safeText().toLowerCase().indexOf(word) >= 0;
         });
         note.visible = matchesTitle || matchesBody;
@@ -699,42 +685,42 @@ class NotesCtrl {
 
   sortNotes(items, sortBy, reverse) {
     const sortValueFn = (a, b, pinCheck = false) => {
-      if(a.dummy) { return -1; }
-      if(b.dummy) { return 1; }
-      if(!pinCheck) {
-        if(a.pinned && b.pinned) {
+      if (a.dummy) { return -1; }
+      if (b.dummy) { return 1; }
+      if (!pinCheck) {
+        if (a.pinned && b.pinned) {
           return sortValueFn(a, b, true);
         }
-        if(a.pinned) { return -1; }
-        if(b.pinned) { return 1; }
+        if (a.pinned) { return -1; }
+        if (b.pinned) { return 1; }
       }
 
       let aValue = a[sortBy] || '';
       let bValue = b[sortBy] || '';
       let vector = 1;
-      if(reverse) {
+      if (reverse) {
         vector *= -1;
       }
-      if(sortBy === SORT_KEY_TITLE) {
+      if (sortBy === SORT_KEY_TITLE) {
         aValue = aValue.toLowerCase();
         bValue = bValue.toLowerCase();
-        if(aValue.length == 0 && bValue.length == 0) {
+        if (aValue.length === 0 && bValue.length === 0) {
           return 0;
-        } else if(aValue.length == 0 && bValue.length != 0) {
+        } else if (aValue.length === 0 && bValue.length !== 0) {
           return 1 * vector;
-        } else if(aValue.length != 0 && bValue.length == 0) {
+        } else if (aValue.length !== 0 && bValue.length === 0) {
           return -1 * vector;
-        } else  {
+        } else {
           vector *= -1;
         }
       }
-      if(aValue > bValue) { return -1 * vector;}
-      else if(aValue < bValue) { return 1 * vector;}
+      if (aValue > bValue) { return -1 * vector; }
+      else if (aValue < bValue) { return 1 * vector; }
       return 0;
     }
 
     items = items || [];
-    const result = items.sort(function(a, b){
+    const result = items.sort(function (a, b) {
       return sortValueFn(a, b);
     })
     return result;
@@ -772,7 +758,7 @@ class NotesCtrl {
       ],
       onKeyDown: (event) => {
         const searchBar = this.getSearchBar();
-        if(searchBar === document.activeElement) {
+        if (searchBar === document.activeElement) {
           searchBar.blur()
         }
         this.$timeout(() => {
@@ -799,7 +785,7 @@ class NotesCtrl {
       ],
       onKeyDown: (event) => {
         const searchBar = this.getSearchBar();
-        if(searchBar) {searchBar.focus()};
+        if (searchBar) { searchBar.focus() };
       }
     })
   }
