@@ -4,6 +4,7 @@ import { isDesktopApplication } from '@/utils';
 import { KeyboardManager } from '@/services/keyboardManager';
 import { PrivilegesManager } from '@/services/privilegesManager';
 import template from '%/editor.pug';
+import { PureCtrl } from '@Controllers';
 import {
   APP_STATE_EVENT_NOTE_CHANGED,
   APP_STATE_EVENT_PREFERENCES_CHANGED
@@ -32,21 +33,21 @@ const SAVE_TIMEOUT_DEBOUNCE = 350;
 const SAVE_TIMEOUT_NO_DEBOUNCE = 100;
 const EDITOR_DEBOUNCE = 200;
 
-const APP_DATA_KEY_PINNED               = 'pinned';
-const APP_DATA_KEY_LOCKED               = 'locked';
-const APP_DATA_KEY_ARCHIVED             = 'archived';
+const APP_DATA_KEY_PINNED = 'pinned';
+const APP_DATA_KEY_LOCKED = 'locked';
+const APP_DATA_KEY_ARCHIVED = 'archived';
 const APP_DATA_KEY_PREFERS_PLAIN_EDITOR = 'prefersPlainEditor';
 
-const ELEMENT_ID_NOTE_TEXT_EDITOR  = 'note-text-editor';
+const ELEMENT_ID_NOTE_TEXT_EDITOR = 'note-text-editor';
 const ELEMENT_ID_NOTE_TITLE_EDITOR = 'note-title-editor';
-const ELEMENT_ID_EDITOR_CONTENT    = 'editor-content';
+const ELEMENT_ID_EDITOR_CONTENT = 'editor-content';
 const ELEMENT_ID_NOTE_TAGS_COMPONENT_CONTAINER = 'note-tags-component-container';
 
 const DESKTOP_MONOSPACE_FAMILY = `Menlo,Consolas,'DejaVu Sans Mono',monospace`;
-const WEB_MONOSPACE_FAMILY     = `monospace`;
-const SANS_SERIF_FAMILY        = `inherit`;
+const WEB_MONOSPACE_FAMILY = `monospace`;
+const SANS_SERIF_FAMILY = `inherit`;
 
-class EditorCtrl {
+class EditorCtrl extends PureCtrl {
   /* @ngInject */
   constructor(
     $timeout,
@@ -64,8 +65,8 @@ class EditorCtrl {
     sessionHistory /** Unused below, required to load globally */,
     syncManager,
   ) {
+    super($timeout);
     this.$rootScope = $rootScope;
-    this.$timeout = $timeout;
     this.alertManager = alertManager;
     this.appState = appState;
     this.actionsManager = actionsManager;
@@ -78,10 +79,13 @@ class EditorCtrl {
     this.privilegesManager = privilegesManager;
     this.syncManager = syncManager;
 
-    this.componentStack = [];
-    this.editorDebounce = EDITOR_DEBOUNCE;
-    this.isDesktop = isDesktopApplication();
-    this.spellcheck = true;
+    this.state = {
+      componentStack: [],
+      editorDebounce: EDITOR_DEBOUNCE,
+      isDesktop: isDesktopApplication(),
+      spellcheck: true
+    }
+
     this.leftResizeControl = {};
     this.rightResizeControl = {};
 
@@ -100,14 +104,60 @@ class EditorCtrl {
 
   addAppStateObserver() {
     this.appState.addObserver((eventName, data) => {
-      if(eventName === APP_STATE_EVENT_NOTE_CHANGED) {
-        this.note = this.appState.getSelectedNote();
-        this.setNote(this.note, data.previousNote);
-        this.reloadComponentContext();
-      } else if(eventName === APP_STATE_EVENT_PREFERENCES_CHANGED) {
+      if (eventName === APP_STATE_EVENT_NOTE_CHANGED) {
+        this.handleNoteSelectionChange(
+          this.appState.getSelectedNote(),
+          data.previousNote
+        );
+      } else if (eventName === APP_STATE_EVENT_PREFERENCES_CHANGED) {
         this.loadPreferences();
       }
     })
+  }
+
+  async handleNoteSelectionChange(note, previousNote) {
+    this.setState({
+      note: this.appState.getSelectedNote(),
+      showExtensions: false,
+      showOptionsMenu: false,
+      altKeyDown: false,
+      noteStatus: null
+    })
+    if (!note) {
+      return;
+    }
+    const associatedEditor = this.editorForNote(note);
+    if (associatedEditor && associatedEditor !== this.state.selectedEditor) {
+      /**
+       * Setting note to not ready will remove the editor from view in a flash,
+       * so we only want to do this if switching between external editors
+       */
+      this.setState({
+        noteReady: false,
+        selectedEditor: associatedEditor
+      });
+    } else if (!associatedEditor) {
+      /** No editor */
+      this.setState({
+        selectedEditor: null
+      });
+    }
+    await this.setState({
+      noteReady: true,
+    });
+    this.reloadTagsString();
+    this.loadPreferences();
+
+    if (note.safeText().length === 0 && note.dummy) {
+      this.focusTitle(100);
+    }
+    if (previousNote && previousNote !== note) {
+      if (previousNote.dummy) {
+        this.performNoteDeletion(previousNote);
+      }
+    }
+
+    this.reloadComponentContext();
   }
 
   addMappingObservers() {
@@ -115,95 +165,101 @@ class EditorCtrl {
       'editor-note-observer',
       'Note',
       (allItems, validItems, deletedItems, source) => {
-        if(!this.note) {
+        if (!this.state.note) {
           return;
         }
-        if(this.note.deleted || this.note.content.trashed) {
+        if (this.state.note.deleted || this.state.note.content.trashed) {
           return;
         }
-        if(!SFModelManager.isMappingSourceRetrieved(source)) {
+        if (!SFModelManager.isMappingSourceRetrieved(source)) {
           return;
         }
         const matchingNote = allItems.find((item) => {
-          return item.uuid === this.note.uuid;
+          return item.uuid === this.state.note.uuid;
         });
-        if(!matchingNote) {
+        if (!matchingNote) {
           return;
         }
-        this.loadTagsString();
-    });
+        this.reloadTagsString();
+      });
 
     this.modelManager.addItemSyncObserver(
       'editor-tag-observer',
       'Tag',
       (allItems, validItems, deletedItems, source) => {
-        if(!this.note) {
+        if (!this.state.note) {
           return;
         }
-        for(const tag of allItems) {
-          if(
-            !this.note.savedTagsString ||
+        for (const tag of allItems) {
+          if (
+            !this.state.note.savedTagsString ||
             tag.deleted ||
-            tag.hasRelationshipWithItem(this.note)
+            tag.hasRelationshipWithItem(this.state.note)
           ) {
-            this.loadTagsString();
+            this.reloadTagsString();
             break;
           }
         }
-    });
+      });
 
     this.modelManager.addItemSyncObserver(
       'editor-component-observer',
       'SN|Component',
       (allItems, validItems, deletedItems, source) => {
-        if(!this.note) {
+        if (!this.state.note) {
           return;
         }
         /** Reload componentStack in case new ones were added or removed */
         this.reloadComponentStackArray();
         /** Observe editor changes to see if the current note should update its editor */
-        const editors = allItems.filter(function(item) {
+        const editors = allItems.filter(function (item) {
           return item.isEditor();
         });
-        if(editors.length == 0) {
+        if (editors.length === 0) {
           return;
         }
         /** Find the most recent editor for note */
-        const editor = this.editorForNote(this.note);
-        this.selectedEditor = editor;
-        if(!editor) {
+        const editor = this.editorForNote(this.state.note);
+        this.setState({
+          selectedEditor: editor
+        })
+        if (!editor) {
           this.reloadFont();
         }
-    });
+      });
   }
 
   addSyncEventHandler() {
     this.syncManager.addEventHandler((eventName, data) => {
-      if(!this.note) {
+      if (!this.state.note) {
         return;
       }
-      if(eventName === 'sync:taking-too-long') {
-        this.syncTakingTooLong = true;
-      } else if(eventName === 'sync:completed') {
-        this.syncTakingTooLong = false;
-        if(this.note.dirty) {
+      if (eventName === 'sync:taking-too-long') {
+        this.setState({
+          syncTakingTooLong: true
+        })
+      } else if (eventName === 'sync:completed') {
+        this.setState({
+          syncTakingTooLong: false
+        })
+        if (this.state.note.dirty) {
           /** if we're still dirty, don't change status, a sync is likely upcoming. */
         } else {
           const savedItem = data.savedItems.find((item) => {
-            return item.uuid === this.note.uuid
+            return item.uuid === this.state.note.uuid
           });
-          const isInErrorState = this.saveError;
-          if(isInErrorState || savedItem) {
+          const isInErrorState = this.state.saveError;
+          if (isInErrorState || savedItem) {
             this.showAllChangesSavedStatus();
           }
         }
-      } else if(eventName === 'sync:error') {
+      } else if (eventName === 'sync:error') {
         /**
          * Only show error status in editor if the note is dirty.
          * Otherwise, it means the originating sync came from somewhere else
          * and we don't want to display an error here.
          */
-        if(this.note.dirty){
+        if (this.state.note.dirty) {
           this.showErrorStatus();
         }
       }
@@ -212,130 +268,86 @@ class EditorCtrl {
 
   addSyncStatusObserver() {
     this.syncStatusObserver = this.syncManager.
-    registerSyncStatusObserver((status) => {
-      if(status.localError) {
-        this.$timeout(() => {
-          this.showErrorStatus({
-            message: "Offline Saving Issue",
-            desc: "Changes not saved"
-          });
-        }, 500)
-      }
-    })
-  }
-
-  setNote(note, previousNote) {
-    this.showExtensions = false;
-    this.showMenu = false;
-    this.noteStatus = null;
-    /**
-     * When setting alt key down and deleting note, an alert will come up
-     * and block the key up event when alt is released.
-     * We reset it on set note so that the alt menu restores to default.
-     */
-    this.altKeyDown = false;
-    if(!note) {
-      return;
-    }
-    this.loadTagsString();
-    const onReady = () => {
-      this.noteReady = true;
-      this.$timeout(() => {
-        this.loadPreferences();
+      registerSyncStatusObserver((status) => {
+        if (status.localError) {
+          this.$timeout(() => {
+            this.showErrorStatus({
+              message: "Offline Saving Issue",
+              desc: "Changes not saved"
+            });
+          }, 500)
+        }
       })
-    }
-    const associatedEditor = this.editorForNote(note);
-    if(associatedEditor && associatedEditor !== this.selectedEditor) {
-      /**
-       * Setting note to not ready will remove the editor from view in a flash,
-       * so we only want to do this if switching between external editors
-       */
-      this.noteReady = false;
-      /** Switch after timeout, so that note data isnt posted to current editor */
-      this.$timeout(() => {
-        this.selectedEditor = associatedEditor;
-        onReady();
-      })
-    } else if(associatedEditor) {
-      /** Same editor as currently active */
-      onReady();
-    } else {
-      /** No editor */
-      this.selectedEditor = null;
-      onReady();
-    }
-
-    if(note.safeText().length === 0 && note.dummy) {
-      this.focusTitle(100);
-    }
-    if(previousNote && previousNote !== note) {
-      if(previousNote.dummy) {
-        this.performNoteDeletion(previousNote);
-      }
-    }
   }
 
   editorForNote(note) {
     return this.componentManager.editorForNote(note);
   }
 
-  closeAllMenus() {
-    this.showEditorMenu = false;
-    this.showMenu = false;
-    this.showExtensions = false;
+  setMenuState(menu, state) {
+    this.setState({
+      [menu]: state
+    });
+    this.closeAllMenus({ exclude: menu });
   }
 
   toggleMenu(menu) {
-    this[menu] = !this[menu];
+    this.setMenuState(menu, !this.state[menu]);
+  }
+
+  closeAllMenus({ exclude } = {}) {
     const allMenus = [
-      'showMenu',
+      'showOptionsMenu',
       'showEditorMenu',
       'showExtensions',
       'showSessionHistory'
     ];
-    for(const candidate of allMenus) {
-      if(candidate != menu) {
-        this[candidate] = false;
+    const menuState = {};
+    for (const candidate of allMenus) {
+      if (candidate !== exclude) {
+        menuState[candidate] = false;
       }
     }
+    this.setState(menuState);
   }
 
   editorMenuOnSelect = (component) => {
-    if(!component || component.area === 'editor-editor') {
+    if (!component || component.area === 'editor-editor') {
       /** If plain editor or other editor */
-      this.showEditorMenu = false;
+      this.setMenuState('showEditorMenu', false);
       const editor = component;
-      if(this.selectedEditor && editor !== this.selectedEditor) {
-        this.disassociateComponentWithCurrentNote(this.selectedEditor);
+      if (this.state.selectedEditor && editor !== this.state.selectedEditor) {
+        this.disassociateComponentWithCurrentNote(this.state.selectedEditor);
       }
-      if(editor) {
-        const prefersPlain = this.note.getAppDataItem(
+      if (editor) {
+        const prefersPlain = this.state.note.getAppDataItem(
           APP_DATA_KEY_PREFERS_PLAIN_EDITOR
         ) === true;
-        if(prefersPlain) {
-          this.note.setAppDataItem(
+        if (prefersPlain) {
+          this.state.note.setAppDataItem(
             APP_DATA_KEY_PREFERS_PLAIN_EDITOR,
             false
           );
-          this.modelManager.setItemDirty(this.note);
+          this.modelManager.setItemDirty(this.state.note);
         }
         this.associateComponentWithCurrentNote(editor);
       } else {
         /** Note prefers plain editor */
-        if(!this.note.getAppDataItem(APP_DATA_KEY_PREFERS_PLAIN_EDITOR)) {
-          this.note.setAppDataItem(
+        if (!this.state.note.getAppDataItem(APP_DATA_KEY_PREFERS_PLAIN_EDITOR)) {
+          this.state.note.setAppDataItem(
             APP_DATA_KEY_PREFERS_PLAIN_EDITOR,
             true
           );
-          this.modelManager.setItemDirty(this.note);
+          this.modelManager.setItemDirty(this.state.note);
         }
-        this.$timeout(() => {
-          this.reloadFont();
-        })
+
+        this.reloadFont();
       }
 
-      this.selectedEditor = editor;
-    } else if(component.area === 'editor-stack') {
+      this.setState({
+        selectedEditor: editor
+      });
+    } else if (component.area === 'editor-stack') {
       this.toggleStackComponentForCurrentItem(component);
     }
 
@@ -344,26 +356,26 @@ class EditorCtrl {
   }
 
   hasAvailableExtensions() {
-    return this.actionsManager.extensionsInContextOfItem(this.note).length > 0;
+    return this.actionsManager.extensionsInContextOfItem(this.state.note).length > 0;
   }
 
-  focusEditor({delay} = {}) {
+  focusEditor({ delay } = {}) {
     setTimeout(() => {
       const element = document.getElementById(ELEMENT_ID_NOTE_TEXT_EDITOR);
-      if(element) {
+      if (element) {
         element.focus();
       }
     }, delay)
   }
 
   focusTitle(delay) {
-    setTimeout(function(){
+    setTimeout(function () {
       document.getElementById(ELEMENT_ID_NOTE_TITLE_EDITOR).focus();
     }, delay)
   }
 
   clickedTextArea() {
-    this.showMenu = false;
+    this.setMenuState('showOptionsMenu', false);
   }
 
   saveNote({
@@ -371,15 +383,15 @@ class EditorCtrl {
     updateClientModified,
     dontUpdatePreviews
   }) {
-    const note = this.note;
+    const note = this.state.note;
     note.dummy = false;
-    if(note.deleted) {
+    if (note.deleted) {
       this.alertManager.alert({
         text: STRING_DELETED_NOTE
       });
       return;
     }
-    if(!this.modelManager.findItem(note.uuid)) {
+    if (!this.modelManager.findItem(note.uuid)) {
       this.alertManager.alert({
         text: STRING_INVALID_NOTE
       });
@@ -388,12 +400,12 @@ class EditorCtrl {
 
     this.showSavingStatus();
 
-    if(!dontUpdatePreviews) {
+    if (!dontUpdatePreviews) {
       const text = note.text || '';
       const truncate = text.length > NOTE_PREVIEW_CHAR_LIMIT;
       const substring = text.substring(0, NOTE_PREVIEW_CHAR_LIMIT);
-      const preview_plain = substring + (truncate ? STRING_ELLIPSES : '');
-      note.content.preview_plain = preview_plain;
+      const previewPlain = substring + (truncate ? STRING_ELLIPSES : '');
+      note.content.preview_plain = previewPlain;
       note.content.preview_html = null;
     }
     this.modelManager.setItemDirty(
@@ -401,7 +413,7 @@ class EditorCtrl {
       true,
       updateClientModified
     );
-    if(this.saveTimeout) {
+    if (this.saveTimeout) {
       this.$timeout.cancel(this.saveTimeout);
     }
 
@@ -411,7 +423,7 @@ class EditorCtrl {
       : SAVE_TIMEOUT_DEBOUNCE;
     this.saveTimeout = this.$timeout(() => {
       this.syncManager.sync().then((response) => {
-        if(response && response.error && !this.didShowErrorAlert) {
+        if (response && response.error && !this.didShowErrorAlert) {
           this.didShowErrorAlert = true;
           this.alertManager.alert({
             text: STRING_GENERIC_SAVE_ERROR
@@ -423,51 +435,57 @@ class EditorCtrl {
 
   showSavingStatus() {
     this.setStatus(
-      {message: "Saving..."},
+      { message: "Saving..." },
       false
     );
   }
 
   showAllChangesSavedStatus() {
-    this.saveError = false;
-    this.syncTakingTooLong = false;
+    this.setState({
+      saveError: false,
+      syncTakingTooLong: false
+    })
     let status = "All changes saved";
-    if(this.authManager.offline()) {
+    if (this.authManager.offline()) {
       status += " (offline)";
     }
     this.setStatus(
-      {message: status}
+      { message: status }
     );
   }
 
   showErrorStatus(error) {
-    if(!error) {
+    if (!error) {
       error = {
         message: "Sync Unreachable",
         desc: "Changes saved offline"
       }
     }
-    this.saveError = true;
-    this.syncTakingTooLong = false;
+    this.setState({
+      saveError: true,
+      syncTakingTooLong: false
+    })
     this.setStatus(error);
   }
 
   setStatus(status, wait = true) {
     let waitForMs;
-    if(!this.noteStatus || !this.noteStatus.date) {
+    if (!this.state.noteStatus || !this.state.noteStatus.date) {
       waitForMs = 0;
     } else {
-      waitForMs = MINIMUM_STATUS_DURATION - (new Date() - this.noteStatus.date);
+      waitForMs = MINIMUM_STATUS_DURATION - (new Date() - this.state.noteStatus.date);
     }
-    if(!wait || waitForMs < 0) {
+    if (!wait || waitForMs < 0) {
       waitForMs = 0;
     }
-    if(this.statusTimeout) {
+    if (this.statusTimeout) {
       this.$timeout.cancel(this.statusTimeout);
     }
     this.statusTimeout = this.$timeout(() => {
       status.date = new Date();
-      this.noteStatus = status;
+      this.setState({
+        noteStatus: status
+      })
     }, waitForMs)
   }
 
@@ -503,56 +521,54 @@ class EditorCtrl {
   }
 
   selectedMenuItem(hide) {
-    if(hide) {
-      this.showMenu = false;
+    if (hide) {
+      this.setMenuState('showOptionsMenu', false);
     }
   }
 
   async deleteNote(permanently) {
-    if(this.note.dummy) {
+    if (this.state.note.dummy) {
       this.alertManager.alert({
         text: STRING_DELETE_PLACEHOLDER_ATTEMPT
       });
       return;
     }
     const run = () => {
-      this.$timeout(() => {
-        if(this.note.locked) {
-          this.alertManager.alert({
-            text: STRING_DELETE_LOCKED_ATTEMPT
-          });
-          return;
-        }
-        const title = this.note.safeTitle().length
-          ? `'${this.note.title}'`
-          : "this note";
-        const text = StringDeleteNote({
-          title: title,
-          permanently: permanently
-        })
-        this.alertManager.confirm({
-          text: text,
-          destructive: true,
-          onConfirm: () => {
-            if(permanently) {
-              this.performNoteDeletion(this.note);
-            } else {
-              this.note.content.trashed = true;
-              this.saveNote({
-                bypassDebouncer: true,
-                dontUpdatePreviews: true
-              });
-            }
-            this.appState.setSelectedNote(null);
-            this.showMenu = false;
+      if (this.state.note.locked) {
+        this.alertManager.alert({
+          text: STRING_DELETE_LOCKED_ATTEMPT
+        });
+        return;
+      }
+      const title = this.state.note.safeTitle().length
+        ? `'${this.state.note.title}'`
+        : "this note";
+      const text = StringDeleteNote({
+        title: title,
+        permanently: permanently
+      })
+      this.alertManager.confirm({
+        text: text,
+        destructive: true,
+        onConfirm: () => {
+          if (permanently) {
+            this.performNoteDeletion(this.state.note);
+          } else {
+            this.state.note.content.trashed = true;
+            this.saveNote({
+              bypassDebouncer: true,
+              dontUpdatePreviews: true
+            });
           }
-        })
-      });
+          this.appState.setSelectedNote(null);
+          this.setMenuState('showOptionsMenu', false);
+        }
+      })
     }
     const requiresPrivilege = await this.privilegesManager.actionRequiresPrivilege(
       PrivilegesManager.ActionDeleteNote
     );
-    if(requiresPrivilege) {
+    if (requiresPrivilege) {
       this.privilegesManager.presentPrivilegesModal(
         PrivilegesManager.ActionDeleteNote,
         () => {
@@ -566,16 +582,18 @@ class EditorCtrl {
 
   performNoteDeletion(note) {
     this.modelManager.setItemToBeDeleted(note);
-    if(note === this.note) {
-      this.note = null;
+    if (note === this.state.note) {
+      this.setState({
+        note: null
+      })
     }
-    if(note.dummy) {
+    if (note.dummy) {
       this.modelManager.removeItemLocally(note);
       return;
     }
 
     this.syncManager.sync().then(() => {
-      if(this.authManager.offline()) {
+      if (this.authManager.offline()) {
         /**
          * When deleting items while ofline, we need
          * to explictly tell angular to refresh UI
@@ -588,7 +606,7 @@ class EditorCtrl {
   }
 
   restoreTrashedNote() {
-    this.note.content.trashed = false;
+    this.state.note.content.trashed = false;
     this.saveNote({
       bypassDebouncer: true,
       dontUpdatePreviews: true
@@ -607,7 +625,7 @@ class EditorCtrl {
   emptyTrash() {
     const count = this.getTrashCount();
     this.alertManager.confirm({
-      text: StringEmptyTrash({count}),
+      text: StringEmptyTrash({ count }),
       destructive: true,
       onConfirm: () => {
         this.modelManager.emptyTrash();
@@ -617,9 +635,9 @@ class EditorCtrl {
   }
 
   togglePin() {
-    this.note.setAppDataItem(
+    this.state.note.setAppDataItem(
       APP_DATA_KEY_PINNED,
-      !this.note.pinned
+      !this.state.note.pinned
     );
     this.saveNote({
       bypassDebouncer: true,
@@ -628,9 +646,9 @@ class EditorCtrl {
   }
 
   toggleLockNote() {
-    this.note.setAppDataItem(
+    this.state.note.setAppDataItem(
       APP_DATA_KEY_LOCKED,
-      !this.note.locked
+      !this.state.note.locked
     );
     this.saveNote({
       bypassDebouncer: true,
@@ -639,7 +657,7 @@ class EditorCtrl {
   }
 
   toggleProtectNote() {
-    this.note.content.protected = !this.note.content.protected;
+    this.state.note.content.protected = !this.state.note.content.protected;
     this.saveNote({
       bypassDebouncer: true,
       dontUpdatePreviews: true
@@ -649,14 +667,14 @@ class EditorCtrl {
     this.privilegesManager.actionHasPrivilegesConfigured(
       PrivilegesManager.ActionViewProtectedNotes
     ).then((configured) => {
-      if(!configured) {
+      if (!configured) {
         this.privilegesManager.presentPrivilegesManagementModal();
       }
     })
   }
 
   toggleNotePreview() {
-    this.note.content.hidePreview = !this.note.content.hidePreview;
+    this.state.note.content.hidePreview = !this.state.note.content.hidePreview;
     this.saveNote({
       bypassDebouncer: true,
       dontUpdatePreviews: true
@@ -664,9 +682,9 @@ class EditorCtrl {
   }
 
   toggleArchiveNote() {
-    this.note.setAppDataItem(
+    this.state.note.setAppDataItem(
       APP_DATA_KEY_ARCHIVED,
-      !this.note.archived
+      !this.state.note.archived
     );
     this.saveNote({
       bypassDebouncer: true,
@@ -680,80 +698,82 @@ class EditorCtrl {
     });
   }
 
-  loadTagsString() {
-    this.tagsString = this.note.tagsString();
+  reloadTagsString() {
+    this.setState({
+      tagsString: this.state.note.tagsString()
+    });
   }
 
   addTag(tag) {
-    const strings = this.note.tags.map((currentTag) => {
+    const strings = this.state.note.tags.map((currentTag) => {
       return currentTag.title;
     })
     strings.push(tag.title);
     this.updateTags(strings);
-    this.loadTagsString();
+    this.reloadTagsString();
   }
 
   removeTag(tag) {
-    const strings = this.note.tags.map((currentTag) => {
+    const strings = this.state.note.tags.map((currentTag) => {
       return currentTag.title;
     }).filter((title) => {
       return title !== tag.title;
     })
     this.updateTags(strings);
-    this.loadTagsString();
+    this.reloadTagsString();
   }
 
   updateTag(stringTags) {
     const toRemove = [];
-    for(const tag of this.note.tags) {
-      if(stringTags.indexOf(tag.title) === -1) {
+    for (const tag of this.state.note.tags) {
+      if (stringTags.indexOf(tag.title) === -1) {
         toRemove.push(tag);
       }
     }
-    for(const tagToRemove of toRemove) {
-      tagToRemove.removeItemAsRelationship(this.note);
+    for (const tagToRemove of toRemove) {
+      tagToRemove.removeItemAsRelationship(this.state.note);
     }
     this.modelManager.setItemsDirty(toRemove);
     const tags = [];
-    for(const tagString of stringTags) {
+    for (const tagString of stringTags) {
       const existingRelationship = _.find(
-        this.note.tags,
-        {title: tagString}
+        this.state.note.tags,
+        { title: tagString }
       );
-      if(!existingRelationship) {
+      if (!existingRelationship) {
         tags.push(
           this.modelManager.findOrCreateTagByTitle(tagString)
         );
       }
     }
-    for(const tag of tags) {
-      tag.addItemAsRelationship(this.note);
+    for (const tag of tags) {
+      tag.addItemAsRelationship(this.state.note);
     }
     this.modelManager.setItemsDirty(tags);
     this.syncManager.sync();
   }
 
   updateTagsFromTagsString() {
-    if(this.tagsString === this.note.tagsString()) {
+    if (this.state.tagsString === this.state.note.tagsString()) {
       return;
     }
-    const strings = this.tagsString.split('#').filter((string) => {
+    const strings = this.state.tagsString.split('#').filter((string) => {
       return string.length > 0;
     }).map((string) => {
       return string.trim();
     })
-    this.note.dummy = false;
+    this.state.note.dummy = false;
     this.updateTags(strings);
   }
 
   onPanelResizeFinish = (width, left, isMaxWidth) => {
-    if(isMaxWidth) {
+    if (isMaxWidth) {
       this.preferencesManager.setUserPrefValue(
         PREF_EDITOR_WIDTH,
         null
       );
     } else {
-      if(width !== undefined && width !== null) {
+      if (width !== undefined && width !== null) {
         this.preferencesManager.setUserPrefValue(
           PREF_EDITOR_WIDTH,
           width
@@ -761,7 +781,7 @@ class EditorCtrl {
         this.leftResizeControl.setWidth(width);
       }
     }
-    if(left !== undefined && left !== null) {
+    if (left !== undefined && left !== null) {
       this.preferencesManager.setUserPrefValue(
         PREF_EDITOR_LEFT,
         left
@@ -772,31 +792,37 @@ class EditorCtrl {
   }
 
   loadPreferences() {
-    this.monospaceEnabled = this.preferencesManager.getValue(
+    const monospaceEnabled = this.preferencesManager.getValue(
       PREF_EDITOR_MONOSPACE_ENABLED,
       true
     );
-    this.spellcheck = this.preferencesManager.getValue(
+    const spellcheck = this.preferencesManager.getValue(
       PREF_EDITOR_SPELLCHECK,
       true
     );
-    this.marginResizersEnabled = this.preferencesManager.getValue(
+    const marginResizersEnabled = this.preferencesManager.getValue(
       PREF_EDITOR_RESIZERS_ENABLED,
       true
     );
-    if(!document.getElementById(ELEMENT_ID_EDITOR_CONTENT)) {
+    this.setState({
+      monospaceEnabled,
+      spellcheck,
+      marginResizersEnabled
+    });
+
+    if (!document.getElementById(ELEMENT_ID_EDITOR_CONTENT)) {
       /** Elements have not yet loaded due to ng-if around wrapper */
       return;
     }
 
     this.reloadFont();
 
-    if(this.marginResizersEnabled) {
+    if (this.state.marginResizersEnabled) {
       const width = this.preferencesManager.getValue(
         PREF_EDITOR_WIDTH,
         null
       );
-      if(width != null) {
+      if (width != null) {
         this.leftResizeControl.setWidth(width);
         this.rightResizeControl.setWidth(width);
       }
@@ -804,7 +830,7 @@ class EditorCtrl {
         PREF_EDITOR_LEFT,
         null
       );
-      if(left != null) {
+      if (left != null) {
         this.leftResizeControl.setLeft(left);
         this.rightResizeControl.setLeft(left);
       }
@@ -815,11 +841,11 @@ class EditorCtrl {
     const editor = document.getElementById(
       ELEMENT_ID_NOTE_TEXT_EDITOR
     );
-    if(!editor) {
+    if (!editor) {
       return;
     }
-    if(this.monospaceEnabled) {
-      if(isDesktopApplication()) {
+    if (this.state.monospaceEnabled) {
+      if (this.state.isDesktop) {
         editor.style.fontFamily = DESKTOP_MONOSPACE_FAMILY;
       } else {
         editor.style.fontFamily = WEB_MONOSPACE_FAMILY;
@@ -829,7 +855,7 @@ class EditorCtrl {
     }
   }
 
-  toggleKey(key) {
+  async toggleKey(key) {
     this[key] = !this[key];
     this.preferencesManager.setUserPrefValue(
       key,
@@ -838,16 +864,16 @@ class EditorCtrl {
     );
     this.reloadFont();
 
-    if(key === PREF_EDITOR_SPELLCHECK) {
+    if (key === PREF_EDITOR_SPELLCHECK) {
       /** Allows textarea to reload */
-      this.noteReady = false;
-      this.$timeout(() => {
-        this.noteReady = true;
-        this.$timeout(() => {
-          this.reloadFont();
-        })
+      await this.setState({
+        noteReady: false
       })
-    } else if(key === PREF_EDITOR_RESIZERS_ENABLED && this[key] === true) {
+      this.setState({
+        noteReady: true
+      })
+      this.reloadFont();
+    } else if (key === PREF_EDITOR_RESIZERS_ENABLED && this[key] === true) {
       this.$timeout(() => {
         this.leftResizeControl.flash();
         this.rightResizeControl.flash();
@@ -870,122 +896,129 @@ class EditorCtrl {
         'editor-editor'
       ],
       activationHandler: (component) => {
-        if(component.area === 'note-tags') {
-          this.tagsComponent = component.active ? component : null;
-        } else if(component.area === 'editor-editor') {
-          if(
-            component === this.selectedEditor
-            && !component.active
+        if (component.area === 'note-tags') {
+          this.setState({
+            tagsComponent: component.active ? component : null
+          })
+        } else if (component.area === 'editor-editor') {
+          if (
+            component === this.state.selectedEditor &&
+            !component.active
           ) {
-            this.selectedEditor = null;
+            this.setState({ selectedEditor: null });
           }
-          else if(this.selectedEditor) {
-            if(this.selectedEditor.active) {
-              if(
-                component.isExplicitlyEnabledForItem(this.note)
-                && !this.selectedEditor.isExplicitlyEnabledForItem(this.note)
+          else if (this.state.selectedEditor) {
+            if (this.state.selectedEditor.active) {
+              if (
+                component.isExplicitlyEnabledForItem(this.state.note)
+                && !this.state.selectedEditor.isExplicitlyEnabledForItem(this.state.note)
               ) {
-                this.selectedEditor = component;
+                this.setState({ selectedEditor: component });
               }
             }
           }
           else {
             const enableable = (
-              component.isExplicitlyEnabledForItem(this.note)
+              component.isExplicitlyEnabledForItem(this.state.note)
               || component.isDefaultEditor()
             );
-            if(
+            if (
               component.active
-              && this.note
+              && this.state.note
               && enableable
             ) {
-              this.selectedEditor = component;
+              this.setState({ selectedEditor: component });
             } else {
               /**
                * Not a candidate, and no qualified editor.
                * Disable the current editor.
                */
-              this.selectedEditor = null;
+              this.setState({ selectedEditor: null });
             }
           }
 
-        } else if(component.area === 'editor-stack') {
+        } else if (component.area === 'editor-stack') {
           this.reloadComponentContext();
         }
-    },
-    contextRequestHandler: (component) => {
-      if(
-        component == this.selectedEditor ||
-        component == this.tagsComponent ||
-        this.componentStack.includes(component)
-      ) {
-        return this.note;
-      }
-    },
-    focusHandler: (component, focused) => {
-      if(component.isEditor() && focused) {
-        this.closeAllMenus();
-      }
-    },
-    actionHandler: (component, action, data) => {
-      if(action === 'set-size') {
-        const setSize = function(element, size) {
-          const widthString = typeof size.width === 'string'
-            ? size.width
-            : `${data.width}px`;
-          const heightString = typeof size.height === 'string'
-            ? size.height
-            : `${data.height}px`;
-          element.setAttribute(
-            'style',
-            `width: ${widthString}; height: ${heightString};`
-          );
+      },
+      contextRequestHandler: (component) => {
+        if (
+          component === this.state.selectedEditor ||
+          component === this.state.tagsComponent ||
+          this.state.componentStack.includes(component)
+        ) {
+          return this.state.note;
         }
-        if(data.type === 'container') {
-          if(component.area === 'note-tags') {
-            const container = document.getElementById(
-              ELEMENT_ID_NOTE_TAGS_COMPONENT_CONTAINER
+      },
+      focusHandler: (component, focused) => {
+        if (component.isEditor() && focused) {
+          this.closeAllMenus();
+        }
+      },
+      actionHandler: (component, action, data) => {
+        if (action === 'set-size') {
+          const setSize = function (element, size) {
+            const widthString = typeof size.width === 'string'
+              ? size.width
+              : `${data.width}px`;
+            const heightString = typeof size.height === 'string'
+              ? size.height
+              : `${data.height}px`;
+            element.setAttribute(
+              'style',
+              `width: ${widthString}; height: ${heightString};`
             );
-            setSize(container, data);
+          }
+          if (data.type === 'container') {
+            if (component.area === 'note-tags') {
+              const container = document.getElementById(
+                ELEMENT_ID_NOTE_TAGS_COMPONENT_CONTAINER
+              );
+              setSize(container, data);
+            }
+          }
+        }
+        else if (action === 'associate-item') {
+          if (data.item.content_type === 'Tag') {
+            const tag = this.modelManager.findItem(data.item.uuid);
+            this.addTag(tag);
+          }
+        }
+        else if (action === 'deassociate-item') {
+          const tag = this.modelManager.findItem(data.item.uuid);
+          this.removeTag(tag);
+        }
+        else if (action === 'save-items') {
+          const includesNote = data.items.map((item) => {
+            return item.uuid
+          }).includes(this.state.note.uuid);
+          if (includesNote) {
+            this.showSavingStatus();
           }
         }
       }
-      else if(action === 'associate-item') {
-        if(data.item.content_type === 'Tag') {
-          const tag = this.modelManager.findItem(data.item.uuid);
-          this.addTag(tag);
-        }
-      }
-      else if(action === 'deassociate-item') {
-        const tag = this.modelManager.findItem(data.item.uuid);
-        this.removeTag(tag);
-      }
-      else if(action === 'save-items') {
-        const includesNote = data.items.map((item) => {
-          return item.uuid
-        }).includes(this.note.uuid);
-        if(includesNote) {
-          this.showSavingStatus();
-        }
-      }
-    }});
+    });
   }
 
   reloadComponentStackArray() {
-    const components = this.componentManager.componentsForArea('editor-stack');
-    this.componentStack = components.sort((a, b) => {
-      return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
-    });
+    const components = this.componentManager.componentsForArea('editor-stack')
+      .sort((a, b) => {
+        return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+      });
+
+    this.setState({
+      state: components
+    })
   }
 
   reloadComponentContext() {
     this.reloadComponentStackArray();
-    if(this.note) {
-      for(const component of this.componentStack) {
-        if(component.active) {
+    if (this.state.note) {
+      for (const component of this.state.componentStack) {
+        if (component.active) {
           this.componentManager.setComponentHidden(
             component,
-            !component.isExplicitlyEnabledForItem(this.note)
+            !component.isExplicitlyEnabledForItem(this.state.note)
           );
         }
       }
@@ -997,10 +1030,10 @@ class EditorCtrl {
   }
 
   toggleStackComponentForCurrentItem(component) {
-    if(component.hidden || !component.active) {
+    if (component.hidden || !component.active) {
       this.componentManager.setComponentHidden(component, false);
       this.associateComponentWithCurrentNote(component);
-      if(!component.active) {
+      if (!component.active) {
         this.componentManager.activateComponent(component);
       }
       this.componentManager.contextItemDidChangeInArea('editor-stack');
@@ -1012,11 +1045,11 @@ class EditorCtrl {
 
   disassociateComponentWithCurrentNote(component) {
     component.associatedItemIds = component.associatedItemIds.filter((id) => {
-      return id !== this.note.uuid;
+      return id !== this.state.note.uuid;
     });
 
-    if(!component.disassociatedItemIds.includes(this.note.uuid)) {
-      component.disassociatedItemIds.push(this.note.uuid);
+    if (!component.disassociatedItemIds.includes(this.state.note.uuid)) {
+      component.disassociatedItemIds.push(this.state.note.uuid);
     }
 
     this.modelManager.setItemDirty(component);
@@ -1025,12 +1058,12 @@ class EditorCtrl {
 
   associateComponentWithCurrentNote(component) {
     component.disassociatedItemIds = component.disassociatedItemIds
-    .filter((id) => {
-      return id !== this.note.uuid;
-    });
+      .filter((id) => {
+        return id !== this.state.note.uuid;
+      });
 
-    if(!component.associatedItemIds.includes(this.note.uuid)) {
-      component.associatedItemIds.push(this.note.uuid);
+    if (!component.associatedItemIds.includes(this.state.note.uuid)) {
+      component.associatedItemIds.push(this.state.note.uuid);
     }
 
     this.modelManager.setItemDirty(component);
@@ -1043,13 +1076,13 @@ class EditorCtrl {
         KeyboardManager.KeyModifierAlt
       ],
       onKeyDown: () => {
-        this.$timeout(() => {
-          this.altKeyDown = true;
+        this.setState({
+          altKeyDown: true
         })
       },
       onKeyUp: () => {
-        this.$timeout(() => {
-          this.altKeyDown = false;
+        this.setState({
+          altKeyDown: false
         });
       }
     })
@@ -1062,9 +1095,7 @@ class EditorCtrl {
       ],
       modifiers: [KeyboardManager.KeyModifierMeta],
       onKeyDown: () => {
-        this.$timeout(() => {
-          this.deleteNote();
-        });
+        this.deleteNote();
       },
     })
 
@@ -1077,15 +1108,13 @@ class EditorCtrl {
       ],
       onKeyDown: (event) => {
         event.preventDefault();
-        this.$timeout(() => {
-          this.deleteNote(true);
-        });
+        this.deleteNote(true);
       },
     })
   }
 
   onSystemEditorLoad() {
-    if(this.loadedTabListener) {
+    if (this.loadedTabListener) {
       return;
     }
     this.loadedTabListener = true;
@@ -1102,7 +1131,7 @@ class EditorCtrl {
       element: editor,
       key: KeyboardManager.KeyTab,
       onKeyDown: (event) => {
-        if(this.note.locked || event.shiftKey) {
+        if (this.state.note.locked || event.shiftKey) {
           return;
         }
         event.preventDefault();
@@ -1112,7 +1141,7 @@ class EditorCtrl {
           false,
           '\t'
         );
-        if(!insertSuccessful) {
+        if (!insertSuccessful) {
           /** document.execCommand works great on Chrome/Safari but not Firefox */
           const start = editor.selectionStart;
           const end = editor.selectionEnd;
@@ -1123,12 +1152,15 @@ class EditorCtrl {
           /** Place cursor 4 spaces away from where the tab key was pressed */
           editor.selectionStart = editor.selectionEnd = start + 4;
         }
-        this.$timeout(() => {
-          this.note.text = editor.value;
-          this.saveNote({
-            bypassDebouncer: true
-          });
+
+        const note = this.state.note;
+        note.text = editor.value;
+        this.setState({
+          note: note
         })
+        this.saveNote({
+          bypassDebouncer: true
+        });
       },
     })
 
@@ -1137,7 +1169,7 @@ class EditorCtrl {
      * (and not when our controller is destroyed.)
      */
     angular.element(editor).on('$destroy', () => {
-      if(this.tabObserver) {
+      if (this.tabObserver) {
         this.keyboardManager.removeKeyObserver(this.tabObserver);
         this.loadedTabListener = false;
       }
@@ -1152,7 +1184,7 @@ export class EditorPanel {
     this.template = template;
     this.replace = true;
     this.controller = EditorCtrl;
-    this.controllerAs = 'ctrl';
+    this.controllerAs = 'self';
     this.bindToController = true;
   }
 }

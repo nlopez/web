@@ -206,20 +206,34 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/defineProperty.js");
-/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! angular */ "./node_modules/angular/index.js");
-/* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(angular__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
-/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/utils.js");
-/* harmony import */ var _services_keyboardManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/services/keyboardManager */ "./app/assets/javascripts/services/keyboardManager.js");
-/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/services/privilegesManager.js");
-/* harmony import */ var _editor_pug__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! %/editor.pug */ "./app/assets/templates/editor.pug");
-/* harmony import */ var _editor_pug__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(_editor_pug__WEBPACK_IMPORTED_MODULE_9__);
-/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
-/* harmony import */ var _strings__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @/strings */ "./app/assets/javascripts/strings.js");
-/* harmony import */ var _services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @/services/preferencesManager */ "./app/assets/javascripts/services/preferencesManager.js");
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @babel/runtime/helpers/assertThisInitialized */ "./node_modules/@babel/runtime/helpers/assertThisInitialized.js");
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/defineProperty.js");
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! angular */ "./node_modules/angular/index.js");
+/* harmony import */ var angular__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(angular__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! snjs */ "./node_modules/snjs/dist/snjs.js");
+/* harmony import */ var snjs__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(snjs__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @/utils */ "./app/assets/javascripts/utils.js");
+/* harmony import */ var _services_keyboardManager__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @/services/keyboardManager */ "./app/assets/javascripts/services/keyboardManager.js");
+/* harmony import */ var _services_privilegesManager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @/services/privilegesManager */ "./app/assets/javascripts/services/privilegesManager.js");
+/* harmony import */ var _editor_pug__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! %/editor.pug */ "./app/assets/templates/editor.pug");
+/* harmony import */ var _editor_pug__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(_editor_pug__WEBPACK_IMPORTED_MODULE_13__);
+/* harmony import */ var _Controllers__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @Controllers */ "./app/assets/javascripts/controllers/index.js");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
+/* harmony import */ var _strings__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @/strings */ "./app/assets/javascripts/strings.js");
+/* harmony import */ var _services_preferencesManager__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @/services/preferencesManager */ "./app/assets/javascripts/services/preferencesManager.js");
+
+
+
+
+
 
 
 
@@ -252,51 +266,56 @@ var SANS_SERIF_FAMILY = "inherit";
 
 var EditorCtrl =
 /*#__PURE__*/
-function () {
+function (_PureCtrl) {
   EditorCtrl.$inject = ["$timeout", "$rootScope", "alertManager", "appState", "authManager", "actionsManager", "componentManager", "desktopManager", "keyboardManager", "modelManager", "preferencesManager", "privilegesManager", "sessionHistory", "syncManager"];
+
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6___default()(EditorCtrl, _PureCtrl);
 
   /* @ngInject */
   function EditorCtrl($timeout, $rootScope, alertManager, appState, authManager, actionsManager, componentManager, desktopManager, keyboardManager, modelManager, preferencesManager, privilegesManager, sessionHistory
   /** Unused below, required to load globally */
   , syncManager) {
-    var _this = this;
+    var _this;
 
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, EditorCtrl);
 
-    _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3___default()(this, "editorMenuOnSelect", function (component) {
+    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(EditorCtrl).call(this, $timeout));
+
+    _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_7___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5___default()(_this), "editorMenuOnSelect", function (component) {
       if (!component || component.area === 'editor-editor') {
         /** If plain editor or other editor */
-        _this.showEditorMenu = false;
+        _this.setMenuState('showEditorMenu', false);
+
         var editor = component;
 
-        if (_this.selectedEditor && editor !== _this.selectedEditor) {
-          _this.disassociateComponentWithCurrentNote(_this.selectedEditor);
+        if (_this.state.selectedEditor && editor !== _this.state.selectedEditor) {
+          _this.disassociateComponentWithCurrentNote(_this.state.selectedEditor);
         }
 
         if (editor) {
-          var prefersPlain = _this.note.getAppDataItem(APP_DATA_KEY_PREFERS_PLAIN_EDITOR) === true;
+          var prefersPlain = _this.state.note.getAppDataItem(APP_DATA_KEY_PREFERS_PLAIN_EDITOR) === true;
 
           if (prefersPlain) {
-            _this.note.setAppDataItem(APP_DATA_KEY_PREFERS_PLAIN_EDITOR, false);
+            _this.state.note.setAppDataItem(APP_DATA_KEY_PREFERS_PLAIN_EDITOR, false);
 
-            _this.modelManager.setItemDirty(_this.note);
+            _this.modelManager.setItemDirty(_this.state.note);
           }
 
           _this.associateComponentWithCurrentNote(editor);
         } else {
           /** Note prefers plain editor */
-          if (!_this.note.getAppDataItem(APP_DATA_KEY_PREFERS_PLAIN_EDITOR)) {
-            _this.note.setAppDataItem(APP_DATA_KEY_PREFERS_PLAIN_EDITOR, true);
+          if (!_this.state.note.getAppDataItem(APP_DATA_KEY_PREFERS_PLAIN_EDITOR)) {
+            _this.state.note.setAppDataItem(APP_DATA_KEY_PREFERS_PLAIN_EDITOR, true);
 
-            _this.modelManager.setItemDirty(_this.note);
+            _this.modelManager.setItemDirty(_this.state.note);
           }
 
-          _this.$timeout(function () {
-            _this.reloadFont();
-          });
+          _this.reloadFont();
         }
 
-        _this.selectedEditor = editor;
+        _this.setState({
+          selectedEditor: editor
+        });
       } else if (component.area === 'editor-stack') {
         _this.toggleStackComponentForCurrentItem(component);
       }
@@ -306,19 +325,19 @@ function () {
       _this.syncManager.sync();
     });
 
-    _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3___default()(this, "onPanelResizeFinish", function (width, left, isMaxWidth) {
+    _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_7___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5___default()(_this), "onPanelResizeFinish", function (width, left, isMaxWidth) {
       if (isMaxWidth) {
-        _this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__["PREF_EDITOR_WIDTH"], null);
+        _this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_17__["PREF_EDITOR_WIDTH"], null);
       } else {
         if (width !== undefined && width !== null) {
-          _this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__["PREF_EDITOR_WIDTH"], width);
+          _this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_17__["PREF_EDITOR_WIDTH"], width);
 
           _this.leftResizeControl.setWidth(width);
         }
       }
 
       if (left !== undefined && left !== null) {
-        _this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__["PREF_EDITOR_LEFT"], left);
+        _this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_17__["PREF_EDITOR_LEFT"], left);
 
         _this.rightResizeControl.setLeft(left);
       }
@@ -326,40 +345,49 @@ function () {
       _this.preferencesManager.syncUserPreferences();
     });
 
-    _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3___default()(this, "onEditorLoad", function (editor) {
+    _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_7___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_5___default()(_this), "onEditorLoad", function (editor) {
       _this.desktopManager.redoSearch();
     });
 
-    this.$rootScope = $rootScope;
-    this.$timeout = $timeout;
-    this.alertManager = alertManager;
-    this.appState = appState;
-    this.actionsManager = actionsManager;
-    this.authManager = authManager;
-    this.componentManager = componentManager;
-    this.desktopManager = desktopManager;
-    this.keyboardManager = keyboardManager;
-    this.modelManager = modelManager;
-    this.preferencesManager = preferencesManager;
-    this.privilegesManager = privilegesManager;
-    this.syncManager = syncManager;
-    this.componentStack = [];
-    this.editorDebounce = EDITOR_DEBOUNCE;
-    this.isDesktop = Object(_utils__WEBPACK_IMPORTED_MODULE_6__["isDesktopApplication"])();
-    this.spellcheck = true;
-    this.leftResizeControl = {};
-    this.rightResizeControl = {};
-    this.addAppStateObserver();
-    this.addSyncEventHandler();
-    this.addSyncStatusObserver();
-    this.addMappingObservers();
-    this.registerComponentHandler();
-    this.registerKeyboardShortcuts();
+    _this.$rootScope = $rootScope;
+    _this.alertManager = alertManager;
+    _this.appState = appState;
+    _this.actionsManager = actionsManager;
+    _this.authManager = authManager;
+    _this.componentManager = componentManager;
+    _this.desktopManager = desktopManager;
+    _this.keyboardManager = keyboardManager;
+    _this.modelManager = modelManager;
+    _this.preferencesManager = preferencesManager;
+    _this.privilegesManager = privilegesManager;
+    _this.syncManager = syncManager;
+    _this.state = {
+      componentStack: [],
+      editorDebounce: EDITOR_DEBOUNCE,
+      isDesktop: Object(_utils__WEBPACK_IMPORTED_MODULE_10__["isDesktopApplication"])(),
+      spellcheck: true
+    };
+    _this.leftResizeControl = {};
+    _this.rightResizeControl = {};
+
+    _this.addAppStateObserver();
+
+    _this.addSyncEventHandler();
+
+    _this.addSyncStatusObserver();
+
+    _this.addMappingObservers();
+
+    _this.registerComponentHandler();
+
+    _this.registerKeyboardShortcuts();
     /** Used by .pug template */
 
-    this.prefKeyMonospace = _services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__["PREF_EDITOR_MONOSPACE_ENABLED"];
-    this.prefKeySpellcheck = _services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__["PREF_EDITOR_SPELLCHECK"];
-    this.prefKeyMarginResizers = _services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__["PREF_EDITOR_RESIZERS_ENABLED"];
+
+    _this.prefKeyMonospace = _services_preferencesManager__WEBPACK_IMPORTED_MODULE_17__["PREF_EDITOR_MONOSPACE_ENABLED"];
+    _this.prefKeySpellcheck = _services_preferencesManager__WEBPACK_IMPORTED_MODULE_17__["PREF_EDITOR_SPELLCHECK"];
+    _this.prefKeyMarginResizers = _services_preferencesManager__WEBPACK_IMPORTED_MODULE_17__["PREF_EDITOR_RESIZERS_ENABLED"];
+    return _this;
   }
 
   _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(EditorCtrl, [{
@@ -368,16 +396,82 @@ function () {
       var _this2 = this;
 
       this.appState.addObserver(function (eventName, data) {
-        if (eventName === _state__WEBPACK_IMPORTED_MODULE_10__["APP_STATE_EVENT_NOTE_CHANGED"]) {
-          _this2.note = _this2.appState.getSelectedNote();
-
-          _this2.setNote(_this2.note, data.previousNote);
-
-          _this2.reloadComponentContext();
-        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_10__["APP_STATE_EVENT_PREFERENCES_CHANGED"]) {
+        if (eventName === _state__WEBPACK_IMPORTED_MODULE_15__["APP_STATE_EVENT_NOTE_CHANGED"]) {
+          _this2.handleNoteSelectionChange(_this2.appState.getSelectedNote(), data.previousNote);
+        } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_15__["APP_STATE_EVENT_PREFERENCES_CHANGED"]) {
           _this2.loadPreferences();
         }
       });
+    }
+  }, {
+    key: "handleNoteSelectionChange",
+    value: function handleNoteSelectionChange(note, previousNote) {
+      var associatedEditor;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function handleNoteSelectionChange$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              this.setState({
+                note: this.appState.getSelectedNote(),
+                showExtensions: false,
+                showOptionsMenu: false,
+                altKeyDown: false,
+                noteStatus: null
+              });
+
+              if (note) {
+                _context.next = 3;
+                break;
+              }
+
+              return _context.abrupt("return");
+
+            case 3:
+              associatedEditor = this.editorForNote(note);
+
+              if (associatedEditor && associatedEditor !== this.state.selectedEditor) {
+                /**
+                 * Setting note to not ready will remove the editor from view in a flash,
+                 * so we only want to do this if switching between external editors
+                 */
+                this.setState({
+                  noteReady: false,
+                  selectedEditor: associatedEditor
+                });
+              } else if (!associatedEditor) {
+                /** No editor */
+                this.setState({
+                  selectedEditor: null
+                });
+              }
+
+              _context.next = 7;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.setState({
+                noteReady: true
+              }));
+
+            case 7:
+              this.reloadTagsString();
+              this.loadPreferences();
+
+              if (note.safeText().length === 0 && note.dummy) {
+                this.focusTitle(100);
+              }
+
+              if (previousNote && previousNote !== note) {
+                if (previousNote.dummy) {
+                  this.performNoteDeletion(previousNote);
+                }
+              }
+
+              this.reloadComponentContext();
+
+            case 12:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
     }
   }, {
     key: "addMappingObservers",
@@ -385,30 +479,30 @@ function () {
       var _this3 = this;
 
       this.modelManager.addItemSyncObserver('editor-note-observer', 'Note', function (allItems, validItems, deletedItems, source) {
-        if (!_this3.note) {
+        if (!_this3.state.note) {
           return;
         }
 
-        if (_this3.note.deleted || _this3.note.content.trashed) {
+        if (_this3.state.note.deleted || _this3.state.note.content.trashed) {
           return;
         }
 
-        if (!snjs__WEBPACK_IMPORTED_MODULE_5__["SFModelManager"].isMappingSourceRetrieved(source)) {
+        if (!snjs__WEBPACK_IMPORTED_MODULE_9__["SFModelManager"].isMappingSourceRetrieved(source)) {
           return;
         }
 
         var matchingNote = allItems.find(function (item) {
-          return item.uuid === _this3.note.uuid;
+          return item.uuid === _this3.state.note.uuid;
         });
 
         if (!matchingNote) {
           return;
         }
 
-        _this3.loadTagsString();
+        _this3.reloadTagsString();
       });
       this.modelManager.addItemSyncObserver('editor-tag-observer', 'Tag', function (allItems, validItems, deletedItems, source) {
-        if (!_this3.note) {
+        if (!_this3.state.note) {
           return;
         }
 
@@ -420,8 +514,8 @@ function () {
           for (var _iterator = allItems[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
             var tag = _step.value;
 
-            if (!_this3.note.savedTagsString || tag.deleted || tag.hasRelationshipWithItem(_this3.note)) {
-              _this3.loadTagsString();
+            if (!_this3.state.note.savedTagsString || tag.deleted || tag.hasRelationshipWithItem(_this3.state.note)) {
+              _this3.reloadTagsString();
 
               break;
             }
@@ -442,7 +536,7 @@ function () {
         }
       });
       this.modelManager.addItemSyncObserver('editor-component-observer', 'SN|Component', function (allItems, validItems, deletedItems, source) {
-        if (!_this3.note) {
+        if (!_this3.state.note) {
           return;
         }
         /** Reload componentStack in case new ones were added or removed */
@@ -456,15 +550,17 @@ function () {
           return item.isEditor();
         });
 
-        if (editors.length == 0) {
+        if (editors.length === 0) {
           return;
         }
         /** Find the most recent editor for note */
 
 
-        var editor = _this3.editorForNote(_this3.note);
+        var editor = _this3.editorForNote(_this3.state.note);
 
-        _this3.selectedEditor = editor;
+        _this3.setState({
+          selectedEditor: editor
+        });
 
         if (!editor) {
           _this3.reloadFont();
@@ -477,22 +573,26 @@ function () {
       var _this4 = this;
 
       this.syncManager.addEventHandler(function (eventName, data) {
-        if (!_this4.note) {
+        if (!_this4.state.note) {
           return;
         }
 
         if (eventName === 'sync:taking-too-long') {
-          _this4.syncTakingTooLong = true;
+          _this4.setState({
+            syncTakingTooLong: true
+          });
         } else if (eventName === 'sync:completed') {
-          _this4.syncTakingTooLong = false;
+          _this4.setState({
+            syncTakingTooLong: false
+          });
 
-          if (_this4.note.dirty) {
+          if (_this4.state.note.dirty) {
             /** if we're still dirty, don't change status, a sync is likely upcoming. */
           } else {
             var savedItem = data.savedItems.find(function (item) {
-              return item.uuid === _this4.note.uuid;
+              return item.uuid === _this4.state.note.uuid;
             });
-            var isInErrorState = _this4.saveError;
+            var isInErrorState = _this4.state.saveError;
 
             if (isInErrorState || savedItem) {
               _this4.showAllChangesSavedStatus();
@@ -504,7 +604,7 @@ function () {
            * Otherwise, it means the originating sync came from somewhere else
            * and we don't want to display an error here.
            */
-          if (_this4.note.dirty) {
+          if (_this4.state.note.dirty) {
             _this4.showErrorStatus();
           }
         }
@@ -527,104 +627,52 @@ function () {
       });
     }
   }, {
-    key: "setNote",
-    value: function setNote(note, previousNote) {
-      var _this6 = this;
-
-      this.showExtensions = false;
-      this.showMenu = false;
-      this.noteStatus = null;
-      /**
-       * When setting alt key down and deleting note, an alert will come up
-       * and block the key up event when alt is released.
-       * We reset it on set note so that the alt menu restores to default.
-       */
-
-      this.altKeyDown = false;
-
-      if (!note) {
-        return;
-      }
-
-      this.loadTagsString();
-
-      var onReady = function onReady() {
-        _this6.noteReady = true;
-
-        _this6.$timeout(function () {
-          _this6.loadPreferences();
-        });
-      };
-
-      var associatedEditor = this.editorForNote(note);
-
-      if (associatedEditor && associatedEditor !== this.selectedEditor) {
-        /**
-         * Setting note to not ready will remove the editor from view in a flash,
-         * so we only want to do this if switching between external editors
-         */
-        this.noteReady = false;
-        /** Switch after timeout, so that note data isnt posted to current editor */
-
-        this.$timeout(function () {
-          _this6.selectedEditor = associatedEditor;
-          onReady();
-        });
-      } else if (associatedEditor) {
-        /** Same editor as currently active */
-        onReady();
-      } else {
-        /** No editor */
-        this.selectedEditor = null;
-        onReady();
-      }
-
-      if (note.safeText().length === 0 && note.dummy) {
-        this.focusTitle(100);
-      }
-
-      if (previousNote && previousNote !== note) {
-        if (previousNote.dummy) {
-          this.performNoteDeletion(previousNote);
-        }
-      }
-    }
-  }, {
     key: "editorForNote",
     value: function editorForNote(note) {
       return this.componentManager.editorForNote(note);
     }
   }, {
-    key: "closeAllMenus",
-    value: function closeAllMenus() {
-      this.showEditorMenu = false;
-      this.showMenu = false;
-      this.showExtensions = false;
+    key: "setMenuState",
+    value: function setMenuState(menu, state) {
+      this.setState(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_7___default()({}, menu, state));
+      this.closeAllMenus({
+        exclude: menu
+      });
     }
   }, {
     key: "toggleMenu",
     value: function toggleMenu(menu) {
-      this[menu] = !this[menu];
-      var allMenus = ['showMenu', 'showEditorMenu', 'showExtensions', 'showSessionHistory'];
+      this.setMenuState(menu, !this.state[menu]);
+    }
+  }, {
+    key: "closeAllMenus",
+    value: function closeAllMenus() {
+      var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+          exclude = _ref.exclude;
+
+      var allMenus = ['showOptionsMenu', 'showEditorMenu', 'showExtensions', 'showSessionHistory'];
+      var menuState = {};
 
       for (var _i = 0, _allMenus = allMenus; _i < _allMenus.length; _i++) {
         var candidate = _allMenus[_i];
 
-        if (candidate != menu) {
-          this[candidate] = false;
+        if (candidate !== exclude) {
+          menuState[candidate] = false;
         }
       }
+
+      this.setState(menuState);
     }
   }, {
     key: "hasAvailableExtensions",
     value: function hasAvailableExtensions() {
-      return this.actionsManager.extensionsInContextOfItem(this.note).length > 0;
+      return this.actionsManager.extensionsInContextOfItem(this.state.note).length > 0;
     }
   }, {
     key: "focusEditor",
     value: function focusEditor() {
-      var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-          delay = _ref.delay;
+      var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+          delay = _ref2.delay;
 
       setTimeout(function () {
         var element = document.getElementById(ELEMENT_ID_NOTE_TEXT_EDITOR);
@@ -644,29 +692,29 @@ function () {
   }, {
     key: "clickedTextArea",
     value: function clickedTextArea() {
-      this.showMenu = false;
+      this.setMenuState('showOptionsMenu', false);
     }
   }, {
     key: "saveNote",
-    value: function saveNote(_ref2) {
-      var _this7 = this;
+    value: function saveNote(_ref3) {
+      var _this6 = this;
 
-      var bypassDebouncer = _ref2.bypassDebouncer,
-          updateClientModified = _ref2.updateClientModified,
-          dontUpdatePreviews = _ref2.dontUpdatePreviews;
-      var note = this.note;
+      var bypassDebouncer = _ref3.bypassDebouncer,
+          updateClientModified = _ref3.updateClientModified,
+          dontUpdatePreviews = _ref3.dontUpdatePreviews;
+      var note = this.state.note;
       note.dummy = false;
 
       if (note.deleted) {
         this.alertManager.alert({
-          text: _strings__WEBPACK_IMPORTED_MODULE_11__["STRING_DELETED_NOTE"]
+          text: _strings__WEBPACK_IMPORTED_MODULE_16__["STRING_DELETED_NOTE"]
         });
         return;
       }
 
       if (!this.modelManager.findItem(note.uuid)) {
         this.alertManager.alert({
-          text: _strings__WEBPACK_IMPORTED_MODULE_11__["STRING_INVALID_NOTE"]
+          text: _strings__WEBPACK_IMPORTED_MODULE_16__["STRING_INVALID_NOTE"]
         });
         return;
       }
@@ -677,8 +725,8 @@ function () {
         var text = note.text || '';
         var truncate = text.length > NOTE_PREVIEW_CHAR_LIMIT;
         var substring = text.substring(0, NOTE_PREVIEW_CHAR_LIMIT);
-        var preview_plain = substring + (truncate ? _strings__WEBPACK_IMPORTED_MODULE_11__["STRING_ELLIPSES"] : '');
-        note.content.preview_plain = preview_plain;
+        var previewPlain = substring + (truncate ? _strings__WEBPACK_IMPORTED_MODULE_16__["STRING_ELLIPSES"] : '');
+        note.content.preview_plain = previewPlain;
         note.content.preview_html = null;
       }
 
@@ -691,12 +739,12 @@ function () {
       var noDebounce = bypassDebouncer || this.authManager.offline();
       var syncDebouceMs = noDebounce ? SAVE_TIMEOUT_NO_DEBOUNCE : SAVE_TIMEOUT_DEBOUNCE;
       this.saveTimeout = this.$timeout(function () {
-        _this7.syncManager.sync().then(function (response) {
-          if (response && response.error && !_this7.didShowErrorAlert) {
-            _this7.didShowErrorAlert = true;
+        _this6.syncManager.sync().then(function (response) {
+          if (response && response.error && !_this6.didShowErrorAlert) {
+            _this6.didShowErrorAlert = true;
 
-            _this7.alertManager.alert({
-              text: _strings__WEBPACK_IMPORTED_MODULE_11__["STRING_GENERIC_SAVE_ERROR"]
+            _this6.alertManager.alert({
+              text: _strings__WEBPACK_IMPORTED_MODULE_16__["STRING_GENERIC_SAVE_ERROR"]
             });
           }
         });
@@ -712,8 +760,10 @@ function () {
   }, {
     key: "showAllChangesSavedStatus",
     value: function showAllChangesSavedStatus() {
-      this.saveError = false;
-      this.syncTakingTooLong = false;
+      this.setState({
+        saveError: false,
+        syncTakingTooLong: false
+      });
       var status = "All changes saved";
 
       if (this.authManager.offline()) {
@@ -734,22 +784,24 @@ function () {
         };
       }
 
-      this.saveError = true;
-      this.syncTakingTooLong = false;
+      this.setState({
+        saveError: true,
+        syncTakingTooLong: false
+      });
       this.setStatus(error);
     }
   }, {
     key: "setStatus",
     value: function setStatus(status) {
-      var _this8 = this;
+      var _this7 = this;
 
       var wait = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
       var waitForMs;
 
-      if (!this.noteStatus || !this.noteStatus.date) {
+      if (!this.state.noteStatus || !this.state.noteStatus.date) {
         waitForMs = 0;
       } else {
-        waitForMs = MINIMUM_STATUS_DURATION - (new Date() - this.noteStatus.date);
+        waitForMs = MINIMUM_STATUS_DURATION - (new Date() - this.state.noteStatus.date);
       }
 
       if (!wait || waitForMs < 0) {
@@ -762,7 +814,10 @@ function () {
 
       this.statusTimeout = this.$timeout(function () {
         status.date = new Date();
-        _this8.noteStatus = status;
+
+        _this7.setState({
+          noteStatus: status
+        });
       }, waitForMs);
     }
   }, {
@@ -806,77 +861,75 @@ function () {
     key: "selectedMenuItem",
     value: function selectedMenuItem(hide) {
       if (hide) {
-        this.showMenu = false;
+        this.setMenuState('showOptionsMenu', false);
       }
     }
   }, {
     key: "deleteNote",
     value: function deleteNote(permanently) {
-      var _this9 = this;
+      var _this8 = this;
 
       var run, requiresPrivilege;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function deleteNote$(_context) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function deleteNote$(_context2) {
         while (1) {
-          switch (_context.prev = _context.next) {
+          switch (_context2.prev = _context2.next) {
             case 0:
-              if (!this.note.dummy) {
-                _context.next = 3;
+              if (!this.state.note.dummy) {
+                _context2.next = 3;
                 break;
               }
 
               this.alertManager.alert({
-                text: _strings__WEBPACK_IMPORTED_MODULE_11__["STRING_DELETE_PLACEHOLDER_ATTEMPT"]
+                text: _strings__WEBPACK_IMPORTED_MODULE_16__["STRING_DELETE_PLACEHOLDER_ATTEMPT"]
               });
-              return _context.abrupt("return");
+              return _context2.abrupt("return");
 
             case 3:
               run = function run() {
-                _this9.$timeout(function () {
-                  if (_this9.note.locked) {
-                    _this9.alertManager.alert({
-                      text: _strings__WEBPACK_IMPORTED_MODULE_11__["STRING_DELETE_LOCKED_ATTEMPT"]
-                    });
-
-                    return;
-                  }
-
-                  var title = _this9.note.safeTitle().length ? "'".concat(_this9.note.title, "'") : "this note";
-                  var text = Object(_strings__WEBPACK_IMPORTED_MODULE_11__["StringDeleteNote"])({
-                    title: title,
-                    permanently: permanently
+                if (_this8.state.note.locked) {
+                  _this8.alertManager.alert({
+                    text: _strings__WEBPACK_IMPORTED_MODULE_16__["STRING_DELETE_LOCKED_ATTEMPT"]
                   });
 
-                  _this9.alertManager.confirm({
-                    text: text,
-                    destructive: true,
-                    onConfirm: function onConfirm() {
-                      if (permanently) {
-                        _this9.performNoteDeletion(_this9.note);
-                      } else {
-                        _this9.note.content.trashed = true;
+                  return;
+                }
 
-                        _this9.saveNote({
-                          bypassDebouncer: true,
-                          dontUpdatePreviews: true
-                        });
-                      }
+                var title = _this8.state.note.safeTitle().length ? "'".concat(_this8.state.note.title, "'") : "this note";
+                var text = Object(_strings__WEBPACK_IMPORTED_MODULE_16__["StringDeleteNote"])({
+                  title: title,
+                  permanently: permanently
+                });
 
-                      _this9.appState.setSelectedNote(null);
+                _this8.alertManager.confirm({
+                  text: text,
+                  destructive: true,
+                  onConfirm: function onConfirm() {
+                    if (permanently) {
+                      _this8.performNoteDeletion(_this8.state.note);
+                    } else {
+                      _this8.state.note.content.trashed = true;
 
-                      _this9.showMenu = false;
+                      _this8.saveNote({
+                        bypassDebouncer: true,
+                        dontUpdatePreviews: true
+                      });
                     }
-                  });
+
+                    _this8.appState.setSelectedNote(null);
+
+                    _this8.setMenuState('showOptionsMenu', false);
+                  }
                 });
               };
 
-              _context.next = 6;
-              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_8__["PrivilegesManager"].ActionDeleteNote));
+              _context2.next = 6;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.privilegesManager.actionRequiresPrivilege(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_12__["PrivilegesManager"].ActionDeleteNote));
 
             case 6:
-              requiresPrivilege = _context.sent;
+              requiresPrivilege = _context2.sent;
 
               if (requiresPrivilege) {
-                this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_8__["PrivilegesManager"].ActionDeleteNote, function () {
+                this.privilegesManager.presentPrivilegesModal(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_12__["PrivilegesManager"].ActionDeleteNote, function () {
                   run();
                 });
               } else {
@@ -885,7 +938,7 @@ function () {
 
             case 8:
             case "end":
-              return _context.stop();
+              return _context2.stop();
           }
         }
       }, null, this);
@@ -893,12 +946,14 @@ function () {
   }, {
     key: "performNoteDeletion",
     value: function performNoteDeletion(note) {
-      var _this10 = this;
+      var _this9 = this;
 
       this.modelManager.setItemToBeDeleted(note);
 
-      if (note === this.note) {
-        this.note = null;
+      if (note === this.state.note) {
+        this.setState({
+          note: null
+        });
       }
 
       if (note.dummy) {
@@ -907,7 +962,7 @@ function () {
       }
 
       this.syncManager.sync().then(function () {
-        if (_this10.authManager.offline()) {
+        if (_this9.authManager.offline()) {
           /**
            * When deleting items while ofline, we need
            * to explictly tell angular to refresh UI
@@ -921,7 +976,7 @@ function () {
   }, {
     key: "restoreTrashedNote",
     value: function restoreTrashedNote() {
-      this.note.content.trashed = false;
+      this.state.note.content.trashed = false;
       this.saveNote({
         bypassDebouncer: true,
         dontUpdatePreviews: true
@@ -941,25 +996,25 @@ function () {
   }, {
     key: "emptyTrash",
     value: function emptyTrash() {
-      var _this11 = this;
+      var _this10 = this;
 
       var count = this.getTrashCount();
       this.alertManager.confirm({
-        text: Object(_strings__WEBPACK_IMPORTED_MODULE_11__["StringEmptyTrash"])({
+        text: Object(_strings__WEBPACK_IMPORTED_MODULE_16__["StringEmptyTrash"])({
           count: count
         }),
         destructive: true,
         onConfirm: function onConfirm() {
-          _this11.modelManager.emptyTrash();
+          _this10.modelManager.emptyTrash();
 
-          _this11.syncManager.sync();
+          _this10.syncManager.sync();
         }
       });
     }
   }, {
     key: "togglePin",
     value: function togglePin() {
-      this.note.setAppDataItem(APP_DATA_KEY_PINNED, !this.note.pinned);
+      this.state.note.setAppDataItem(APP_DATA_KEY_PINNED, !this.state.note.pinned);
       this.saveNote({
         bypassDebouncer: true,
         dontUpdatePreviews: true
@@ -968,7 +1023,7 @@ function () {
   }, {
     key: "toggleLockNote",
     value: function toggleLockNote() {
-      this.note.setAppDataItem(APP_DATA_KEY_LOCKED, !this.note.locked);
+      this.state.note.setAppDataItem(APP_DATA_KEY_LOCKED, !this.state.note.locked);
       this.saveNote({
         bypassDebouncer: true,
         dontUpdatePreviews: true
@@ -977,25 +1032,25 @@ function () {
   }, {
     key: "toggleProtectNote",
     value: function toggleProtectNote() {
-      var _this12 = this;
+      var _this11 = this;
 
-      this.note.content.protected = !this.note.content.protected;
+      this.state.note.content.protected = !this.state.note.content.protected;
       this.saveNote({
         bypassDebouncer: true,
         dontUpdatePreviews: true
       });
       /** Show privilegesManager if protection is not yet set up */
 
-      this.privilegesManager.actionHasPrivilegesConfigured(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_8__["PrivilegesManager"].ActionViewProtectedNotes).then(function (configured) {
+      this.privilegesManager.actionHasPrivilegesConfigured(_services_privilegesManager__WEBPACK_IMPORTED_MODULE_12__["PrivilegesManager"].ActionViewProtectedNotes).then(function (configured) {
         if (!configured) {
-          _this12.privilegesManager.presentPrivilegesManagementModal();
+          _this11.privilegesManager.presentPrivilegesManagementModal();
         }
       });
     }
   }, {
     key: "toggleNotePreview",
     value: function toggleNotePreview() {
-      this.note.content.hidePreview = !this.note.content.hidePreview;
+      this.state.note.content.hidePreview = !this.state.note.content.hidePreview;
       this.saveNote({
         bypassDebouncer: true,
         dontUpdatePreviews: true
@@ -1004,7 +1059,7 @@ function () {
   }, {
     key: "toggleArchiveNote",
     value: function toggleArchiveNote() {
-      this.note.setAppDataItem(APP_DATA_KEY_ARCHIVED, !this.note.archived);
+      this.state.note.setAppDataItem(APP_DATA_KEY_ARCHIVED, !this.state.note.archived);
       this.saveNote({
         bypassDebouncer: true,
         dontUpdatePreviews: true
@@ -1018,30 +1073,32 @@ function () {
       });
     }
   }, {
-    key: "loadTagsString",
-    value: function loadTagsString() {
-      this.tagsString = this.note.tagsString();
+    key: "reloadTagsString",
+    value: function reloadTagsString() {
+      this.setState({
+        tagsString: this.state.note.tagsString()
+      });
     }
   }, {
     key: "addTag",
     value: function addTag(tag) {
-      var strings = this.note.tags.map(function (currentTag) {
+      var strings = this.state.note.tags.map(function (currentTag) {
         return currentTag.title;
       });
       strings.push(tag.title);
       this.updateTags(strings);
-      this.loadTagsString();
+      this.reloadTagsString();
     }
   }, {
     key: "removeTag",
     value: function removeTag(tag) {
-      var strings = this.note.tags.map(function (currentTag) {
+      var strings = this.state.note.tags.map(function (currentTag) {
         return currentTag.title;
       }).filter(function (title) {
         return title !== tag.title;
       });
       this.updateTags(strings);
-      this.loadTagsString();
+      this.reloadTagsString();
     }
   }, {
     key: "updateTag",
@@ -1052,7 +1109,7 @@ function () {
       var _iteratorError2 = undefined;
 
       try {
-        for (var _iterator2 = this.note.tags[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+        for (var _iterator2 = this.state.note.tags[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
           var tag = _step2.value;
 
           if (stringTags.indexOf(tag.title) === -1) {
@@ -1076,7 +1133,7 @@ function () {
 
       for (var _i2 = 0, _toRemove = toRemove; _i2 < _toRemove.length; _i2++) {
         var tagToRemove = _toRemove[_i2];
-        tagToRemove.removeItemAsRelationship(this.note);
+        tagToRemove.removeItemAsRelationship(this.state.note);
       }
 
       this.modelManager.setItemsDirty(toRemove);
@@ -1089,7 +1146,7 @@ function () {
         for (var _iterator3 = stringTags[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
           var tagString = _step3.value;
 
-          var existingRelationship = _.find(this.note.tags, {
+          var existingRelationship = _.find(this.state.note.tags, {
             title: tagString
           });
 
@@ -1115,7 +1172,7 @@ function () {
       for (var _i3 = 0, _tags = tags; _i3 < _tags.length; _i3++) {
         var _tag = _tags[_i3];
 
-        _tag.addItemAsRelationship(this.note);
+        _tag.addItemAsRelationship(this.state.note);
       }
 
       this.modelManager.setItemsDirty(tags);
@@ -1124,24 +1181,29 @@ function () {
   }, {
     key: "updateTagsFromTagsString",
     value: function updateTagsFromTagsString() {
-      if (this.tagsString === this.note.tagsString()) {
+      if (this.state.tagsString === this.state.note.tagsString()) {
         return;
       }
 
-      var strings = this.tagsString.split('#').filter(function (string) {
+      var strings = this.state.tagsString.split('#').filter(function (string) {
         return string.length > 0;
       }).map(function (string) {
         return string.trim();
       });
-      this.note.dummy = false;
+      this.state.note.dummy = false;
       this.updateTags(strings);
     }
   }, {
     key: "loadPreferences",
     value: function loadPreferences() {
-      this.monospaceEnabled = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__["PREF_EDITOR_MONOSPACE_ENABLED"], true);
-      this.spellcheck = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__["PREF_EDITOR_SPELLCHECK"], true);
-      this.marginResizersEnabled = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__["PREF_EDITOR_RESIZERS_ENABLED"], true);
+      var monospaceEnabled = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_17__["PREF_EDITOR_MONOSPACE_ENABLED"], true);
+      var spellcheck = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_17__["PREF_EDITOR_SPELLCHECK"], true);
+      var marginResizersEnabled = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_17__["PREF_EDITOR_RESIZERS_ENABLED"], true);
+      this.setState({
+        monospaceEnabled: monospaceEnabled,
+        spellcheck: spellcheck,
+        marginResizersEnabled: marginResizersEnabled
+      });
 
       if (!document.getElementById(ELEMENT_ID_EDITOR_CONTENT)) {
         /** Elements have not yet loaded due to ng-if around wrapper */
@@ -1150,15 +1212,15 @@ function () {
 
       this.reloadFont();
 
-      if (this.marginResizersEnabled) {
-        var width = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__["PREF_EDITOR_WIDTH"], null);
+      if (this.state.marginResizersEnabled) {
+        var width = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_17__["PREF_EDITOR_WIDTH"], null);
 
         if (width != null) {
           this.leftResizeControl.setWidth(width);
           this.rightResizeControl.setWidth(width);
         }
 
-        var left = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__["PREF_EDITOR_LEFT"], null);
+        var left = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_17__["PREF_EDITOR_LEFT"], null);
 
         if (left != null) {
           this.leftResizeControl.setLeft(left);
@@ -1175,8 +1237,8 @@ function () {
         return;
       }
 
-      if (this.monospaceEnabled) {
-        if (Object(_utils__WEBPACK_IMPORTED_MODULE_6__["isDesktopApplication"])()) {
+      if (this.state.monospaceEnabled) {
+        if (this.state.isDesktop) {
           editor.style.fontFamily = DESKTOP_MONOSPACE_FAMILY;
         } else {
           editor.style.fontFamily = WEB_MONOSPACE_FAMILY;
@@ -1188,77 +1250,107 @@ function () {
   }, {
     key: "toggleKey",
     value: function toggleKey(key) {
-      var _this13 = this;
+      var _this12 = this;
 
-      this[key] = !this[key];
-      this.preferencesManager.setUserPrefValue(key, this[key], true);
-      this.reloadFont();
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function toggleKey$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              this[key] = !this[key];
+              this.preferencesManager.setUserPrefValue(key, this[key], true);
+              this.reloadFont();
 
-      if (key === _services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__["PREF_EDITOR_SPELLCHECK"]) {
-        /** Allows textarea to reload */
-        this.noteReady = false;
-        this.$timeout(function () {
-          _this13.noteReady = true;
+              if (!(key === _services_preferencesManager__WEBPACK_IMPORTED_MODULE_17__["PREF_EDITOR_SPELLCHECK"])) {
+                _context3.next = 10;
+                break;
+              }
 
-          _this13.$timeout(function () {
-            _this13.reloadFont();
-          });
-        });
-      } else if (key === _services_preferencesManager__WEBPACK_IMPORTED_MODULE_12__["PREF_EDITOR_RESIZERS_ENABLED"] && this[key] === true) {
-        this.$timeout(function () {
-          _this13.leftResizeControl.flash();
+              _context3.next = 6;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.setState({
+                noteReady: false
+              }));
 
-          _this13.rightResizeControl.flash();
-        });
-      }
+            case 6:
+              this.setState({
+                noteReady: true
+              });
+              this.reloadFont();
+              _context3.next = 11;
+              break;
+
+            case 10:
+              if (key === _services_preferencesManager__WEBPACK_IMPORTED_MODULE_17__["PREF_EDITOR_RESIZERS_ENABLED"] && this[key] === true) {
+                this.$timeout(function () {
+                  _this12.leftResizeControl.flash();
+
+                  _this12.rightResizeControl.flash();
+                });
+              }
+
+            case 11:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, null, this);
     }
     /** @components */
 
   }, {
     key: "registerComponentHandler",
     value: function registerComponentHandler() {
-      var _this14 = this;
+      var _this13 = this;
 
       this.componentManager.registerHandler({
         identifier: 'editor',
         areas: ['note-tags', 'editor-stack', 'editor-editor'],
         activationHandler: function activationHandler(component) {
           if (component.area === 'note-tags') {
-            _this14.tagsComponent = component.active ? component : null;
+            _this13.setState({
+              tagsComponent: component.active ? component : null
+            });
           } else if (component.area === 'editor-editor') {
-            if (component === _this14.selectedEditor && !component.active) {
-              _this14.selectedEditor = null;
-            } else if (_this14.selectedEditor) {
-              if (_this14.selectedEditor.active) {
-                if (component.isExplicitlyEnabledForItem(_this14.note) && !_this14.selectedEditor.isExplicitlyEnabledForItem(_this14.note)) {
-                  _this14.selectedEditor = component;
+            if (component === _this13.state.selectedEditor && !component.active) {
+              _this13.setState({
+                selectedEditor: null
+              });
+            } else if (_this13.state.selectedEditor) {
+              if (_this13.state.selectedEditor.active) {
+                if (component.isExplicitlyEnabledForItem(_this13.state.note) && !_this13.state.selectedEditor.isExplicitlyEnabledForItem(_this13.state.note)) {
+                  _this13.setState({
+                    selectedEditor: component
+                  });
                 }
               }
             } else {
-              var enableable = component.isExplicitlyEnabledForItem(_this14.note) || component.isDefaultEditor();
+              var enableable = component.isExplicitlyEnabledForItem(_this13.state.note) || component.isDefaultEditor();
 
-              if (component.active && _this14.note && enableable) {
-                _this14.selectedEditor = component;
+              if (component.active && _this13.state.note && enableable) {
+                _this13.setState({
+                  selectedEditor: component
+                });
               } else {
                 /**
                  * Not a candidate, and no qualified editor.
                  * Disable the current editor.
                  */
-                _this14.selectedEditor = null;
+                _this13.setState({
+                  selectedEditor: null
+                });
               }
             }
           } else if (component.area === 'editor-stack') {
-            _this14.reloadComponentContext();
+            _this13.reloadComponentContext();
           }
         },
         contextRequestHandler: function contextRequestHandler(component) {
-          if (component == _this14.selectedEditor || component == _this14.tagsComponent || _this14.componentStack.includes(component)) {
-            return _this14.note;
+          if (component === _this13.state.selectedEditor || component === _this13.state.tagsComponent || _this13.state.componentStack.includes(component)) {
+            return _this13.state.note;
           }
         },
         focusHandler: function focusHandler(component, focused) {
           if (component.isEditor() && focused) {
-            _this14.closeAllMenus();
+            _this13.closeAllMenus();
           }
         },
         actionHandler: function actionHandler(component, action, data) {
@@ -1277,21 +1369,21 @@ function () {
             }
           } else if (action === 'associate-item') {
             if (data.item.content_type === 'Tag') {
-              var tag = _this14.modelManager.findItem(data.item.uuid);
+              var tag = _this13.modelManager.findItem(data.item.uuid);
 
-              _this14.addTag(tag);
+              _this13.addTag(tag);
             }
           } else if (action === 'deassociate-item') {
-            var _tag2 = _this14.modelManager.findItem(data.item.uuid);
+            var _tag2 = _this13.modelManager.findItem(data.item.uuid);
 
-            _this14.removeTag(_tag2);
+            _this13.removeTag(_tag2);
           } else if (action === 'save-items') {
             var includesNote = data.items.map(function (item) {
               return item.uuid;
-            }).includes(_this14.note.uuid);
+            }).includes(_this13.state.note.uuid);
 
             if (includesNote) {
-              _this14.showSavingStatus();
+              _this13.showSavingStatus();
             }
           }
         }
@@ -1300,9 +1392,11 @@ function () {
   }, {
     key: "reloadComponentStackArray",
     value: function reloadComponentStackArray() {
-      var components = this.componentManager.componentsForArea('editor-stack');
-      this.componentStack = components.sort(function (a, b) {
+      var components = this.componentManager.componentsForArea('editor-stack').sort(function (a, b) {
         return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+      });
+      this.setState({
+        state: components
       });
     }
   }, {
@@ -1310,17 +1404,17 @@ function () {
     value: function reloadComponentContext() {
       this.reloadComponentStackArray();
 
-      if (this.note) {
+      if (this.state.note) {
         var _iteratorNormalCompletion4 = true;
         var _didIteratorError4 = false;
         var _iteratorError4 = undefined;
 
         try {
-          for (var _iterator4 = this.componentStack[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          for (var _iterator4 = this.state.componentStack[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
             var component = _step4.value;
 
             if (component.active) {
-              this.componentManager.setComponentHidden(component, !component.isExplicitlyEnabledForItem(this.note));
+              this.componentManager.setComponentHidden(component, !component.isExplicitlyEnabledForItem(this.state.note));
             }
           }
         } catch (err) {
@@ -1363,14 +1457,14 @@ function () {
   }, {
     key: "disassociateComponentWithCurrentNote",
     value: function disassociateComponentWithCurrentNote(component) {
-      var _this15 = this;
+      var _this14 = this;
 
       component.associatedItemIds = component.associatedItemIds.filter(function (id) {
-        return id !== _this15.note.uuid;
+        return id !== _this14.state.note.uuid;
       });
 
-      if (!component.disassociatedItemIds.includes(this.note.uuid)) {
-        component.disassociatedItemIds.push(this.note.uuid);
+      if (!component.disassociatedItemIds.includes(this.state.note.uuid)) {
+        component.disassociatedItemIds.push(this.state.note.uuid);
       }
 
       this.modelManager.setItemDirty(component);
@@ -1379,14 +1473,14 @@ function () {
   }, {
     key: "associateComponentWithCurrentNote",
     value: function associateComponentWithCurrentNote(component) {
-      var _this16 = this;
+      var _this15 = this;
 
       component.disassociatedItemIds = component.disassociatedItemIds.filter(function (id) {
-        return id !== _this16.note.uuid;
+        return id !== _this15.state.note.uuid;
       });
 
-      if (!component.associatedItemIds.includes(this.note.uuid)) {
-        component.associatedItemIds.push(this.note.uuid);
+      if (!component.associatedItemIds.includes(this.state.note.uuid)) {
+        component.associatedItemIds.push(this.state.note.uuid);
       }
 
       this.modelManager.setItemDirty(component);
@@ -1395,47 +1489,43 @@ function () {
   }, {
     key: "registerKeyboardShortcuts",
     value: function registerKeyboardShortcuts() {
-      var _this17 = this;
+      var _this16 = this;
 
       this.altKeyObserver = this.keyboardManager.addKeyObserver({
-        modifiers: [_services_keyboardManager__WEBPACK_IMPORTED_MODULE_7__["KeyboardManager"].KeyModifierAlt],
+        modifiers: [_services_keyboardManager__WEBPACK_IMPORTED_MODULE_11__["KeyboardManager"].KeyModifierAlt],
         onKeyDown: function onKeyDown() {
-          _this17.$timeout(function () {
-            _this17.altKeyDown = true;
+          _this16.setState({
+            altKeyDown: true
           });
         },
         onKeyUp: function onKeyUp() {
-          _this17.$timeout(function () {
-            _this17.altKeyDown = false;
+          _this16.setState({
+            altKeyDown: false
           });
         }
       });
       this.trashKeyObserver = this.keyboardManager.addKeyObserver({
-        key: _services_keyboardManager__WEBPACK_IMPORTED_MODULE_7__["KeyboardManager"].KeyBackspace,
+        key: _services_keyboardManager__WEBPACK_IMPORTED_MODULE_11__["KeyboardManager"].KeyBackspace,
         notElementIds: [ELEMENT_ID_NOTE_TEXT_EDITOR, ELEMENT_ID_NOTE_TITLE_EDITOR],
-        modifiers: [_services_keyboardManager__WEBPACK_IMPORTED_MODULE_7__["KeyboardManager"].KeyModifierMeta],
+        modifiers: [_services_keyboardManager__WEBPACK_IMPORTED_MODULE_11__["KeyboardManager"].KeyModifierMeta],
         onKeyDown: function onKeyDown() {
-          _this17.$timeout(function () {
-            _this17.deleteNote();
-          });
+          _this16.deleteNote();
         }
       });
       this.deleteKeyObserver = this.keyboardManager.addKeyObserver({
-        key: _services_keyboardManager__WEBPACK_IMPORTED_MODULE_7__["KeyboardManager"].KeyBackspace,
-        modifiers: [_services_keyboardManager__WEBPACK_IMPORTED_MODULE_7__["KeyboardManager"].KeyModifierMeta, _services_keyboardManager__WEBPACK_IMPORTED_MODULE_7__["KeyboardManager"].KeyModifierShift, _services_keyboardManager__WEBPACK_IMPORTED_MODULE_7__["KeyboardManager"].KeyModifierAlt],
+        key: _services_keyboardManager__WEBPACK_IMPORTED_MODULE_11__["KeyboardManager"].KeyBackspace,
+        modifiers: [_services_keyboardManager__WEBPACK_IMPORTED_MODULE_11__["KeyboardManager"].KeyModifierMeta, _services_keyboardManager__WEBPACK_IMPORTED_MODULE_11__["KeyboardManager"].KeyModifierShift, _services_keyboardManager__WEBPACK_IMPORTED_MODULE_11__["KeyboardManager"].KeyModifierAlt],
         onKeyDown: function onKeyDown(event) {
           event.preventDefault();
 
-          _this17.$timeout(function () {
-            _this17.deleteNote(true);
-          });
+          _this16.deleteNote(true);
         }
       });
     }
   }, {
     key: "onSystemEditorLoad",
     value: function onSystemEditorLoad() {
-      var _this18 = this;
+      var _this17 = this;
 
       if (this.loadedTabListener) {
         return;
@@ -1452,9 +1542,9 @@ function () {
       var editor = document.getElementById(ELEMENT_ID_NOTE_TEXT_EDITOR);
       this.tabObserver = this.keyboardManager.addKeyObserver({
         element: editor,
-        key: _services_keyboardManager__WEBPACK_IMPORTED_MODULE_7__["KeyboardManager"].KeyTab,
+        key: _services_keyboardManager__WEBPACK_IMPORTED_MODULE_11__["KeyboardManager"].KeyTab,
         onKeyDown: function onKeyDown(event) {
-          if (_this18.note.locked || event.shiftKey) {
+          if (_this17.state.note.locked || event.shiftKey) {
             return;
           }
 
@@ -1476,12 +1566,15 @@ function () {
             editor.selectionStart = editor.selectionEnd = start + 4;
           }
 
-          _this18.$timeout(function () {
-            _this18.note.text = editor.value;
+          var note = _this17.state.note;
+          note.text = editor.value;
 
-            _this18.saveNote({
-              bypassDebouncer: true
-            });
+          _this17.setState({
+            note: note
+          });
+
+          _this17.saveNote({
+            bypassDebouncer: true
           });
         }
       });
@@ -1490,28 +1583,28 @@ function () {
        * (and not when our controller is destroyed.)
        */
 
-      angular__WEBPACK_IMPORTED_MODULE_4___default.a.element(editor).on('$destroy', function () {
-        if (_this18.tabObserver) {
-          _this18.keyboardManager.removeKeyObserver(_this18.tabObserver);
+      angular__WEBPACK_IMPORTED_MODULE_8___default.a.element(editor).on('$destroy', function () {
+        if (_this17.tabObserver) {
+          _this17.keyboardManager.removeKeyObserver(_this17.tabObserver);
 
-          _this18.loadedTabListener = false;
+          _this17.loadedTabListener = false;
         }
       });
     }
   }]);
 
   return EditorCtrl;
-}();
+}(_Controllers__WEBPACK_IMPORTED_MODULE_14__["PureCtrl"]);
 
 var EditorPanel = function EditorPanel() {
   _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, EditorPanel);
 
   this.restrict = 'E';
   this.scope = {};
-  this.template = _editor_pug__WEBPACK_IMPORTED_MODULE_9___default.a;
+  this.template = _editor_pug__WEBPACK_IMPORTED_MODULE_13___default.a;
   this.replace = true;
   this.controller = EditorCtrl;
-  this.controllerAs = 'ctrl';
+  this.controllerAs = 'self';
   this.bindToController = true;
 };
 
@@ -2394,13 +2487,11 @@ function (_PureCtrl) {
             _this4.createNewNote();
           }
         } else if (syncEvent === 'sync:completed') {
-          _this4.$timeout(function () {
-            if (_this4.createDummyOnSynCompletionIfNoNotes && _this4.state.notes.length === 0) {
-              _this4.createDummyOnSynCompletionIfNoNotes = false;
+          if (_this4.createDummyOnSynCompletionIfNoNotes && _this4.state.notes.length === 0) {
+            _this4.createDummyOnSynCompletionIfNoNotes = false;
 
-              _this4.createNewNote();
-            }
-          });
+            _this4.createNewNote();
+          }
         }
       });
     }
@@ -69634,7 +69725,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"section editor sn-component\" id=\"editor-column\" aria-label=\"Note\"\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-app-bar no-edges\" ng-if=\"ctrl.note.locked\" ng-init=\"ctrl.lockText = 'Note Locked'\" ng-mouseleave=\"ctrl.lockText = 'Note Locked'\" ng-mouseover=\"ctrl.lockText = 'Unlock'\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-click=\"ctrl.toggleLockNote()\"\u003E\u003Cdiv class=\"sk-label warning\"\u003E\u003Ci class=\"icon ion-locked\"\u003E\u003C\u002Fi\u003E            {{ctrl.lockText}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"section-title-bar\" id=\"editor-title-bar\" ng-class=\"{'locked' : ctrl.note.locked}\" ng-show=\"ctrl.note &amp;&amp; !ctrl.note.errorDecrypting\"\u003E\u003Cdiv class=\"title\"\u003E\u003Cinput class=\"input\" id=\"note-title-editor\" ng-blur=\"ctrl.onNameBlur()\" ng-change=\"ctrl.onTitleChange()\" ng-disabled=\"ctrl.note.locked\" ng-focus=\"ctrl.onNameFocus()\" ng-keyup=\"$event.keyCode == 13 &amp;&amp; ctrl.onTitleEnter($event)\" ng-model=\"ctrl.note.title\" select-on-click=\"true\" spellcheck=\"false\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv id=\"save-status\"\u003E\u003Cdiv class=\"message\" ng-class=\"{'warning sk-bold': ctrl.syncTakingTooLong, 'danger sk-bold': ctrl.saveError}\"\u003E{{ctrl.noteStatus.message}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"desc\" ng-show=\"ctrl.noteStatus.desc\"\u003E{{ctrl.noteStatus.desc}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"editor-tags\"\u003E\u003Cdiv id=\"note-tags-component-container\" ng-if=\"ctrl.tagsComponent\"\u003E\u003Ccomponent-view class=\"component-view\" component=\"ctrl.tagsComponent\" ng-class=\"{'locked' : ctrl.note.locked}\" ng-style=\"ctrl.note.locked &amp;&amp; {'pointer-events' : 'none'}\"\u003E\u003C\u002Fcomponent-view\u003E\u003C\u002Fdiv\u003E\u003Cinput class=\"tags-input\" ng-blur=\"ctrl.updateTagsFromTagsString($event, ctrl.tagsString)\" ng-disabled=\"ctrl.note.locked\" ng-if=\"!(ctrl.tagsComponent &amp;&amp; ctrl.tagsComponent.active)\" ng-keyup=\"$event.keyCode == 13 &amp;&amp; $event.target.blur();\" ng-model=\"ctrl.tagsString\" placeholder=\"#tags\" spellcheck=\"false\" type=\"text\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\" ng-if=\"ctrl.note\"\u003E\u003Cdiv class=\"sk-app-bar no-edges\" id=\"editor-menu-bar\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\" click-outside=\"ctrl.showMenu = false;\" is-open=\"ctrl.showMenu\" ng-class=\"{'selected' : ctrl.showMenu}\" ng-click=\"ctrl.toggleMenu('showMenu')\"\u003E\u003Cdiv class=\"sk-label\"\u003EOptions\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel dropdown-menu\" ng-if=\"ctrl.showMenu\"\u003E\u003Cdiv class=\"sk-menu-panel-section\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003ENote Options\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"ctrl.selectedMenuItem(true); ctrl.togglePin()\" desc=\"'Pin or unpin a note from the top of your list'\" label=\"ctrl.note.pinned ? 'Unpin' : 'Pin'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"ctrl.selectedMenuItem(true); ctrl.toggleArchiveNote()\" desc=\"'Archive or unarchive a note from your Archived system tag'\" label=\"ctrl.note.archived ? 'Unarchive' : 'Archive'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"ctrl.selectedMenuItem(true); ctrl.toggleLockNote()\" desc=\"'Locking notes prevents unintentional editing'\" label=\"ctrl.note.locked ? 'Unlock' : 'Lock'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"ctrl.selectedMenuItem(true); ctrl.toggleProtectNote()\" desc=\"'Protecting a note will require credentials to view it (Manage Privileges via Account menu)'\" label=\"ctrl.note.content.protected ? 'Unprotect' : 'Protect'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"ctrl.selectedMenuItem(true); ctrl.toggleNotePreview()\" circle=\"ctrl.note.content.hidePreview ? 'danger' : 'success'\" circle-align=\"'right'\" desc=\"'Hide or unhide the note preview from the list of notes'\" label=\"'Preview'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"ctrl.selectedMenuItem(); ctrl.deleteNote()\" desc=\"'Send this note to the trash'\" label=\"'Move to Trash'\" ng-show=\"!ctrl.altKeyDown &amp;&amp; !ctrl.note.content.trashed &amp;&amp; !ctrl.note.errorDecrypting\" stylekit-class=\"'warning'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"ctrl.selectedMenuItem(); ctrl.deleteNotePermanantely()\" desc=\"'Delete this note permanently from all your devices'\" label=\"'Delete Permanently'\" ng-show=\"!ctrl.note.content.trashed &amp;&amp; ctrl.note.errorDecrypting\" stylekit-class=\"'danger'\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"ctrl.note.content.trashed || ctrl.altKeyDown\"\u003E\u003Cmenu-row action=\"ctrl.selectedMenuItem(true); ctrl.restoreTrashedNote()\" desc=\"'Undelete this note and restore it back into your notes'\" label=\"'Restore'\" ng-show=\"ctrl.note.content.trashed\" stylekit-class=\"'info'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"ctrl.selectedMenuItem(true); ctrl.deleteNotePermanantely()\" desc=\"'Delete this note permanently from all your devices'\" label=\"'Delete Permanently'\" stylekit-class=\"'danger'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"ctrl.selectedMenuItem(true); ctrl.emptyTrash()\" desc=\"'Permanently delete all notes in the trash'\" label=\"'Empty Trash'\" ng-show=\"ctrl.note.content.trashed || !ctrl.altKeyDown\" stylekit-class=\"'danger'\" subtitle=\"ctrl.getTrashCount() + ' notes in trash'\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel-section\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003EGlobal Display\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"ctrl.selectedMenuItem(true); ctrl.toggleKey(ctrl.prefKeyMonospace)\" circle=\"ctrl.monospaceEnabled ? 'success' : 'neutral'\" desc=\"'Toggles the font style for the default editor'\" disabled=\"ctrl.selectedEditor\" label=\"'Monospace Font'\" subtitle=\"ctrl.selectedEditor ? 'Not available with editor extensions' : null\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"ctrl.selectedMenuItem(true); ctrl.toggleKey(ctrl.prefKeySpellcheck)\" circle=\"ctrl.spellcheck ? 'success' : 'neutral'\" desc=\"'Toggles spellcheck for the default editor'\" disabled=\"ctrl.selectedEditor\" label=\"'Spellcheck'\" subtitle=\"ctrl.selectedEditor ? 'Not available with editor extensions' : (ctrl.isDesktop ? 'May degrade editor performance' : null)\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"ctrl.selectedMenuItem(true); ctrl.toggleKey(ctrl.prefKeyMarginResizers)\" circle=\"ctrl.marginResizersEnabled ? 'success' : 'neutral'\" desc=\"'Allows for editor left and right margins to be resized'\" faded=\"!ctrl.marginResizersEnabled\" label=\"'Margin Resizers'\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item\" click-outside=\"ctrl.showEditorMenu = false;\" is-open=\"ctrl.showEditorMenu\" ng-class=\"{'selected' : ctrl.showEditorMenu}\" ng-click=\"ctrl.toggleMenu('showEditorMenu')\"\u003E\u003Cdiv class=\"sk-label\"\u003EEditor\u003C\u002Fdiv\u003E\u003Ceditor-menu callback=\"ctrl.editorMenuOnSelect\" current-item=\"ctrl.note\" ng-if=\"ctrl.showEditorMenu\" selected-editor=\"ctrl.selectedEditor\"\u003E\u003C\u002Feditor-menu\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item\" click-outside=\"ctrl.showExtensions = false;\" is-open=\"ctrl.showExtensions\" ng-class=\"{'selected' : ctrl.showExtensions}\" ng-click=\"ctrl.toggleMenu('showExtensions')\"\u003E\u003Cdiv class=\"sk-label\"\u003EActions\u003C\u002Fdiv\u003E\u003Cactions-menu item=\"ctrl.note\" ng-if=\"ctrl.showExtensions\"\u003E\u003C\u002Factions-menu\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item\" click-outside=\"ctrl.showSessionHistory = false;\" is-open=\"ctrl.showSessionHistory\" ng-click=\"ctrl.toggleMenu('showSessionHistory')\"\u003E\u003Cdiv class=\"sk-label\"\u003ESession History\u003C\u002Fdiv\u003E\u003Csession-history-menu item=\"ctrl.note\" ng-if=\"ctrl.showSessionHistory\"\u003E\u003C\u002Fsession-history-menu\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"editor-content\" id=\"editor-content\" ng-if=\"ctrl.noteReady &amp;&amp; !ctrl.note.errorDecrypting\"\u003E\u003Cpanel-resizer class=\"left\" control=\"ctrl.leftResizeControl\" hoverable=\"true\" min-width=\"300\" ng-if=\"ctrl.marginResizersEnabled\" on-resize-finish=\"ctrl.onPanelResizeFinish\" panel-id=\"'editor-content'\" property=\"'left'\"\u003E\u003C\u002Fpanel-resizer\u003E\u003Ccomponent-view class=\"component-view\" component=\"ctrl.selectedEditor\" ng-if=\"ctrl.selectedEditor\" on-load=\"ctrl.onEditorLoad\"\u003E\u003C\u002Fcomponent-view\u003E\u003Ctextarea class=\"editable\" id=\"note-text-editor\" dir=\"auto\" ng-attr-spellcheck=\"{{ctrl.spellcheck}}\" ng-change=\"ctrl.contentChanged()\" ng-click=\"ctrl.clickedTextArea()\" ng-focus=\"ctrl.onContentFocus()\" ng-if=\"!ctrl.selectedEditor\" ng-model=\"ctrl.note.text\" ng-model-options=\"{ debounce: ctrl.editorDebounce}\" ng-readonly=\"ctrl.note.locked\" ng-trim=\"false\"\u003E{{ctrl.onSystemEditorLoad()}}\u003C\u002Ftextarea\u003E\u003Cpanel-resizer control=\"ctrl.rightResizeControl\" hoverable=\"true\" min-width=\"300\" ng-if=\"ctrl.marginResizersEnabled\" on-resize-finish=\"ctrl.onPanelResizeFinish\" panel-id=\"'editor-content'\" property=\"'right'\"\u003E\u003C\u002Fpanel-resizer\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"section\" ng-show=\"ctrl.note.errorDecrypting\"\u003E\u003Cp class=\"medium-padding\" style=\"padding-top: 0 !important;\"\u003EThere was an error decrypting this item. Ensure you are running the \nlatest version of this app, then sign out and sign back in to try again.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv id=\"editor-pane-component-stack\" ng-show=\"ctrl.note\"\u003E\u003Cdiv class=\"sk-app-bar no-edges\" id=\"component-stack-menu-bar\" ng-if=\"ctrl.componentStack.length\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-click=\"ctrl.toggleStackComponentForCurrentItem(component)\" ng-repeat=\"component in ctrl.componentStack\"\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-circle small\" ng-class=\"{'info' : !component.hidden &amp;&amp; component.active, 'neutral' : component.hidden  || !component.active}\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-label\"\u003E{{component.name}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Ccomponent-view class=\"component-view component-stack-item\" component=\"component\" manual-dealloc=\"true\" ng-if=\"component.active\" ng-repeat=\"component in ctrl.componentStack\" ng-show=\"!component.hidden\"\u003E\u003C\u002Fcomponent-view\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"section editor sn-component\" id=\"editor-column\" aria-label=\"Note\"\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Cdiv class=\"sk-app-bar no-edges\" ng-if=\"self.state.note.locked\" ng-init=\"self.lockText = 'Note Locked'\" ng-mouseleave=\"self.lockText = 'Note Locked'\" ng-mouseover=\"self.lockText = 'Unlock'\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-click=\"self.toggleLockNote()\"\u003E\u003Cdiv class=\"sk-label warning\"\u003E\u003Ci class=\"icon ion-locked\"\u003E\u003C\u002Fi\u003E            {{self.lockText}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"section-title-bar\" id=\"editor-title-bar\" ng-class=\"{'locked' : self.state.note.locked}\" ng-show=\"self.state.note &amp;&amp; !self.state.note.errorDecrypting\"\u003E\u003Cdiv class=\"title\"\u003E\u003Cinput class=\"input\" id=\"note-title-editor\" ng-blur=\"self.onNameBlur()\" ng-change=\"self.onTitleChange()\" ng-disabled=\"self.state.note.locked\" ng-focus=\"self.onNameFocus()\" ng-keyup=\"$event.keyCode == 13 &amp;&amp; self.onTitleEnter($event)\" ng-model=\"self.state.note.title\" select-on-click=\"true\" spellcheck=\"false\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv id=\"save-status\"\u003E\u003Cdiv class=\"message\" ng-class=\"{'warning sk-bold': self.state.syncTakingTooLong, 'danger sk-bold': self.state.saveError}\"\u003E{{self.state.noteStatus.message}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"desc\" ng-show=\"self.state.noteStatus.desc\"\u003E{{self.state.noteStatus.desc}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"editor-tags\"\u003E\u003Cdiv id=\"note-tags-component-container\" ng-if=\"self.state.tagsComponent\"\u003E\u003Ccomponent-view class=\"component-view\" component=\"self.state.tagsComponent\" ng-class=\"{'locked' : self.state.note.locked}\" ng-style=\"self.state.note.locked &amp;&amp; {'pointer-events' : 'none'}\"\u003E\u003C\u002Fcomponent-view\u003E\u003C\u002Fdiv\u003E\u003Cinput class=\"tags-input\" ng-blur=\"self.updateTagsFromTagsString($event, self.state.tagsString)\" ng-disabled=\"self.state.note.locked\" ng-if=\"!(self.state.tagsComponent &amp;&amp; self.state.tagsComponent.active)\" ng-keyup=\"$event.keyCode == 13 &amp;&amp; $event.target.blur();\" ng-model=\"self.state.tagsString\" placeholder=\"#tags\" spellcheck=\"false\" type=\"text\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\" ng-if=\"self.state.note\"\u003E\u003Cdiv class=\"sk-app-bar no-edges\" id=\"editor-menu-bar\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\" click-outside=\"self.setMenuState('showOptionsMenu', false)\" is-open=\"self.state.showOptionsMenu\" ng-class=\"{'selected' : self.state.showOptionsMenu}\" ng-click=\"self.toggleMenu('showOptionsMenu')\"\u003E\u003Cdiv class=\"sk-label\"\u003EOptions\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel dropdown-menu\" ng-if=\"self.state.showOptionsMenu\"\u003E\u003Cdiv class=\"sk-menu-panel-section\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003ENote Options\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"self.selectedMenuItem(true); self.togglePin()\" desc=\"'Pin or unpin a note from the top of your list'\" label=\"self.state.note.pinned ? 'Unpin' : 'Pin'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(true); self.toggleArchiveNote()\" desc=\"'Archive or unarchive a note from your Archived system tag'\" label=\"self.state.note.archived ? 'Unarchive' : 'Archive'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(true); self.toggleLockNote()\" desc=\"'Locking notes prevents unintentional editing'\" label=\"self.state.note.locked ? 'Unlock' : 'Lock'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(true); self.toggleProtectNote()\" desc=\"'Protecting a note will require credentials to view \n                      it (Manage Privileges via Account menu)'\" label=\"self.state.note.content.protected ? 'Unprotect' : 'Protect'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(true); self.toggleNotePreview()\" circle=\"self.state.note.content.hidePreview ? 'danger' : 'success'\" circle-align=\"'right'\" desc=\"'Hide or unhide the note preview from the list of notes'\" label=\"'Preview'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.deleteNote()\" desc=\"'Send this note to the trash'\" label=\"'Move to Trash'\" ng-show=\"!self.state.altKeyDown &amp;&amp; !self.state.note.content.trashed &amp;&amp; !self.state.note.errorDecrypting\" stylekit-class=\"'warning'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.deleteNotePermanantely()\" desc=\"'Delete this note permanently from all your devices'\" label=\"'Delete Permanently'\" ng-show=\"!self.state.note.content.trashed &amp;&amp; self.state.note.errorDecrypting\" stylekit-class=\"'danger'\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003Cdiv ng-if=\"self.state.note.content.trashed || self.state.altKeyDown\"\u003E\u003Cmenu-row action=\"self.selectedMenuItem(true); self.restoreTrashedNote()\" desc=\"'Undelete this note and restore it back into your notes'\" label=\"'Restore'\" ng-show=\"self.state.note.content.trashed\" stylekit-class=\"'info'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(true); self.deleteNotePermanantely()\" desc=\"'Delete this note permanently from all your devices'\" label=\"'Delete Permanently'\" stylekit-class=\"'danger'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(true); self.emptyTrash()\" desc=\"'Permanently delete all notes in the trash'\" label=\"'Empty Trash'\" ng-show=\"self.state.note.content.trashed || !self.state.altKeyDown\" stylekit-class=\"'danger'\" subtitle=\"self.getTrashCount() + ' notes in trash'\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel-section\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003EGlobal Display\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"self.selectedMenuItem(true); self.toggleKey(self.prefKeyMonospace)\" circle=\"self.state.monospaceEnabled ? 'success' : 'neutral'\" desc=\"'Toggles the font style for the default editor'\" disabled=\"self.state.selectedEditor\" label=\"'Monospace Font'\" subtitle=\"self.state.selectedEditor ? 'Not available with editor extensions' : null\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(true); self.toggleKey(self.prefKeySpellcheck)\" circle=\"self.state.spellcheck ? 'success' : 'neutral'\" desc=\"'Toggles spellcheck for the default editor'\" disabled=\"self.state.selectedEditor\" label=\"'Spellcheck'\" subtitle=\"\n                  self.state.selectedEditor \n                    ? 'Not available with editor extensions' \n                    : (self.state.isDesktop ? 'May degrade editor performance' : null)\n                  \"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(true); self.toggleKey(self.prefKeyMarginResizers)\" circle=\"self.state.marginResizersEnabled ? 'success' : 'neutral'\" desc=\"'Allows for editor left and right margins to be resized'\" faded=\"!self.state.marginResizersEnabled\" label=\"'Margin Resizers'\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item\" click-outside=\"self.setMenuState('showEditorMenu', false)\" is-open=\"self.state.showEditorMenu\" ng-class=\"{'selected' : self.state.showEditorMenu}\" ng-click=\"self.toggleMenu('showEditorMenu')\"\u003E\u003Cdiv class=\"sk-label\"\u003EEditor\u003C\u002Fdiv\u003E\u003Ceditor-menu callback=\"self.editorMenuOnSelect\" current-item=\"self.state.note\" ng-if=\"self.state.showEditorMenu\" selected-editor=\"self.state.selectedEditor\"\u003E\u003C\u002Feditor-menu\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item\" click-outside=\"self.setMenuState('showExtensions', false)\" is-open=\"self.state.showExtensions\" ng-class=\"{'selected' : self.state.showExtensions}\" ng-click=\"self.toggleMenu('showExtensions')\"\u003E\u003Cdiv class=\"sk-label\"\u003EActions\u003C\u002Fdiv\u003E\u003Cactions-menu item=\"self.state.note\" ng-if=\"self.state.showExtensions\"\u003E\u003C\u002Factions-menu\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item\" click-outside=\"self.setMenuState('showSessionHistory', false)\" is-open=\"self.state.showSessionHistory\" ng-click=\"self.toggleMenu('showSessionHistory')\"\u003E\u003Cdiv class=\"sk-label\"\u003ESession History\u003C\u002Fdiv\u003E\u003Csession-history-menu item=\"self.state.note\" ng-if=\"self.state.showSessionHistory\"\u003E\u003C\u002Fsession-history-menu\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"editor-content\" id=\"editor-content\" ng-if=\"self.state.noteReady &amp;&amp; !self.state.note.errorDecrypting\"\u003E\u003Cpanel-resizer class=\"left\" control=\"self.leftResizeControl\" hoverable=\"true\" min-width=\"300\" ng-if=\"self.state.marginResizersEnabled\" on-resize-finish=\"self.onPanelResizeFinish\" panel-id=\"'editor-content'\" property=\"'left'\"\u003E\u003C\u002Fpanel-resizer\u003E\u003Ccomponent-view class=\"component-view\" component=\"self.state.selectedEditor\" ng-if=\"self.state.selectedEditor\" on-load=\"self.onEditorLoad\"\u003E\u003C\u002Fcomponent-view\u003E\u003Ctextarea class=\"editable\" id=\"note-text-editor\" dir=\"auto\" ng-attr-spellcheck=\"{{self.state.spellcheck}}\" ng-change=\"self.contentChanged()\" ng-click=\"self.clickedTextArea()\" ng-focus=\"self.onContentFocus()\" ng-if=\"!self.state.selectedEditor\" ng-model=\"self.state.note.text\" ng-model-options=\"{ debounce: self.state.editorDebounce}\" ng-readonly=\"self.state.note.locked\" ng-trim=\"false\"\u003E{{self.onSystemEditorLoad()}}\u003C\u002Ftextarea\u003E\u003Cpanel-resizer control=\"self.rightResizeControl\" hoverable=\"true\" min-width=\"300\" ng-if=\"self.state.marginResizersEnabled\" on-resize-finish=\"self.onPanelResizeFinish\" panel-id=\"'editor-content'\" property=\"'right'\"\u003E\u003C\u002Fpanel-resizer\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"section\" ng-show=\"self.state.note.errorDecrypting\"\u003E\u003Cp class=\"medium-padding\" style=\"padding-top: 0 !important;\"\u003EThere was an error decrypting this item. Ensure you are running the \nlatest version of this app, then sign out and sign back in to try again.\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cdiv id=\"editor-pane-component-stack\" ng-show=\"self.state.note\"\u003E\u003Cdiv class=\"sk-app-bar no-edges\" id=\"component-stack-menu-bar\" ng-if=\"self.componentStack.length\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-click=\"self.toggleStackComponentForCurrentItem(component)\" ng-repeat=\"component in self.componentStack\"\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-circle small\" ng-class=\"{'info' : !component.hidden &amp;&amp; component.active, 'neutral' : component.hidden  || !component.active}\"\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-label\"\u003E{{component.name}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\"\u003E\u003Ccomponent-view class=\"component-view component-stack-item\" component=\"component\" manual-dealloc=\"true\" ng-if=\"component.active\" ng-repeat=\"component in self.componentStack\" ng-show=\"!component.hidden\"\u003E\u003C\u002Fcomponent-view\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),
@@ -69676,7 +69767,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component section notes\" id=\"notes-column\" aria-label=\"Notes\"\u003E\u003Cdiv class=\"content\"\u003E\u003Cdiv class=\"section-title-bar\" id=\"notes-title-bar\"\u003E\u003Cdiv class=\"padded\"\u003E\u003Cdiv class=\"section-title-bar-header\"\u003E\u003Cdiv class=\"title\"\u003E{{self.state.panelTitle}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button contrast wide\" ng-click=\"self.createNewNote()\" title=\"Create a new note in the selected tag\"\u003E\u003Cdiv class=\"sk-label\"\u003E\u003Ci class=\"icon ion-plus add-button\"\u003E\u003C\u002Fi\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"filter-section\" role=\"search\"\u003E\u003Cinput class=\"filter-bar\" id=\"search-bar\" lowercase=\"true\" ng-blur=\"self.onFilterEnter()\" ng-change=\"self.filterTextChanged()\" ng-keyup=\"$event.keyCode == 13 &amp;&amp; self.onFilterEnter();\" ng-model=\"self.state.noteFilter.text\" placeholder=\"Search\" select-on-click=\"true\" title=\"Searches notes in the currently selected tag\"\u003E\u003Cdiv id=\"search-clear-button\" ng-click=\"self.clearFilterText();\" ng-show=\"self.state.noteFilter.text\"\u003E✕\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\" id=\"notes-menu-bar\"\u003E\u003Cdiv class=\"sk-app-bar no-edges\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-class=\"{'selected' : self.state.mutable.showMenu}\" ng-click=\"self.state.mutable.showMenu = !self.state.mutable.showMenu\"\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-label\"\u003EOptions\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-sublabel\"\u003E{{self.optionsSubtitle()}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel dropdown-menu\" id=\"notes-options-menu\" ng-show=\"self.state.mutable.showMenu\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003ESort By\u003C\u002Fdiv\u003E\u003Ca class=\"info sk-h5\" ng-click=\"self.toggleReverseSort()\"\u003E{{self.state.sortReverse === true ? 'Disable Reverse Sort' : 'Enable Reverse Sort'}}\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.selectedSortByCreated()\" circle=\"self.state.sortBy == 'created_at' &amp;&amp; 'success'\" desc=\"'Sort notes by newest first'\" label=\"'Date Added'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.selectedSortByUpdated()\" circle=\"self.state.sortBy == 'client_updated_at' &amp;&amp; 'success'\" desc=\"'Sort notes with the most recently updated first'\" label=\"'Date Modified'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.selectedSortByTitle()\" circle=\"self.state.sortBy == 'title' &amp;&amp; 'success'\" desc=\"'Sort notes alphabetically by their title'\" label=\"'Title'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cdiv class=\"sk-menu-panel-section\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003EDisplay\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('showArchived')\" circle=\"self.state.showArchived ? 'success' : 'danger'\" desc=\"'Archived notes are usually hidden. \n                        You can explicitly show them with this option.'\" faded=\"!self.state.showArchived\" label=\"'Archived Notes'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hidePinned')\" circle=\"self.state.hidePinned ? 'danger' : 'success'\" desc=\"'Pinned notes always appear on top. You can hide them temporarily\n                         with this option so you can focus on other notes in the list.'\" faded=\"self.state.hidePinned\" label=\"'Pinned Notes'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hideNotePreview')\" circle=\"self.state.hideNotePreview ? 'danger' : 'success'\" desc=\"'Hide the note preview for a more condensed list of notes'\" faded=\"self.state.hideNotePreview\" label=\"'Note Preview'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hideDate')\" circle=\"self.state.hideDate ? 'danger' : 'success'\" desc=\"'Hide the date displayed in each row'\" faded=\"self.state.hideDate\" label=\"'Date'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hideTags')\" circle=\"self.state.hideTags ? 'danger' : 'success'\" desc=\"'Hide the list of tags associated with each note'\" faded=\"self.state.hideTags\" label=\"'Tags'\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"scrollable\"\u003E\u003Cdiv class=\"infinite-scroll\" id=\"notes-scrollable\" can-load=\"true\" infinite-scroll=\"self.paginate()\" threshold=\"200\"\u003E\u003Cdiv class=\"note\" ng-class=\"{'selected' : self.state.selectedNote == note}\" ng-click=\"self.selectNote(note, true)\" ng-repeat=\"note in self.state.renderedNotes track by note.uuid\"\u003E\u003Cdiv class=\"note-flags\" ng-show=\"note.flags.length &gt; 0\"\u003E\u003Cdiv class=\"flag\" ng-class=\"flag.class\" ng-repeat=\"flag in note.flags\"\u003E\u003Cdiv class=\"label\"\u003E{{flag.text}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"name\" ng-show=\"note.title\"\u003E{{note.title}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"note-preview\" ng-if=\"\n              !self.hideNotePreview &amp;&amp; \n              !note.content.hidePreview &amp;&amp; \n              !note.content.protected\"\u003E\u003Cdiv class=\"html-preview\" ng-bind-html=\"note.content.preview_html\" ng-show=\"note.content.preview_html\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"plain-preview\" ng-show=\"!note.content.preview_html &amp;&amp; note.content.preview_plain\"\u003E{{note.content.preview_plain}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"default-preview\" ng-show=\"!note.content.preview_html &amp;&amp; !note.content.preview_plain\"\u003E{{note.text}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"date faded\" ng-show=\"!self.hideDate\"\u003E\u003Cspan ng-show=\"self.state.sortBy == 'client_updated_at'\"\u003E Modified {{note.cachedUpdatedAtString || 'Now'}}\u003C\u002Fspan\u003E\u003Cspan ng-show=\"self.state.sortBy != 'client_updated_at'\"\u003E {{note.cachedCreatedAtString || 'Now'}}\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"tags-string\" ng-show=\"note.shouldShowTags\"\u003E\u003Cdiv class=\"faded\"\u003E{{note.savedTagsString || note.tagsString()}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cpanel-resizer collapsable=\"true\" control=\"self.panelController\" default-width=\"300\" hoverable=\"true\" on-resize-finish=\"self.onPanelResize\" panel-id=\"'notes-column'\"\u003E\u003C\u002Fpanel-resizer\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component section notes\" id=\"notes-column\" aria-label=\"Notes\"\u003E\u003Cdiv class=\"content\"\u003E\u003Cdiv class=\"section-title-bar\" id=\"notes-title-bar\"\u003E\u003Cdiv class=\"padded\"\u003E\u003Cdiv class=\"section-title-bar-header\"\u003E\u003Cdiv class=\"title\"\u003E{{self.state.panelTitle}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button contrast wide\" ng-click=\"self.createNewNote()\" title=\"Create a new note in the selected tag\"\u003E\u003Cdiv class=\"sk-label\"\u003E\u003Ci class=\"icon ion-plus add-button\"\u003E\u003C\u002Fi\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"filter-section\" role=\"search\"\u003E\u003Cinput class=\"filter-bar\" id=\"search-bar\" lowercase=\"true\" ng-blur=\"self.onFilterEnter()\" ng-change=\"self.filterTextChanged()\" ng-keyup=\"$event.keyCode == 13 &amp;&amp; self.onFilterEnter();\" ng-model=\"self.state.noteFilter.text\" placeholder=\"Search\" select-on-click=\"true\" title=\"Searches notes in the currently selected tag\"\u003E\u003Cdiv id=\"search-clear-button\" ng-click=\"self.clearFilterText();\" ng-show=\"self.state.noteFilter.text\"\u003E✕\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\" id=\"notes-menu-bar\"\u003E\u003Cdiv class=\"sk-app-bar no-edges\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-class=\"{'selected' : self.state.mutable.showMenu}\" ng-click=\"self.state.mutable.showMenu = !self.state.mutable.showMenu\"\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-label\"\u003EOptions\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-sublabel\"\u003E{{self.optionsSubtitle()}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel dropdown-menu\" id=\"notes-options-menu\" ng-show=\"self.state.mutable.showMenu\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003ESort By\u003C\u002Fdiv\u003E\u003Ca class=\"info sk-h5\" ng-click=\"self.toggleReverseSort()\"\u003E{{self.state.sortReverse === true ? 'Disable Reverse Sort' : 'Enable Reverse Sort'}}\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.selectedSortByCreated()\" circle=\"self.state.sortBy == 'created_at' &amp;&amp; 'success'\" desc=\"'Sort notes by newest first'\" label=\"'Date Added'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.selectedSortByUpdated()\" circle=\"self.state.sortBy == 'client_updated_at' &amp;&amp; 'success'\" desc=\"'Sort notes with the most recently updated first'\" label=\"'Date Modified'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.selectedSortByTitle()\" circle=\"self.state.sortBy == 'title' &amp;&amp; 'success'\" desc=\"'Sort notes alphabetically by their title'\" label=\"'Title'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cdiv class=\"sk-menu-panel-section\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003EDisplay\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('showArchived')\" circle=\"self.state.showArchived ? 'success' : 'danger'\" desc=\"'Archived notes are usually hidden. \n                    You can explicitly show them with this option.'\" faded=\"!self.state.showArchived\" label=\"'Archived Notes'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hidePinned')\" circle=\"self.state.hidePinned ? 'danger' : 'success'\" desc=\"'Pinned notes always appear on top. You can hide them temporarily\n                    with this option so you can focus on other notes in the list.'\" faded=\"self.state.hidePinned\" label=\"'Pinned Notes'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hideNotePreview')\" circle=\"self.state.hideNotePreview ? 'danger' : 'success'\" desc=\"'Hide the note preview for a more condensed list of notes'\" faded=\"self.state.hideNotePreview\" label=\"'Note Preview'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hideDate')\" circle=\"self.state.hideDate ? 'danger' : 'success'\" desc=\"'Hide the date displayed in each row'\" faded=\"self.state.hideDate\" label=\"'Date'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hideTags')\" circle=\"self.state.hideTags ? 'danger' : 'success'\" desc=\"'Hide the list of tags associated with each note'\" faded=\"self.state.hideTags\" label=\"'Tags'\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"scrollable\"\u003E\u003Cdiv class=\"infinite-scroll\" id=\"notes-scrollable\" can-load=\"true\" infinite-scroll=\"self.paginate()\" threshold=\"200\"\u003E\u003Cdiv class=\"note\" ng-class=\"{'selected' : self.state.selectedNote == note}\" ng-click=\"self.selectNote(note, true)\" ng-repeat=\"note in self.state.renderedNotes track by note.uuid\"\u003E\u003Cdiv class=\"note-flags\" ng-show=\"note.flags.length &gt; 0\"\u003E\u003Cdiv class=\"flag\" ng-class=\"flag.class\" ng-repeat=\"flag in note.flags\"\u003E\u003Cdiv class=\"label\"\u003E{{flag.text}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"name\" ng-show=\"note.title\"\u003E{{note.title}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"note-preview\" ng-if=\"\n              !self.hideNotePreview &amp;&amp; \n              !note.content.hidePreview &amp;&amp; \n              !note.content.protected\"\u003E\u003Cdiv class=\"html-preview\" ng-bind-html=\"note.content.preview_html\" ng-show=\"note.content.preview_html\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"plain-preview\" ng-show=\"!note.content.preview_html &amp;&amp; note.content.preview_plain\"\u003E{{note.content.preview_plain}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"default-preview\" ng-show=\"!note.content.preview_html &amp;&amp; !note.content.preview_plain\"\u003E{{note.text}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"date faded\" ng-show=\"!self.hideDate\"\u003E\u003Cspan ng-show=\"self.state.sortBy == 'client_updated_at'\"\u003E Modified {{note.cachedUpdatedAtString || 'Now'}}\u003C\u002Fspan\u003E\u003Cspan ng-show=\"self.state.sortBy != 'client_updated_at'\"\u003E {{note.cachedCreatedAtString || 'Now'}}\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"tags-string\" ng-show=\"note.shouldShowTags\"\u003E\u003Cdiv class=\"faded\"\u003E{{note.savedTagsString || note.tagsString()}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cpanel-resizer collapsable=\"true\" control=\"self.panelController\" default-width=\"300\" hoverable=\"true\" on-resize-finish=\"self.onPanelResize\" panel-id=\"'notes-column'\"\u003E\u003C\u002Fpanel-resizer\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),

@@ -16,7 +16,7 @@
             ng-blur='self.onFilterEnter()', 
             ng-change='self.filterTextChanged()', 
             ng-keyup='$event.keyCode == 13 && self.onFilterEnter();', 
-            ng-model='self.state.noteFilter.text', 
+            ng-model='self.state.noteFilter.text',
             placeholder='Search', 
             select-on-click='true', 
             title='Searches notes in the currently selected tag'
@@ -69,7 +69,7 @@
                   action="self.selectedMenuItem(); self.togglePrefKey('showArchived')" 
                   circle="self.state.showArchived ? 'success' : 'danger'" 
                   desc=`'Archived notes are usually hidden. 
-                        You can explicitly show them with this option.'`
+                    You can explicitly show them with this option.'`
                   faded="!self.state.showArchived" 
                   label="'Archived Notes'"
                   )
@@ -77,7 +77,7 @@
                   action="self.selectedMenuItem(); self.togglePrefKey('hidePinned')" 
                   circle="self.state.hidePinned ? 'danger' : 'success'" 
                   desc=`'Pinned notes always appear on top. You can hide them temporarily
-                         with this option so you can focus on other notes in the list.'`
+                    with this option so you can focus on other notes in the list.'`
                   faded="self.state.hidePinned" 
                   label="'Pinned Notes'"
                   )
