@@ -4386,35 +4386,62 @@ function (_PureCtrl) {
   }, {
     key: "saveTag",
     value: function saveTag($event, tag) {
-      $event.target.blur();
-      this.setState({
-        editingTag: null
-      });
+      var matchingTag;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function saveTag$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              $event.target.blur();
+              _context3.next = 3;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.setState({
+                editingTag: null
+              }));
 
-      if (!tag.title || tag.title.length === 0) {
-        if (this.editingOriginalName) {
-          tag.title = this.editingOriginalName;
-          this.editingOriginalName = null;
-        } else {
-          /** Newly created tag without content */
-          this.modelManager.removeItemLocally(tag);
+            case 3:
+              if (!(!tag.title || tag.title.length === 0)) {
+                _context3.next = 6;
+                break;
+              }
+
+              if (this.editingOriginalName) {
+                tag.title = this.editingOriginalName;
+                this.editingOriginalName = null;
+              } else {
+                /** Newly created tag without content */
+                this.modelManager.removeItemLocally(tag);
+              }
+
+              return _context3.abrupt("return");
+
+            case 6:
+              matchingTag = this.modelManager.findTag(tag.title);
+
+              if (!(this.state.newTag === tag && matchingTag)) {
+                _context3.next = 11;
+                break;
+              }
+
+              this.alertManager.alert({
+                text: "A tag with this name already exists."
+              });
+              this.modelManager.removeItemLocally(tag);
+              return _context3.abrupt("return");
+
+            case 11:
+              this.modelManager.setItemDirty(tag);
+              this.syncManager.sync();
+              this.modelManager.resortTag(tag);
+              this.selectTag(tag);
+              this.setState({
+                newTag: null
+              });
+
+            case 16:
+            case "end":
+              return _context3.stop();
+          }
         }
-
-        return;
-      }
-
-      if (!tag.title || tag.title.length === 0) {
-        this.removeTag(tag);
-        return;
-      }
-
-      this.modelManager.setItemDirty(tag);
-      this.syncManager.sync();
-      this.modelManager.resortTag(tag);
-      this.selectTag(tag);
-      this.setState({
-        newTag: null
-      });
+      }, null, this);
     }
   }, {
     key: "selectedRenameTag",
@@ -12649,11 +12676,16 @@ function (_SFModelManager) {
       this.handleSignout();
     }
   }, {
-    key: "findOrCreateTagByTitle",
-    value: function findOrCreateTagByTitle(title) {
-      var tag = lodash__WEBPACK_IMPORTED_MODULE_6___default.a.find(this.tags, {
+    key: "findTag",
+    value: function findTag(title) {
+      return lodash__WEBPACK_IMPORTED_MODULE_6___default.a.find(this.tags, {
         title: title
       });
+    }
+  }, {
+    key: "findOrCreateTagByTitle",
+    value: function findOrCreateTagByTitle(title) {
+      var tag = this.findTag(title);
 
       if (!tag) {
         tag = this.createItem({

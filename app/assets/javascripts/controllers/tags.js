@@ -38,7 +38,7 @@ class TagsPanelCtrl extends PureCtrl {
     this.state = {
       smartTags: this.modelManager.getSmartTags(),
       noteCounts: {}
-    }
+    };
   }
 
   $onInit() {
@@ -68,9 +68,9 @@ class TagsPanelCtrl extends PureCtrl {
       } else if (eventName === APP_STATE_EVENT_TAG_CHANGED) {
         this.setState({
           selectedTag: this.appState.getSelectedTag()
-        })
+        });
       }
-    })
+    });
   }
 
   addMappingObserver() {
@@ -85,7 +85,7 @@ class TagsPanelCtrl extends PureCtrl {
         }
         /** If the selected tag has been deleted, revert to All view. */
         const selectedTag = allItems.find((tag) => {
-          return tag.uuid === this.state.selectedTag.uuid
+          return tag.uuid === this.state.selectedTag.uuid;
         });
         if (selectedTag && selectedTag.deleted) {
           this.selectTag(this.state.smartTags[0]);
@@ -111,7 +111,7 @@ class TagsPanelCtrl extends PureCtrl {
     }
     this.setState({
       noteCounts: noteCounts
-    })
+    });
   }
 
   loadPreferences() {
@@ -122,7 +122,7 @@ class TagsPanelCtrl extends PureCtrl {
         this.appState.panelDidResize({
           name: PANEL_NAME_TAGS,
           collapsed: this.panelController.isCollapsed()
-        })
+        });
       }
     }
   }
@@ -194,21 +194,19 @@ class TagsPanelCtrl extends PureCtrl {
       selectedTag: newTag,
       editingTag: newTag,
       newTag: newTag
-    })
+    });
     this.modelManager.addItem(newTag);
   }
 
   tagTitleDidChange(tag) {
     this.setState({
       editingTag: tag
-    })
+    });
   }
 
-  saveTag($event, tag) {
+  async saveTag($event, tag) {
     $event.target.blur();
-    this.setState({
-      editingTag: null
-    })
+    await this.setState({ editingTag: null });
     if (!tag.title || tag.title.length === 0) {
       if (this.editingOriginalName) {
         tag.title = this.editingOriginalName;
@@ -220,8 +218,12 @@ class TagsPanelCtrl extends PureCtrl {
       return;
     }
 
-    if (!tag.title || tag.title.length === 0) {
-      this.removeTag(tag);
+    const matchingTag = this.modelManager.findTag(tag.title);
+    if (this.state.newTag === tag && matchingTag) {
+      this.alertManager.alert({
+        text: "A tag with this name already exists."
+      });
+      this.modelManager.removeItemLocally(tag);
       return;
     }
 
@@ -231,17 +233,17 @@ class TagsPanelCtrl extends PureCtrl {
     this.selectTag(tag);
     this.setState({
       newTag: null
-    })
+    });
   }
 
   selectedRenameTag($event, tag) {
     this.editingOriginalName = tag.title;
     this.setState({
       editingTag: tag
-    })
+    });
     this.$timeout(() => {
-      document.getElementById('tag-' + tag.uuid).focus()
-    })
+      document.getElementById('tag-' + tag.uuid).focus();
+    });
   }
 
   selectedDeleteTag(tag) {

@@ -33,8 +33,12 @@ export class ModelManager extends SFModelManager {
     this.handleSignout();
   }
 
+  findTag(title) {
+    return _.find(this.tags, { title: title });
+  }
+
   findOrCreateTagByTitle(title) {
-    var tag = _.find(this.tags, {title: title})
+    let tag = this.findTag(title);
     if(!tag) {
       tag = this.createItem({content_type: "Tag", content: {title: title}});
       this.addItem(tag);
@@ -88,9 +92,7 @@ export class ModelManager extends SFModelManager {
 
   removeItemLocally(item, callback) {
     super.removeItemLocally(item, callback);
-
     this.removeItemFromRespectiveArray(item);
-
     this.storageManager.deleteModel(item).then(callback);
   }
 
