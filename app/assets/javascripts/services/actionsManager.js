@@ -35,7 +35,7 @@ export class ActionsManager {
     return this.extensions.filter((ext) => {
       return _.includes(ext.supported_types, item.content_type) ||
         ext.actionsWithContextForItem(item).length > 0;
-    })
+    });
   }
 
   /**

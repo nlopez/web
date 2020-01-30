@@ -26,10 +26,10 @@ export class AlertManager extends SFAlertManager {
             resolve(true);
           }
         }
-      ]
+      ];
       const alert = new SKAlert({title, text, buttons});
       alert.present();
-    })
+    });
   }
 
   async confirm({
@@ -66,6 +66,6 @@ export class AlertManager extends SFAlertManager {
       ];
       const alert = new SKAlert({title, text, buttons});
       alert.present();
-    })
+    });
   }
 }

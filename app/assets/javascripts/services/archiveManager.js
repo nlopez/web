@@ -18,9 +18,9 @@ export class ArchiveManager {
   }
 
   async downloadBackupOfItems(items, encrypted) {
-    let run = async () => {
+    const run = async () => {
       // download in Standard Notes format
-      var keys, authParams;
+      let keys, authParams;
       if(encrypted) {
         if(this.authManager.offline() && this.passcodeManager.hasPasscode()) {
           keys = this.passcodeManager.keys();
@@ -31,15 +31,15 @@ export class ArchiveManager {
         }
       }
       this.__itemsData(items, keys, authParams).then((data) => {
-        let modifier = encrypted ? "Encrypted" : "Decrypted";
+        const modifier = encrypted ? "Encrypted" : "Decrypted";
         this.__downloadData(data, `Standard Notes ${modifier} Backup - ${this.__formattedDate()}.txt`);
 
         // download as zipped plain text files
         if(!keys) {
           this.__downloadZippedItems(items);
         }
-      })
-    }
+      });
+    };
 
     if(await this.privilegesManager.actionRequiresPrivilege(PrivilegesManager.ActionManageBackups)) {
       this.privilegesManager.presentPrivilegesModal(PrivilegesManager.ActionManageBackups, () => {
@@ -65,8 +65,8 @@ export class ArchiveManager {
   }
 
   async __itemsData(items, keys, authParams) {
-    let data = await this.modelManager.getJSONDataForItems(items, keys, authParams);
-    let blobData = new Blob([data], {type: 'text/json'});
+    const data = await this.modelManager.getJSONDataForItems(items, keys, authParams);
+    const blobData = new Blob([data], {type: 'text/json'});
     return blobData;
   }
 
@@ -84,7 +84,7 @@ export class ArchiveManager {
     scriptTag.onload = function() {
       zip.workerScriptsPath = "assets/zip/";
       callback();
-    }
+    };
   }
 
   __downloadZippedItems(items) {
@@ -92,11 +92,11 @@ export class ArchiveManager {
       zip.createWriter(new zip.BlobWriter("application/zip"), (zipWriter) => {
         var index = 0;
 
-        let nextFile = () => {
+        const nextFile = () => {
           var item = items[index];
           var name, contents;
 
-          if(item.content_type == "Note") {
+          if(item.content_type === "Note") {
             name = item.content.title;
             contents = item.content.text;
           } else {
@@ -108,16 +108,12 @@ export class ArchiveManager {
             name = "";
           }
 
-          var blob = new Blob([contents], {type: 'text/plain'});
-
-          var filePrefix = name.replace(/\//g, "").replace(/\\+/g, "");
-          var fileSuffix = `-${item.uuid.split("-")[0]}.txt`
-
+          const blob = new Blob([contents], {type: 'text/plain'});
+          let filePrefix = name.replace(/\//g, "").replace(/\\+/g, "");
+          const fileSuffix = `-${item.uuid.split("-")[0]}.txt`;
           // Standard max filename length is 255. Slice the note name down to allow filenameEnd
           filePrefix = filePrefix.slice(0, (255 - fileSuffix.length));
-
-          let fileName = `${item.content_type}/${filePrefix}${fileSuffix}`
-
+          const fileName = `${item.content_type}/${filePrefix}${fileSuffix}`
           zipWriter.add(fileName, new zip.BlobReader(blob), () => {
             index++;
             if(index < items.length) {
@@ -129,11 +125,11 @@ export class ArchiveManager {
               });
             }
           });
-        }
+        };
 
         nextFile();
       }, onerror);
-    })
+    });
   }
 
 

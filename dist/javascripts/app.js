@@ -10335,7 +10335,7 @@ function () {
             var item = items[index];
             var name, contents;
 
-            if (item.content_type == "Note") {
+            if (item.content_type === "Note") {
               name = item.content.title;
               contents = item.content.text;
             } else {
