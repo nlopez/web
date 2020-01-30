@@ -23,6 +23,13 @@ import {
 import {
   PANEL_NAME_NOTES
 } from '@/controllers/constants';
+import {
+  SORT_KEY_CREATED_AT,
+  SORT_KEY_UPDATED_AT,
+  SORT_KEY_CLIENT_UPDATED_AT,
+  SORT_KEY_TITLE,
+  filterAndSortNotes
+} from './note_utils';
 
 /**
  * This is the height of a note cell with nothing but the title,
@@ -31,10 +38,6 @@ import {
 const MIN_NOTE_CELL_HEIGHT = 51.0;
 const DEFAULT_LIST_NUM_NOTES = 20;
 
-const SORT_KEY_CREATED_AT = 'created_at';
-const SORT_KEY_UPDATED_AT = 'updated_at';
-const SORT_KEY_CLIENT_UPDATED_AT = 'client_updated_at';
-const SORT_KEY_TITLE = 'title';
 
 const ELEMENT_ID_SEARCH_BAR = 'search-bar';
 const ELEMENT_ID_SCROLL_CONTAINER = 'notes-scrollable';
@@ -90,11 +93,11 @@ class NotesCtrl extends PureCtrl {
     this.addSignInObserver();
     this.addSyncEventHandler();
     this.addMappingObserver();
-    this.loadPreferences();
+    this.reloadPreferences();
     this.resetPagination();
     this.registerKeyboardShortcuts();
     angular.element(document).ready(() => {
-      this.loadPreferences();
+      this.reloadPreferences();
     });
   }
 
@@ -105,7 +108,7 @@ class NotesCtrl extends PureCtrl {
       } else if (eventName === APP_STATE_EVENT_NOTE_CHANGED) {
         this.handleNoteSelection(this.appState.getSelectedNote());
       } else if (eventName === APP_STATE_EVENT_PREFERENCES_CHANGED) {
-        this.loadPreferences();
+        this.reloadPreferences();
         this.reloadNotes();
       } else if (eventName === APP_STATE_EVENT_EDITOR_FOCUSED) {
         this.setShowMenuFalse();
@@ -197,7 +200,6 @@ class NotesCtrl extends PureCtrl {
     await this.reloadNotes();
 
     if (this.state.notes.length > 0) {
-      this.state.notes.forEach((note) => { note.visible = true; })
       this.selectFirstNote();
     } else if (this.syncManager.initialDataLoaded()) {
       if (!tag.isSmartTag() || tag.content.isAllTag) {
@@ -240,12 +242,15 @@ class NotesCtrl extends PureCtrl {
     if (!this.state.tag) {
       return;
     }
-    const tagNotes = this.state.tag.notes;
-    const notes = this.sortNotes(
-      this.filterNotes(tagNotes),
-      this.state.sortBy,
-      this.state.sortReverse
-    );
+    const notes = filterAndSortNotes({
+      notes: this.state.tag.notes,
+      selectedTag: this.state.tag,
+      showArchived: this.state.showArchived,
+      hidePinned: this.state.hidePinned,
+      filterText: this.state.noteFilter.text,
+      sortBy: this.state.sortBy,
+      reverse: this.state.sortReverse
+    });
     for (const note of notes) {
       if (note.errorDecrypting) {
         this.loadFlagsForNote(note);
@@ -295,7 +300,7 @@ class NotesCtrl extends PureCtrl {
     }
   }
 
-  loadPreferences() {
+  reloadPreferences() {
     const viewOptions = {};
     const prevSortValue = this.state.sortBy;
     let sortBy = this.preferencesManager.getValue(
@@ -386,7 +391,7 @@ class NotesCtrl extends PureCtrl {
   reloadPanelTitle() {
     let title;
     if (this.isFiltering()) {
-      const resultCount = this.state.notes.filter((i) => i.visible).length
+      const resultCount = this.state.notes.length
       title = `${resultCount} search results`;
     } else if (this.state.tag) {
       title = `${this.state.tag.title}`;
@@ -472,9 +477,7 @@ class NotesCtrl extends PureCtrl {
   }
 
   displayableNotes() {
-    return this.state.notes.filter((note) => {
-      return note.visible;
-    });
+    return this.state.notes;
   }
 
   getFirstNonProtectedNote() {
@@ -553,11 +556,12 @@ class NotesCtrl extends PureCtrl {
   }
 
   isFiltering() {
-    return this.state.noteFilter.text && this.state.noteFilter.text.length > 0;
+    return this.state.noteFilter.text && 
+           this.state.noteFilter.text.length > 0;
   }
 
-  setNoteFilterText(text) {
-    this.setState({
+  async setNoteFilterText(text) {
+    await this.setState({
       noteFilter: {
         ...this.state.noteFilter,
         text: text
@@ -565,22 +569,21 @@ class NotesCtrl extends PureCtrl {
     })
   }
 
-  clearFilterText() {
-    this.setNoteFilterText('');
+  async clearFilterText() {
+    await this.setNoteFilterText('');
     this.onFilterEnter();
     this.filterTextChanged();
     this.resetPagination();
   }
 
-  filterTextChanged() {
+  async filterTextChanged() {
     if (this.searchSubmitted) {
       this.searchSubmitted = false;
     }
-    this.reloadNotes().then(() => {
-      if (!this.state.selectedNote.visible) {
-        this.selectFirstNote();
-      }
-    })
+    await this.reloadNotes();
+    if (!this.state.notes.includes(this.state.selectedNote)) {
+      this.selectFirstNote();
+    }
   }
 
   onFilterEnter() {
@@ -598,10 +601,8 @@ class NotesCtrl extends PureCtrl {
   }
 
   togglePrefKey(key) {
-    this[key] = !this[key];
-    this.preferencesManager.setUserPrefValue(key, this[key]);
+    this.preferencesManager.setUserPrefValue(key, !this.state[key]);
     this.preferencesManager.syncUserPreferences();
-    this.reloadNotes();
   }
 
   selectedSortByCreated() {
@@ -618,31 +619,23 @@ class NotesCtrl extends PureCtrl {
 
   toggleReverseSort() {
     this.selectedMenuItem();
-    this.setState({
-      sortReverse: !this.state.sortReverse
-    })
-    this.reloadNotes();
     this.preferencesManager.setUserPrefValue(
       PREF_SORT_NOTES_REVERSE,
-      this.state.sortReverse
+      !this.state.sortReverse
     );
     this.preferencesManager.syncUserPreferences();
   }
 
   setSortBy(type) {
-    this.setState({
-      sortBy: type
-    })
-    this.reloadNotes();
     this.preferencesManager.setUserPrefValue(
       PREF_SORT_NOTES_BY,
-      this.state.sortBy
+      type
     );
     this.preferencesManager.syncUserPreferences();
   }
 
   shouldShowTagsForNote(note) {
-    if (this.hideTags || note.content.protected) {
+    if (this.state.hideTags || note.content.protected) {
       return false;
     }
     if (this.state.tag.content.isAllTag) {
@@ -656,90 +649,6 @@ class NotesCtrl extends PureCtrl {
      * note contains tags other than this.state.tag
      */
     return note.tags && note.tags.length > 1;
-  }
-
-  filterNotes(notes) {
-    return notes.filter((note) => {
-      let canShowArchived = this.state.showArchived;
-      const canShowPinned = !this.state.hidePinned;
-      const isTrash = this.state.tag.content.isTrashTag;
-      if (!isTrash && note.content.trashed) {
-        note.visible = false;
-        return note.visible;
-      }
-      const isSmartTag = this.state.tag.isSmartTag();
-      if (isSmartTag) {
-        canShowArchived = (
-          canShowArchived ||
-          this.state.tag.content.isArchiveTag ||
-          isTrash
-        );
-      }
-      if (
-        (note.archived && !canShowArchived) ||
-        (note.pinned && !canShowPinned)
-      ) {
-        note.visible = false;
-        return note.visible;
-      }
-      const filterText = this.state.noteFilter.text.toLowerCase();
-      if (filterText.length === 0) {
-        note.visible = true;
-      } else {
-        const words = filterText.split(" ");
-        const matchesTitle = words.every(function (word) {
-          return note.safeTitle().toLowerCase().indexOf(word) >= 0;
-        });
-        const matchesBody = words.every(function (word) {
-          return note.safeText().toLowerCase().indexOf(word) >= 0;
-        });
-        note.visible = matchesTitle || matchesBody;
-      }
-      return note.visible;
-    });
-  }
-
-  sortNotes(items, sortBy, reverse) {
-    const sortValueFn = (a, b, pinCheck = false) => {
-      if (a.dummy) { return -1; }
-      if (b.dummy) { return 1; }
-      if (!pinCheck) {
-        if (a.pinned && b.pinned) {
-          return sortValueFn(a, b, true);
-        }
-        if (a.pinned) { return -1; }
-        if (b.pinned) { return 1; }
-      }
-
-      let aValue = a[sortBy] || '';
-      let bValue = b[sortBy] || '';
-      let vector = 1;
-      if (reverse) {
-        vector *= -1;
-      }
-      if (sortBy === SORT_KEY_TITLE) {
-        aValue = aValue.toLowerCase();
-        bValue = bValue.toLowerCase();
-        if (aValue.length === 0 && bValue.length === 0) {
-          return 0;
-        } else if (aValue.length === 0 && bValue.length !== 0) {
-          return 1 * vector;
-        } else if (aValue.length !== 0 && bValue.length === 0) {
-          return -1 * vector;
-        } else {
-          vector *= -1;
-        }
-      }
-      if (aValue > bValue) { return -1 * vector; }
-      else if (aValue < bValue) { return 1 * vector; }
-      return 0;
-    }
-
-    items = items || [];
-    const result = items.sort(function (a, b) {
-      return sortValueFn(a, b);
-    })
-    return result;
   }
 
   getSearchBar() {

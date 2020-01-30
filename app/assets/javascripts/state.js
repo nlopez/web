@@ -59,7 +59,7 @@ export class AppState {
         { previousNote: previousNote }
       );
     }
-    if (note.content.protected &&
+    if (note && note.content.protected &&
       await this.privilegesManager.actionRequiresPrivilege(
         PrivilegesManager.ActionViewProtectedNotes
       )) {

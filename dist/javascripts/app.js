@@ -174,6 +174,79 @@ angular__WEBPACK_IMPORTED_MODULE_0___default.a.module('app').service('appState',
 
 /***/ }),
 
+/***/ "./app/assets/javascripts/controllers/abstract/pure_ctrl.js":
+/*!******************************************************************!*\
+  !*** ./app/assets/javascripts/controllers/abstract/pure_ctrl.js ***!
+  \******************************************************************/
+/*! exports provided: PureCtrl */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PureCtrl", function() { return PureCtrl; });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
+
+
+
+var PureCtrl =
+/*#__PURE__*/
+function () {
+  function PureCtrl($timeout) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, PureCtrl);
+
+    if (!$timeout) {
+      throw 'Invalid PureCtrl construction.';
+    }
+
+    this.$timeout = $timeout;
+    this.state = {};
+    this.props = {};
+  }
+
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(PureCtrl, [{
+    key: "setState",
+    value: function setState(state) {
+      var _this = this;
+
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function setState$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              return _context.abrupt("return", new Promise(function (resolve) {
+                _this.$timeout(function () {
+                  _this.state = Object.freeze(Object.assign({}, _this.state, state));
+                  resolve();
+                });
+              }));
+
+            case 1:
+            case "end":
+              return _context.stop();
+          }
+        }
+      });
+    }
+  }, {
+    key: "initProps",
+    value: function initProps(props) {
+      if (Object.keys(this.props).length > 0) {
+        throw 'Already init-ed props.';
+      }
+
+      this.props = Object.freeze(Object.assign({}, this.props, props));
+    }
+  }]);
+
+  return PureCtrl;
+}();
+
+/***/ }),
+
 /***/ "./app/assets/javascripts/controllers/constants.js":
 /*!*********************************************************!*\
   !*** ./app/assets/javascripts/controllers/constants.js ***!
@@ -2112,8 +2185,8 @@ var Footer = function Footer() {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _pure_ctrl__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./pure_ctrl */ "./app/assets/javascripts/controllers/pure_ctrl.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PureCtrl", function() { return _pure_ctrl__WEBPACK_IMPORTED_MODULE_0__["PureCtrl"]; });
+/* harmony import */ var _abstract_pure_ctrl__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./abstract/pure_ctrl */ "./app/assets/javascripts/controllers/abstract/pure_ctrl.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PureCtrl", function() { return _abstract_pure_ctrl__WEBPACK_IMPORTED_MODULE_7__["PureCtrl"]; });
 
 /* harmony import */ var _editor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./editor */ "./app/assets/javascripts/controllers/editor.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EditorPanel", function() { return _editor__WEBPACK_IMPORTED_MODULE_1__["EditorPanel"]; });
@@ -2121,8 +2194,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _footer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./footer */ "./app/assets/javascripts/controllers/footer.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Footer", function() { return _footer__WEBPACK_IMPORTED_MODULE_2__["Footer"]; });
 
-/* harmony import */ var _notes__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./notes */ "./app/assets/javascripts/controllers/notes.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "NotesPanel", function() { return _notes__WEBPACK_IMPORTED_MODULE_3__["NotesPanel"]; });
+/* harmony import */ var _notes_notes__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./notes/notes */ "./app/assets/javascripts/controllers/notes/notes.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "NotesPanel", function() { return _notes_notes__WEBPACK_IMPORTED_MODULE_3__["NotesPanel"]; });
 
 /* harmony import */ var _tags__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./tags */ "./app/assets/javascripts/controllers/tags.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "TagsPanel", function() { return _tags__WEBPACK_IMPORTED_MODULE_4__["TagsPanel"]; });
@@ -2274,10 +2347,196 @@ var LockScreen = function LockScreen() {
 
 /***/ }),
 
-/***/ "./app/assets/javascripts/controllers/notes.js":
-/*!*****************************************************!*\
-  !*** ./app/assets/javascripts/controllers/notes.js ***!
-  \*****************************************************/
+/***/ "./app/assets/javascripts/controllers/notes/note_utils.js":
+/*!****************************************************************!*\
+  !*** ./app/assets/javascripts/controllers/notes/note_utils.js ***!
+  \****************************************************************/
+/*! exports provided: SORT_KEY_CREATED_AT, SORT_KEY_UPDATED_AT, SORT_KEY_CLIENT_UPDATED_AT, SORT_KEY_TITLE, filterAndSortNotes, filterNotes, sortNotes */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SORT_KEY_CREATED_AT", function() { return SORT_KEY_CREATED_AT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SORT_KEY_UPDATED_AT", function() { return SORT_KEY_UPDATED_AT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SORT_KEY_CLIENT_UPDATED_AT", function() { return SORT_KEY_CLIENT_UPDATED_AT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SORT_KEY_TITLE", function() { return SORT_KEY_TITLE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "filterAndSortNotes", function() { return filterAndSortNotes; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "filterNotes", function() { return filterNotes; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sortNotes", function() { return sortNotes; });
+var SORT_KEY_CREATED_AT = 'created_at';
+var SORT_KEY_UPDATED_AT = 'updated_at';
+var SORT_KEY_CLIENT_UPDATED_AT = 'client_updated_at';
+var SORT_KEY_TITLE = 'title';
+function filterAndSortNotes(_ref) {
+  var notes = _ref.notes,
+      selectedTag = _ref.selectedTag,
+      showArchived = _ref.showArchived,
+      hidePinned = _ref.hidePinned,
+      filterText = _ref.filterText,
+      sortBy = _ref.sortBy,
+      reverse = _ref.reverse;
+  var filtered = filterNotes({
+    notes: notes,
+    selectedTag: selectedTag,
+    showArchived: showArchived,
+    hidePinned: hidePinned,
+    filterText: filterText
+  });
+  var sorted = sortNotes({
+    notes: filtered,
+    sortBy: sortBy,
+    reverse: reverse
+  });
+  return sorted;
+}
+function filterNotes(_ref2) {
+  var notes = _ref2.notes,
+      selectedTag = _ref2.selectedTag,
+      showArchived = _ref2.showArchived,
+      hidePinned = _ref2.hidePinned,
+      filterText = _ref2.filterText;
+  return notes.filter(function (note) {
+    var canShowArchived = showArchived;
+    var canShowPinned = !hidePinned;
+    var isTrash = selectedTag.content.isTrashTag;
+
+    if (!isTrash && note.content.trashed) {
+      return false;
+    }
+
+    var isSmartTag = selectedTag.isSmartTag();
+
+    if (isSmartTag) {
+      canShowArchived = canShowArchived || selectedTag.content.isArchiveTag || isTrash;
+    }
+
+    if (note.archived && !canShowArchived || note.pinned && !canShowPinned) {
+      return false;
+    }
+
+    return noteMatchesQuery({
+      note: note,
+      query: filterText
+    });
+  });
+}
+
+function noteMatchesQuery(_ref3) {
+  var note = _ref3.note,
+      query = _ref3.query;
+
+  if (query.length === 0) {
+    return true;
+  }
+
+  var title = note.safeTitle().toLowerCase();
+  var text = note.safeText().toLowerCase();
+  var lowercaseText = query.toLowerCase();
+  var quotedText = stringBetweenQuotes(lowercaseText);
+
+  if (quotedText) {
+    return title.includes(quotedText) || text.includes(quotedText);
+  }
+
+  if (stringIsUuid(lowercaseText)) {
+    return note.uuid === lowercaseText;
+  }
+
+  var words = lowercaseText.split(" ");
+  var matchesTitle = words.every(function (word) {
+    return title.indexOf(word) >= 0;
+  });
+  var matchesBody = words.every(function (word) {
+    return text.indexOf(word) >= 0;
+  });
+  return matchesTitle || matchesBody;
+}
+
+function stringBetweenQuotes(text) {
+  var matches = text.match(/"(.*?)"/);
+  return matches ? matches[1] : null;
+}
+
+function stringIsUuid(text) {
+  var matches = text.match(/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/);
+  return matches ? true : false;
+}
+
+function sortNotes(_ref4) {
+  var _ref4$notes = _ref4.notes,
+      notes = _ref4$notes === void 0 ? [] : _ref4$notes,
+      sortBy = _ref4.sortBy,
+      reverse = _ref4.reverse;
+
+  var sortValueFn = function sortValueFn(a, b) {
+    var pinCheck = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+    if (a.dummy) {
+      return -1;
+    }
+
+    if (b.dummy) {
+      return 1;
+    }
+
+    if (!pinCheck) {
+      if (a.pinned && b.pinned) {
+        return sortValueFn(a, b, true);
+      }
+
+      if (a.pinned) {
+        return -1;
+      }
+
+      if (b.pinned) {
+        return 1;
+      }
+    }
+
+    var aValue = a[sortBy] || '';
+    var bValue = b[sortBy] || '';
+    var vector = 1;
+
+    if (reverse) {
+      vector *= -1;
+    }
+
+    if (sortBy === SORT_KEY_TITLE) {
+      aValue = aValue.toLowerCase();
+      bValue = bValue.toLowerCase();
+
+      if (aValue.length === 0 && bValue.length === 0) {
+        return 0;
+      } else if (aValue.length === 0 && bValue.length !== 0) {
+        return 1 * vector;
+      } else if (aValue.length !== 0 && bValue.length === 0) {
+        return -1 * vector;
+      } else {
+        vector *= -1;
+      }
+    }
+
+    if (aValue > bValue) {
+      return -1 * vector;
+    } else if (aValue < bValue) {
+      return 1 * vector;
+    }
+
+    return 0;
+  };
+
+  var result = notes.sort(function (a, b) {
+    return sortValueFn(a, b);
+  });
+  return result;
+}
+
+/***/ }),
+
+/***/ "./app/assets/javascripts/controllers/notes/notes.js":
+/*!***********************************************************!*\
+  !*** ./app/assets/javascripts/controllers/notes/notes.js ***!
+  \***********************************************************/
 /*! exports provided: NotesPanel */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -2313,6 +2572,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @/state */ "./app/assets/javascripts/state.js");
 /* harmony import */ var _services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @/services/preferencesManager */ "./app/assets/javascripts/services/preferencesManager.js");
 /* harmony import */ var _controllers_constants__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @/controllers/constants */ "./app/assets/javascripts/controllers/constants.js");
+/* harmony import */ var _note_utils__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./note_utils */ "./app/assets/javascripts/controllers/notes/note_utils.js");
 
 
 
@@ -2335,6 +2595,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 
 
+
 /**
  * This is the height of a note cell with nothing but the title,
  * which *is* a display option
@@ -2342,10 +2603,6 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 var MIN_NOTE_CELL_HEIGHT = 51.0;
 var DEFAULT_LIST_NUM_NOTES = 20;
-var SORT_KEY_CREATED_AT = 'created_at';
-var SORT_KEY_UPDATED_AT = 'updated_at';
-var SORT_KEY_CLIENT_UPDATED_AT = 'client_updated_at';
-var SORT_KEY_TITLE = 'title';
 var ELEMENT_ID_SEARCH_BAR = 'search-bar';
 var ELEMENT_ID_SCROLL_CONTAINER = 'notes-scrollable';
 
@@ -2417,14 +2674,14 @@ function (_PureCtrl) {
 
     _this.addMappingObserver();
 
-    _this.loadPreferences();
+    _this.reloadPreferences();
 
     _this.resetPagination();
 
     _this.registerKeyboardShortcuts();
 
     angular__WEBPACK_IMPORTED_MODULE_9___default.a.element(document).ready(function () {
-      _this.loadPreferences();
+      _this.reloadPreferences();
     });
     return _this;
   }
@@ -2440,7 +2697,7 @@ function (_PureCtrl) {
         } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_14__["APP_STATE_EVENT_NOTE_CHANGED"]) {
           _this2.handleNoteSelection(_this2.appState.getSelectedNote());
         } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_14__["APP_STATE_EVENT_PREFERENCES_CHANGED"]) {
-          _this2.loadPreferences();
+          _this2.reloadPreferences();
 
           _this2.reloadNotes();
         } else if (eventName === _state__WEBPACK_IMPORTED_MODULE_14__["APP_STATE_EVENT_EDITOR_FOCUSED"]) {
@@ -2620,9 +2877,6 @@ function (_PureCtrl) {
 
             case 14:
               if (this.state.notes.length > 0) {
-                this.state.notes.forEach(function (note) {
-                  note.visible = true;
-                });
                 this.selectFirstNote();
               } else if (this.syncManager.initialDataLoaded()) {
                 if (!tag.isSmartTag() || tag.content.isAllTag) {
@@ -2698,7 +2952,7 @@ function (_PureCtrl) {
   }, {
     key: "reloadNotes",
     value: function reloadNotes() {
-      var tagNotes, notes, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, note;
+      var notes, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, note;
 
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function reloadNotes$(_context5) {
         while (1) {
@@ -2712,12 +2966,19 @@ function (_PureCtrl) {
               return _context5.abrupt("return");
 
             case 2:
-              tagNotes = this.state.tag.notes;
-              notes = this.sortNotes(this.filterNotes(tagNotes), this.state.sortBy, this.state.sortReverse);
+              notes = Object(_note_utils__WEBPACK_IMPORTED_MODULE_17__["filterAndSortNotes"])({
+                notes: this.state.tag.notes,
+                selectedTag: this.state.tag,
+                showArchived: this.state.showArchived,
+                hidePinned: this.state.hidePinned,
+                filterText: this.state.noteFilter.text,
+                sortBy: this.state.sortBy,
+                reverse: this.state.sortReverse
+              });
               _iteratorNormalCompletion2 = true;
               _didIteratorError2 = false;
               _iteratorError2 = undefined;
-              _context5.prev = 7;
+              _context5.prev = 6;
 
               for (_iterator2 = notes[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                 note = _step2.value;
@@ -2729,55 +2990,55 @@ function (_PureCtrl) {
                 note.shouldShowTags = this.shouldShowTagsForNote(note);
               }
 
-              _context5.next = 15;
+              _context5.next = 14;
               break;
 
-            case 11:
-              _context5.prev = 11;
-              _context5.t0 = _context5["catch"](7);
+            case 10:
+              _context5.prev = 10;
+              _context5.t0 = _context5["catch"](6);
               _didIteratorError2 = true;
               _iteratorError2 = _context5.t0;
 
-            case 15:
+            case 14:
+              _context5.prev = 14;
               _context5.prev = 15;
-              _context5.prev = 16;
 
               if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
                 _iterator2.return();
               }
 
-            case 18:
-              _context5.prev = 18;
+            case 17:
+              _context5.prev = 17;
 
               if (!_didIteratorError2) {
-                _context5.next = 21;
+                _context5.next = 20;
                 break;
               }
 
               throw _iteratorError2;
 
+            case 20:
+              return _context5.finish(17);
+
             case 21:
-              return _context5.finish(18);
+              return _context5.finish(14);
 
             case 22:
-              return _context5.finish(15);
-
-            case 23:
-              _context5.next = 25;
+              _context5.next = 24;
               return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.setState({
                 notes: notes,
                 renderedNotes: notes.slice(0, this.notesToDisplay)
               }));
 
-            case 25:
+            case 24:
               this.reloadPanelTitle();
 
-            case 26:
+            case 25:
             case "end":
               return _context5.stop();
           }
         }
-      }, null, this, [[7, 11, 15, 23], [16,, 18, 22]]);
+      }, null, this, [[6, 10, 14, 22], [15,, 17, 21]]);
     }
   }, {
     key: "setShowMenuFalse",
@@ -2845,15 +3106,15 @@ function (_PureCtrl) {
       }, null, this);
     }
   }, {
-    key: "loadPreferences",
-    value: function loadPreferences() {
+    key: "reloadPreferences",
+    value: function reloadPreferences() {
       var viewOptions = {};
       var prevSortValue = this.state.sortBy;
-      var sortBy = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_SORT_NOTES_BY"], SORT_KEY_CREATED_AT);
+      var sortBy = this.preferencesManager.getValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_SORT_NOTES_BY"], _note_utils__WEBPACK_IMPORTED_MODULE_17__["SORT_KEY_CREATED_AT"]);
 
-      if (sortBy === SORT_KEY_UPDATED_AT) {
+      if (sortBy === _note_utils__WEBPACK_IMPORTED_MODULE_17__["SORT_KEY_UPDATED_AT"]) {
         /** Use client_updated_at instead */
-        sortBy = SORT_KEY_CLIENT_UPDATED_AT;
+        sortBy = _note_utils__WEBPACK_IMPORTED_MODULE_17__["SORT_KEY_CLIENT_UPDATED_AT"];
       }
 
       viewOptions.sortBy = sortBy;
@@ -2917,9 +3178,7 @@ function (_PureCtrl) {
       var title;
 
       if (this.isFiltering()) {
-        var resultCount = this.state.notes.filter(function (i) {
-          return i.visible;
-        }).length;
+        var resultCount = this.state.notes.length;
         title = "".concat(resultCount, " search results");
       } else if (this.state.tag) {
         title = "".concat(this.state.tag.title);
@@ -3023,9 +3282,7 @@ function (_PureCtrl) {
   }, {
     key: "displayableNotes",
     value: function displayableNotes() {
-      return this.state.notes.filter(function (note) {
-        return note.visible;
-      });
+      return this.state.notes;
     }
   }, {
     key: "getFirstNonProtectedNote",
@@ -3127,34 +3384,71 @@ function (_PureCtrl) {
   }, {
     key: "setNoteFilterText",
     value: function setNoteFilterText(text) {
-      this.setState({
-        noteFilter: _objectSpread({}, this.state.noteFilter, {
-          text: text
-        })
-      });
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function setNoteFilterText$(_context7) {
+        while (1) {
+          switch (_context7.prev = _context7.next) {
+            case 0:
+              _context7.next = 2;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.setState({
+                noteFilter: _objectSpread({}, this.state.noteFilter, {
+                  text: text
+                })
+              }));
+
+            case 2:
+            case "end":
+              return _context7.stop();
+          }
+        }
+      }, null, this);
     }
   }, {
     key: "clearFilterText",
     value: function clearFilterText() {
-      this.setNoteFilterText('');
-      this.onFilterEnter();
-      this.filterTextChanged();
-      this.resetPagination();
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function clearFilterText$(_context8) {
+        while (1) {
+          switch (_context8.prev = _context8.next) {
+            case 0:
+              _context8.next = 2;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.setNoteFilterText(''));
+
+            case 2:
+              this.onFilterEnter();
+              this.filterTextChanged();
+              this.resetPagination();
+
+            case 5:
+            case "end":
+              return _context8.stop();
+          }
+        }
+      }, null, this);
     }
   }, {
     key: "filterTextChanged",
     value: function filterTextChanged() {
-      var _this6 = this;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function filterTextChanged$(_context9) {
+        while (1) {
+          switch (_context9.prev = _context9.next) {
+            case 0:
+              if (this.searchSubmitted) {
+                this.searchSubmitted = false;
+              }
 
-      if (this.searchSubmitted) {
-        this.searchSubmitted = false;
-      }
+              _context9.next = 3;
+              return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(this.reloadNotes());
 
-      this.reloadNotes().then(function () {
-        if (!_this6.state.selectedNote.visible) {
-          _this6.selectFirstNote();
+            case 3:
+              if (!this.state.notes.includes(this.state.selectedNote)) {
+                this.selectFirstNote();
+              }
+
+            case 4:
+            case "end":
+              return _context9.stop();
+          }
         }
-      });
+      }, null, this);
     }
   }, {
     key: "onFilterEnter",
@@ -3175,51 +3469,41 @@ function (_PureCtrl) {
   }, {
     key: "togglePrefKey",
     value: function togglePrefKey(key) {
-      this[key] = !this[key];
-      this.preferencesManager.setUserPrefValue(key, this[key]);
+      this.preferencesManager.setUserPrefValue(key, !this.state[key]);
       this.preferencesManager.syncUserPreferences();
-      this.reloadNotes();
     }
   }, {
     key: "selectedSortByCreated",
     value: function selectedSortByCreated() {
-      this.setSortBy(SORT_KEY_CREATED_AT);
+      this.setSortBy(_note_utils__WEBPACK_IMPORTED_MODULE_17__["SORT_KEY_CREATED_AT"]);
     }
   }, {
     key: "selectedSortByUpdated",
     value: function selectedSortByUpdated() {
-      this.setSortBy(SORT_KEY_CLIENT_UPDATED_AT);
+      this.setSortBy(_note_utils__WEBPACK_IMPORTED_MODULE_17__["SORT_KEY_CLIENT_UPDATED_AT"]);
     }
   }, {
     key: "selectedSortByTitle",
     value: function selectedSortByTitle() {
-      this.setSortBy(SORT_KEY_TITLE);
+      this.setSortBy(_note_utils__WEBPACK_IMPORTED_MODULE_17__["SORT_KEY_TITLE"]);
     }
   }, {
     key: "toggleReverseSort",
     value: function toggleReverseSort() {
       this.selectedMenuItem();
-      this.setState({
-        sortReverse: !this.state.sortReverse
-      });
-      this.reloadNotes();
-      this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_SORT_NOTES_REVERSE"], this.state.sortReverse);
+      this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_SORT_NOTES_REVERSE"], !this.state.sortReverse);
       this.preferencesManager.syncUserPreferences();
     }
   }, {
     key: "setSortBy",
     value: function setSortBy(type) {
-      this.setState({
-        sortBy: type
-      });
-      this.reloadNotes();
-      this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_SORT_NOTES_BY"], this.state.sortBy);
+      this.preferencesManager.setUserPrefValue(_services_preferencesManager__WEBPACK_IMPORTED_MODULE_15__["PREF_SORT_NOTES_BY"], type);
       this.preferencesManager.syncUserPreferences();
     }
   }, {
     key: "shouldShowTagsForNote",
     value: function shouldShowTagsForNote(note) {
-      if (this.hideTags || note.content.protected) {
+      if (this.state.hideTags || note.content.protected) {
         return false;
       }
 
@@ -3239,116 +3523,6 @@ function (_PureCtrl) {
       return note.tags && note.tags.length > 1;
     }
   }, {
-    key: "filterNotes",
-    value: function filterNotes(notes) {
-      var _this7 = this;
-
-      return notes.filter(function (note) {
-        var canShowArchived = _this7.state.showArchived;
-        var canShowPinned = !_this7.state.hidePinned;
-        var isTrash = _this7.state.tag.content.isTrashTag;
-
-        if (!isTrash && note.content.trashed) {
-          note.visible = false;
-          return note.visible;
-        }
-
-        var isSmartTag = _this7.state.tag.isSmartTag();
-
-        if (isSmartTag) {
-          canShowArchived = canShowArchived || _this7.state.tag.content.isArchiveTag || isTrash;
-        }
-
-        if (note.archived && !canShowArchived || note.pinned && !canShowPinned) {
-          note.visible = false;
-          return note.visible;
-        }
-
-        var filterText = _this7.state.noteFilter.text.toLowerCase();
-
-        if (filterText.length === 0) {
-          note.visible = true;
-        } else {
-          var words = filterText.split(" ");
-          var matchesTitle = words.every(function (word) {
-            return note.safeTitle().toLowerCase().indexOf(word) >= 0;
-          });
-          var matchesBody = words.every(function (word) {
-            return note.safeText().toLowerCase().indexOf(word) >= 0;
-          });
-          note.visible = matchesTitle || matchesBody;
-        }
-
-        return note.visible;
-      });
-    }
-  }, {
-    key: "sortNotes",
-    value: function sortNotes(items, sortBy, reverse) {
-      var sortValueFn = function sortValueFn(a, b) {
-        var pinCheck = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-        if (a.dummy) {
-          return -1;
-        }
-
-        if (b.dummy) {
-          return 1;
-        }
-
-        if (!pinCheck) {
-          if (a.pinned && b.pinned) {
-            return sortValueFn(a, b, true);
-          }
-
-          if (a.pinned) {
-            return -1;
-          }
-
-          if (b.pinned) {
-            return 1;
-          }
-        }
-
-        var aValue = a[sortBy] || '';
-        var bValue = b[sortBy] || '';
-        var vector = 1;
-
-        if (reverse) {
-          vector *= -1;
-        }
-
-        if (sortBy === SORT_KEY_TITLE) {
-          aValue = aValue.toLowerCase();
-          bValue = bValue.toLowerCase();
-
-          if (aValue.length === 0 && bValue.length === 0) {
-            return 0;
-          } else if (aValue.length === 0 && bValue.length !== 0) {
-            return 1 * vector;
-          } else if (aValue.length !== 0 && bValue.length === 0) {
-            return -1 * vector;
-          } else {
-            vector *= -1;
-          }
-        }
-
-        if (aValue > bValue) {
-          return -1 * vector;
-        } else if (aValue < bValue) {
-          return 1 * vector;
-        }
-
-        return 0;
-      };
-
-      items = items || [];
-      var result = items.sort(function (a, b) {
-        return sortValueFn(a, b);
-      });
-      return result;
-    }
-  }, {
     key: "getSearchBar",
     value: function getSearchBar() {
       return document.getElementById(ELEMENT_ID_SEARCH_BAR);
@@ -3356,7 +3530,7 @@ function (_PureCtrl) {
   }, {
     key: "registerKeyboardShortcuts",
     value: function registerKeyboardShortcuts() {
-      var _this8 = this;
+      var _this6 = this;
 
       /**
        * In the browser we're not allowed to override cmd/ctrl + n, so we have to
@@ -3369,34 +3543,34 @@ function (_PureCtrl) {
         onKeyDown: function onKeyDown(event) {
           event.preventDefault();
 
-          _this8.createNewNote();
+          _this6.createNewNote();
         }
       });
       this.nextNoteKeyObserver = this.keyboardManager.addKeyObserver({
         key: _services_keyboardManager__WEBPACK_IMPORTED_MODULE_12__["KeyboardManager"].KeyDown,
         elements: [document.body, this.getSearchBar()],
         onKeyDown: function onKeyDown(event) {
-          var searchBar = _this8.getSearchBar();
+          var searchBar = _this6.getSearchBar();
 
           if (searchBar === document.activeElement) {
             searchBar.blur();
           }
 
-          _this8.selectNextNote();
+          _this6.selectNextNote();
         }
       });
       this.nextNoteKeyObserver = this.keyboardManager.addKeyObserver({
         key: _services_keyboardManager__WEBPACK_IMPORTED_MODULE_12__["KeyboardManager"].KeyUp,
         element: document.body,
         onKeyDown: function onKeyDown(event) {
-          _this8.selectPreviousNote();
+          _this6.selectPreviousNote();
         }
       });
       this.searchKeyObserver = this.keyboardManager.addKeyObserver({
         key: "f",
         modifiers: [_services_keyboardManager__WEBPACK_IMPORTED_MODULE_12__["KeyboardManager"].KeyModifierMeta, _services_keyboardManager__WEBPACK_IMPORTED_MODULE_12__["KeyboardManager"].KeyModifierShift],
         onKeyDown: function onKeyDown(event) {
-          var searchBar = _this8.getSearchBar();
+          var searchBar = _this6.getSearchBar();
 
           if (searchBar) {
             searchBar.focus();
@@ -3421,79 +3595,6 @@ var NotesPanel = function NotesPanel() {
   this.controllerAs = 'self';
   this.bindToController = true;
 };
-
-/***/ }),
-
-/***/ "./app/assets/javascripts/controllers/pure_ctrl.js":
-/*!*********************************************************!*\
-  !*** ./app/assets/javascripts/controllers/pure_ctrl.js ***!
-  \*********************************************************/
-/*! exports provided: PureCtrl */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PureCtrl", function() { return PureCtrl; });
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
-
-
-
-var PureCtrl =
-/*#__PURE__*/
-function () {
-  function PureCtrl($timeout) {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, PureCtrl);
-
-    if (!$timeout) {
-      throw 'Invalid PureCtrl construction.';
-    }
-
-    this.$timeout = $timeout;
-    this.state = {};
-    this.props = {};
-  }
-
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(PureCtrl, [{
-    key: "setState",
-    value: function setState(state) {
-      var _this = this;
-
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function setState$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              return _context.abrupt("return", new Promise(function (resolve) {
-                _this.$timeout(function () {
-                  _this.state = Object.freeze(Object.assign({}, _this.state, state));
-                  resolve();
-                });
-              }));
-
-            case 1:
-            case "end":
-              return _context.stop();
-          }
-        }
-      });
-    }
-  }, {
-    key: "initProps",
-    value: function initProps(props) {
-      if (Object.keys(this.props).length > 0) {
-        throw 'Already init-ed props.';
-      }
-
-      this.props = Object.freeze(Object.assign({}, this.props, props));
-    }
-  }]);
-
-  return PureCtrl;
-}();
 
 /***/ }),
 
@@ -15133,7 +15234,7 @@ function () {
                 });
               };
 
-              _context4.t0 = note.content.protected;
+              _context4.t0 = note && note.content.protected;
 
               if (!_context4.t0) {
                 _context4.next = 6;
@@ -69851,7 +69952,7 @@ module.exports = template;
 
 var pug = __webpack_require__(/*! ../../../node_modules/pug-runtime/index.js */ "./node_modules/pug-runtime/index.js");
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component section notes\" id=\"notes-column\" aria-label=\"Notes\"\u003E\u003Cdiv class=\"content\"\u003E\u003Cdiv class=\"section-title-bar\" id=\"notes-title-bar\"\u003E\u003Cdiv class=\"padded\"\u003E\u003Cdiv class=\"section-title-bar-header\"\u003E\u003Cdiv class=\"title\"\u003E{{self.state.panelTitle}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button contrast wide\" ng-click=\"self.createNewNote()\" title=\"Create a new note in the selected tag\"\u003E\u003Cdiv class=\"sk-label\"\u003E\u003Ci class=\"icon ion-plus add-button\"\u003E\u003C\u002Fi\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"filter-section\" role=\"search\"\u003E\u003Cinput class=\"filter-bar\" id=\"search-bar\" lowercase=\"true\" ng-blur=\"self.onFilterEnter()\" ng-change=\"self.filterTextChanged()\" ng-keyup=\"$event.keyCode == 13 &amp;&amp; self.onFilterEnter();\" ng-model=\"self.state.noteFilter.text\" placeholder=\"Search\" select-on-click=\"true\" title=\"Searches notes in the currently selected tag\"\u003E\u003Cdiv id=\"search-clear-button\" ng-click=\"self.clearFilterText();\" ng-show=\"self.state.noteFilter.text\"\u003E✕\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\" id=\"notes-menu-bar\"\u003E\u003Cdiv class=\"sk-app-bar no-edges\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-class=\"{'selected' : self.state.mutable.showMenu}\" ng-click=\"self.state.mutable.showMenu = !self.state.mutable.showMenu\"\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-label\"\u003EOptions\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-sublabel\"\u003E{{self.optionsSubtitle()}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel dropdown-menu\" id=\"notes-options-menu\" ng-show=\"self.state.mutable.showMenu\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003ESort By\u003C\u002Fdiv\u003E\u003Ca class=\"info sk-h5\" ng-click=\"self.toggleReverseSort()\"\u003E{{self.state.sortReverse === true ? 'Disable Reverse Sort' : 'Enable Reverse Sort'}}\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.selectedSortByCreated()\" circle=\"self.state.sortBy == 'created_at' &amp;&amp; 'success'\" desc=\"'Sort notes by newest first'\" label=\"'Date Added'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.selectedSortByUpdated()\" circle=\"self.state.sortBy == 'client_updated_at' &amp;&amp; 'success'\" desc=\"'Sort notes with the most recently updated first'\" label=\"'Date Modified'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.selectedSortByTitle()\" circle=\"self.state.sortBy == 'title' &amp;&amp; 'success'\" desc=\"'Sort notes alphabetically by their title'\" label=\"'Title'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cdiv class=\"sk-menu-panel-section\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003EDisplay\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('showArchived')\" circle=\"self.state.showArchived ? 'success' : 'danger'\" desc=\"'Archived notes are usually hidden. \n                    You can explicitly show them with this option.'\" faded=\"!self.state.showArchived\" label=\"'Archived Notes'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hidePinned')\" circle=\"self.state.hidePinned ? 'danger' : 'success'\" desc=\"'Pinned notes always appear on top. You can hide them temporarily\n                    with this option so you can focus on other notes in the list.'\" faded=\"self.state.hidePinned\" label=\"'Pinned Notes'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hideNotePreview')\" circle=\"self.state.hideNotePreview ? 'danger' : 'success'\" desc=\"'Hide the note preview for a more condensed list of notes'\" faded=\"self.state.hideNotePreview\" label=\"'Note Preview'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hideDate')\" circle=\"self.state.hideDate ? 'danger' : 'success'\" desc=\"'Hide the date displayed in each row'\" faded=\"self.state.hideDate\" label=\"'Date'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hideTags')\" circle=\"self.state.hideTags ? 'danger' : 'success'\" desc=\"'Hide the list of tags associated with each note'\" faded=\"self.state.hideTags\" label=\"'Tags'\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"scrollable\"\u003E\u003Cdiv class=\"infinite-scroll\" id=\"notes-scrollable\" can-load=\"true\" infinite-scroll=\"self.paginate()\" threshold=\"200\"\u003E\u003Cdiv class=\"note\" ng-class=\"{'selected' : self.state.selectedNote == note}\" ng-click=\"self.selectNote(note, true)\" ng-repeat=\"note in self.state.renderedNotes track by note.uuid\"\u003E\u003Cdiv class=\"note-flags\" ng-show=\"note.flags.length &gt; 0\"\u003E\u003Cdiv class=\"flag\" ng-class=\"flag.class\" ng-repeat=\"flag in note.flags\"\u003E\u003Cdiv class=\"label\"\u003E{{flag.text}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"name\" ng-show=\"note.title\"\u003E{{note.title}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"note-preview\" ng-if=\"\n              !self.hideNotePreview &amp;&amp; \n              !note.content.hidePreview &amp;&amp; \n              !note.content.protected\"\u003E\u003Cdiv class=\"html-preview\" ng-bind-html=\"note.content.preview_html\" ng-show=\"note.content.preview_html\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"plain-preview\" ng-show=\"!note.content.preview_html &amp;&amp; note.content.preview_plain\"\u003E{{note.content.preview_plain}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"default-preview\" ng-show=\"!note.content.preview_html &amp;&amp; !note.content.preview_plain\"\u003E{{note.text}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"date faded\" ng-show=\"!self.hideDate\"\u003E\u003Cspan ng-show=\"self.state.sortBy == 'client_updated_at'\"\u003E Modified {{note.cachedUpdatedAtString || 'Now'}}\u003C\u002Fspan\u003E\u003Cspan ng-show=\"self.state.sortBy != 'client_updated_at'\"\u003E {{note.cachedCreatedAtString || 'Now'}}\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"tags-string\" ng-show=\"note.shouldShowTags\"\u003E\u003Cdiv class=\"faded\"\u003E{{note.savedTagsString || note.tagsString()}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cpanel-resizer collapsable=\"true\" control=\"self.panelController\" default-width=\"300\" hoverable=\"true\" on-resize-finish=\"self.onPanelResize\" panel-id=\"'notes-column'\"\u003E\u003C\u002Fpanel-resizer\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;pug_html = pug_html + "\u003Cdiv class=\"sn-component section notes\" id=\"notes-column\" aria-label=\"Notes\"\u003E\u003Cdiv class=\"content\"\u003E\u003Cdiv class=\"section-title-bar\" id=\"notes-title-bar\"\u003E\u003Cdiv class=\"padded\"\u003E\u003Cdiv class=\"section-title-bar-header\"\u003E\u003Cdiv class=\"title\"\u003E{{self.state.panelTitle}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-button contrast wide\" ng-click=\"self.createNewNote()\" title=\"Create a new note in the selected tag\"\u003E\u003Cdiv class=\"sk-label\"\u003E\u003Ci class=\"icon ion-plus add-button\"\u003E\u003C\u002Fi\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"filter-section\" role=\"search\"\u003E\u003Cinput class=\"filter-bar\" id=\"search-bar\" lowercase=\"true\" ng-blur=\"self.onFilterEnter()\" ng-change=\"self.filterTextChanged()\" ng-keyup=\"$event.keyCode == 13 &amp;&amp; self.onFilterEnter();\" ng-model=\"self.state.noteFilter.text\" placeholder=\"Search\" select-on-click=\"true\" title=\"Searches notes in the currently selected tag\"\u003E\u003Cdiv id=\"search-clear-button\" ng-click=\"self.clearFilterText();\" ng-show=\"self.state.noteFilter.text\"\u003E✕\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sn-component\" id=\"notes-menu-bar\"\u003E\u003Cdiv class=\"sk-app-bar no-edges\"\u003E\u003Cdiv class=\"left\"\u003E\u003Cdiv class=\"sk-app-bar-item\" ng-class=\"{'selected' : self.state.mutable.showMenu}\" ng-click=\"self.state.mutable.showMenu = !self.state.mutable.showMenu\"\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-label\"\u003EOptions\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-app-bar-item-column\"\u003E\u003Cdiv class=\"sk-sublabel\"\u003E{{self.optionsSubtitle()}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"sk-menu-panel dropdown-menu\" id=\"notes-options-menu\" ng-show=\"self.state.mutable.showMenu\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003ESort By\u003C\u002Fdiv\u003E\u003Ca class=\"info sk-h5\" ng-click=\"self.toggleReverseSort()\"\u003E{{self.state.sortReverse === true ? 'Disable Reverse Sort' : 'Enable Reverse Sort'}}\u003C\u002Fa\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.selectedSortByCreated()\" circle=\"self.state.sortBy == 'created_at' &amp;&amp; 'success'\" desc=\"'Sort notes by newest first'\" label=\"'Date Added'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.selectedSortByUpdated()\" circle=\"self.state.sortBy == 'client_updated_at' &amp;&amp; 'success'\" desc=\"'Sort notes with the most recently updated first'\" label=\"'Date Modified'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.selectedSortByTitle()\" circle=\"self.state.sortBy == 'title' &amp;&amp; 'success'\" desc=\"'Sort notes alphabetically by their title'\" label=\"'Title'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cdiv class=\"sk-menu-panel-section\"\u003E\u003Cdiv class=\"sk-menu-panel-header\"\u003E\u003Cdiv class=\"sk-menu-panel-header-title\"\u003EDisplay\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('showArchived')\" circle=\"self.state.showArchived ? 'success' : 'danger'\" desc=\"'Archived notes are usually hidden. \n                    You can explicitly show them with this option.'\" faded=\"!self.state.showArchived\" label=\"'Archived Notes'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hidePinned')\" circle=\"self.state.hidePinned ? 'danger' : 'success'\" desc=\"'Pinned notes always appear on top. You can hide them temporarily\n                    with this option so you can focus on other notes in the list.'\" faded=\"self.state.hidePinned\" label=\"'Pinned Notes'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hideNotePreview')\" circle=\"self.state.hideNotePreview ? 'danger' : 'success'\" desc=\"'Hide the note preview for a more condensed list of notes'\" faded=\"self.state.hideNotePreview\" label=\"'Note Preview'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hideDate')\" circle=\"self.state.hideDate ? 'danger' : 'success'\" desc=\"'Hide the date displayed in each row'\" faded=\"self.state.hideDate\" label=\"'Date'\"\u003E\u003C\u002Fmenu-row\u003E\u003Cmenu-row action=\"self.selectedMenuItem(); self.togglePrefKey('hideTags')\" circle=\"self.state.hideTags ? 'danger' : 'success'\" desc=\"'Hide the list of tags associated with each note'\" faded=\"self.state.hideTags\" label=\"'Tags'\"\u003E\u003C\u002Fmenu-row\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"scrollable\"\u003E\u003Cdiv class=\"infinite-scroll\" id=\"notes-scrollable\" can-load=\"true\" infinite-scroll=\"self.paginate()\" threshold=\"200\"\u003E\u003Cdiv class=\"note\" ng-class=\"{'selected' : self.state.selectedNote == note}\" ng-click=\"self.selectNote(note, true)\" ng-repeat=\"note in self.state.renderedNotes track by note.uuid\"\u003E\u003Cdiv class=\"note-flags\" ng-show=\"note.flags.length &gt; 0\"\u003E\u003Cdiv class=\"flag\" ng-class=\"flag.class\" ng-repeat=\"flag in note.flags\"\u003E\u003Cdiv class=\"label\"\u003E{{flag.text}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"name\" ng-show=\"note.title\"\u003E{{note.title}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"note-preview\" ng-if=\"\n              !self.state.hideNotePreview &amp;&amp; \n              !note.content.hidePreview &amp;&amp; \n              !note.content.protected\"\u003E\u003Cdiv class=\"html-preview\" ng-bind-html=\"note.content.preview_html\" ng-show=\"note.content.preview_html\"\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"plain-preview\" ng-show=\"!note.content.preview_html &amp;&amp; note.content.preview_plain\"\u003E{{note.content.preview_plain}}\u003C\u002Fdiv\u003E\u003Cdiv class=\"default-preview\" ng-show=\"!note.content.preview_html &amp;&amp; !note.content.preview_plain\"\u003E{{note.text}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"date faded\" ng-show=\"!self.state.hideDate\"\u003E\u003Cspan ng-show=\"self.state.sortBy == 'client_updated_at'\"\u003E Modified {{note.cachedUpdatedAtString || 'Now'}}\u003C\u002Fspan\u003E\u003Cspan ng-show=\"self.state.sortBy != 'client_updated_at'\"\u003E {{note.cachedCreatedAtString || 'Now'}}\u003C\u002Fspan\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"tags-string\" ng-show=\"note.shouldShowTags\"\u003E\u003Cdiv class=\"faded\"\u003E{{note.savedTagsString || note.tagsString()}}\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003Cpanel-resizer collapsable=\"true\" control=\"self.panelController\" default-width=\"300\" hoverable=\"true\" on-resize-finish=\"self.onPanelResize\" panel-id=\"'notes-column'\"\u003E\u003C\u002Fpanel-resizer\u003E\u003C\u002Fdiv\u003E";;return pug_html;};
 module.exports = template;
 
 /***/ }),

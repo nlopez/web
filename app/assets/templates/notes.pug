@@ -112,7 +112,7 @@
           ng-class="{'selected' : self.state.selectedNote == note}",
           ng-click='self.selectNote(note, true)', 
           ng-repeat='note in self.state.renderedNotes track by note.uuid'
-          )
+        )
           .note-flags(ng-show='note.flags.length > 0')
             .flag(ng-class='flag.class', ng-repeat='flag in note.flags')
               .label {{flag.text}}
@@ -120,7 +120,7 @@
             | {{note.title}}
           .note-preview(
             ng-if=`
-              !self.hideNotePreview && 
+              !self.state.hideNotePreview && 
               !note.content.hidePreview && 
               !note.content.protected`
             )
@@ -134,7 +134,7 @@
             .default-preview(
               ng-show='!note.content.preview_html && !note.content.preview_plain'
               ) {{note.text}}
-          .date.faded(ng-show='!self.hideDate')
+          .date.faded(ng-show='!self.state.hideDate')
             span(ng-show="self.state.sortBy == 'client_updated_at'") 
               | Modified {{note.cachedUpdatedAtString || 'Now'}}
             span(ng-show="self.state.sortBy != 'client_updated_at'") 
